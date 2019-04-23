@@ -4,7 +4,8 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3  /home/pi/SUSI.AI/susi_linux/access_point/server/server.py
+WorkingDirectory=/home/pi/SUSI.AI
+ExecStart=/usr/bin/python3  /home/pi/SUSI.AI/susi_installer/raspi/access_point/server/server.py
 
 [Install]
 WantedBy=multi-user.target

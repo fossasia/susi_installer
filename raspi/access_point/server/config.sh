@@ -13,7 +13,7 @@ sudo python3 config_generator.py $STT $TTS $HOTWORD $WAKE
 
 sudo systemctl daemon-reload
 sudo systemctl disable ss-python-flask.service
-sudo systemctl enable ss-susi-linux.service
+# sudo systemctl enable ss-susi-linux.service
 sudo systemctl enable ss-factory-daemon.service
 
 sleep 5

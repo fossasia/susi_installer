@@ -5,8 +5,8 @@ After=network-online.target
 
 [Service]
 Type=idle
-WorkingDirectory=/home/pi/SUSI.AI/susi_linux/
-ExecStart=/usr/bin/python3 susi_login.py
+WorkingDirectory=/home/pi/SUSI.AI
+ExecStart=/usr/bin/python3 susi_linux/susi_login.py
 
 [Install]
 WantedBy=multi-user.target

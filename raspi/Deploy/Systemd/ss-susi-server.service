@@ -5,7 +5,7 @@ Description=Starting SUSI Server for SUSI Linux
 User=pi
 # Tell SUSI server not to run as daemon, so that systemd can manage it better
 Environment=DO_NOT_DAEMONIZE=1
-ExecStart=/home/pi/SUSI.AI/susi_linux/susi_server/susi_server/bin/start.sh
+ExecStart=/home/pi/SUSI.AI/susi_server/bin/start.sh
 
 [Install]
 WantedBy=multi-user.target
