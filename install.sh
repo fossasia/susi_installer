@@ -238,17 +238,23 @@ sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
 
 echo "Installing Susi Linux Server Systemd service file"
 cd "$BASE_PATH"
-if [ -r 'susi_server/systemd/ss-susi-server@.service.in' ]
+if [ -d 'susi_server/systemd' ]
 then
     cp 'susi_server/systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
+    cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
 else
     # falling back until susi_server releases are updated 
     # See PR https://github.com/fossasia/susi_server/pull/1251
-    cp 'susi_installer/ss-susi-server@.service.in' 'ss-susi-server@.service'
+    cp 'susi_installer/susi-server-systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
+    cp 'susi_installer/susi-server-systemd/ss-susi-server.service.in' 'ss-susi-server.service'
 fi
 sed -i -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_server!' 'ss-susi-server@.service'
+sed -i -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_server!' 'ss-susi-server.service'
+
 sudo cp 'ss-susi-server@.service' /lib/systemd/system/
+sudo cp 'ss-susi-server.service' /usr/lib/systemd/user/
 rm 'ss-susi-server@.service'
+rm 'ss-susi-server.service'
 # enable the service
 sudo systemd enable 'ss-susi-server@pi'
 
