@@ -237,7 +237,7 @@ sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
 
 echo "Installing Susi Linux Server Systemd service file"
 cd "$BASE_PATH"
-cp 'susi_server/ss-susi-server@.service.in' 'ss-susi-server@.service'
+cp 'susi_server/systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
 sed -i -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_server!' 'ss-susi-server@.service'
 sudo cp 'ss-susi-server@.service' /lib/systemd/system/
 # enable the service
