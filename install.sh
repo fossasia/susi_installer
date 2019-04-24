@@ -220,11 +220,21 @@ fi
 echo "Cloning and building SUSI server"
 install_susi_server
 
-#
-# TODO manually install systemd files, also update them as they
-# are broken and need PATH fixes
-echo "Updating Systemd Rules"
-sudo bash $DIR_PATH/raspi/Deploy/auto_boot.sh
+# TODO TODO 
+# systemd files rework
+if [ $isRaspi = 1 ]
+    #
+    #
+    echo "Updating Systemd Rules"
+    sudo bash $DIR_PATH/raspi/Deploy/auto_boot.sh
+fi
+echo "Updating Susi Linux Systemd service file"
+cd "$BASE_PATH"
+cp 'susi_linux/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
+sed -i -e 's!@SUSI_WORKING_DIR@!/home/%i/SUSI.AI!' -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_linux!' 'ss-susi-linux@.service'
+sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
+# TODO
+# we *SHOULD* move the ss-susi-server.service file to the susi-server distributions!!!!
 
 if [ $isRaspi = 1 ]
 then
