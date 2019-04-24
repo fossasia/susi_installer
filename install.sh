@@ -225,16 +225,23 @@ install_susi_server
 if [ $isRaspi = 1 ]
     #
     #
-    echo "Updating Systemd Rules"
+    echo "Installing RPi specific Systemd Rules"
     sudo bash $DIR_PATH/raspi/Deploy/auto_boot.sh
 fi
+
 echo "Updating Susi Linux Systemd service file"
 cd "$BASE_PATH"
 cp 'susi_linux/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
 sed -i -e 's!@SUSI_WORKING_DIR@!/home/%i/SUSI.AI!' -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_linux!' 'ss-susi-linux@.service'
 sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
-# TODO
-# we *SHOULD* move the ss-susi-server.service file to the susi-server distributions!!!!
+
+echo "Installing Susi Linux Server Systemd service file"
+cd "$BASE_PATH"
+cp 'susi_server/ss-susi-server@.service.in' 'ss-susi-server@.service'
+sed -i -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_server!' 'ss-susi-server@.service'
+sudo cp 'ss-susi-server@.service' /lib/systemd/system/
+# enable the service
+sudo systemd enable 'ss-susi-server@pi'
 
 if [ $isRaspi = 1 ]
 then

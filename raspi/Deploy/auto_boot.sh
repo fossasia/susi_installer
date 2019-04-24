@@ -8,6 +8,5 @@ DIR_PATH=$(dirname $SCRIPT_PATH)
 cp $DIR_PATH/Systemd/ss-*.service /lib/systemd/system/
 
 systemctl enable ss-update-daemon.service
-systemctl enable ss-susi-server.service
 systemctl enable ss-python-flask.service
 systemctl enable ss-susi-youtube.service
