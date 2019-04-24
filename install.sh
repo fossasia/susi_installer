@@ -148,8 +148,8 @@ function install_susi_server() {
 }
 
 disable_ipv6_avahi() {
-	# Avahi has bug with IPv6, and make it fail to propage mDNS domain.
-	sudo sed -i 's/use-ipv6=yes/use-ipv6=no/g' /etc/avahi/avahi-daemon.conf || true
+    # Avahi has bug with IPv6, and make it fail to propage mDNS domain.
+    sudo sed -i 's/use-ipv6=yes/use-ipv6=no/g' /etc/avahi/avahi-daemon.conf || true
 }
 
 
@@ -197,9 +197,9 @@ sudo pip3 install -r susi_api_wrapper/python_wrapper/requirements.txt
 # in the requirements-hw.txt are not usable for desktop systems
 if [ $isRaspi = 1 ]
 then
-	sudo pip3 install -r susi_linux/requirements-hw.txt
+    sudo pip3 install -r susi_linux/requirements-hw.txt
 else
-	sudo pip3 install pip3 install speechRecognition==3.8.1 service_identity pocketsphinx==0.1.15 pyaudio json_config google_speech async_promises python-Levenshtein pyalsaaudio 'youtube-dl>2018' python-vlc pafy colorlog rx
+    sudo pip3 install pip3 install speechRecognition==3.8.1 service_identity pocketsphinx==0.1.15 pyaudio json_config google_speech async_promises python-Levenshtein pyalsaaudio 'youtube-dl>2018' python-vlc pafy colorlog rx
 fi
 sudo pip3 install -r susi_linux/requirements-special.txt
 
@@ -223,6 +223,7 @@ install_susi_server
 # TODO TODO 
 # systemd files rework
 if [ $isRaspi = 1 ]
+then
     #
     #
     echo "Installing RPi specific Systemd Rules"
