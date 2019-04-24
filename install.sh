@@ -232,7 +232,7 @@ fi
 
 echo "Updating Susi Linux Systemd service file"
 cd "$BASE_PATH"
-cp 'susi_linux/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
+cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
 sed -i -e 's!@SUSI_WORKING_DIR@!/home/%i/SUSI.AI!' -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_linux!' 'ss-susi-linux@.service'
 sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
 
