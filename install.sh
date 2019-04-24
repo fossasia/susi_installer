@@ -248,6 +248,7 @@ else
 fi
 sed -i -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_server!' 'ss-susi-server@.service'
 sudo cp 'ss-susi-server@.service' /lib/systemd/system/
+rm 'ss-susi-server@.service'
 # enable the service
 sudo systemd enable 'ss-susi-server@pi'
 
