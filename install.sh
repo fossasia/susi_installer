@@ -244,12 +244,6 @@ then
     echo "Disable dhcpcd"
     sudo systemctl disable dhcpcd
 
-    # TODO we need to decide what to do
-    # WHY do we not start susi_linux without Wifi setup done? Devices could
-    # be connected via ethernet ...
-    echo "Enable susi-linux@pi"
-    sudo systemctl enable ss-susi-linux@pi
-
     cd "$BASE_PATH"
     echo "Creating a backup folder for future factory_reset"
     sudo rm -Rf .git

@@ -39,7 +39,7 @@ cp /etc/network/interfaces.d/wlan.hostap /etc/network/interfaces.d/wlan-hostap
 
 echo "enabling / disabling system services"
 systemctl disable ss-startup-audio.service
-#systemctl disable ss-susi-linux.service
+systemctl disable ss-susi-linux@pi.service
 systemctl enable ss-python-flask.service
 systemctl disable ss-susi-login.service
 

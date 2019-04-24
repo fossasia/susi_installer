@@ -20,8 +20,7 @@ cp /etc/network/interfaces.d/wlan.client /etc/network/interfaces.d/wlan-client
 #Empty port 5000
 #Remove the server file from auto-boot
 sudo systemctl enable ss-startup-audio.service
-# already enabled initially
-# sudo systemctl enable ss-susi-linux.service
+sudo systemctl enable ss-susi-linux@pi.service
 sudo systemctl disable ss-python-flask.service
 sudo systemctl enable ss-susi-login.service
 

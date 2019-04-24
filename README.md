@@ -168,11 +168,11 @@ Use the following commands.
 
 This section is intended for developer.
 
-SUSI Linux application is run automatically by `systemd`. The main component is run as _ss-susi-linux.service_. By default, it is ran in _production_ mode, where log messages are limited to _error_ and _warning_ only. In development, you may want to see more logs, to help debugging. You can switch it to "verbose" mode by 2 ways:
+SUSI Linux application is run automatically by `systemd`. The main component is run as _ss-susi-linux@pi.service_. By default, it is ran in _production_ mode, where log messages are limited to _error_ and _warning_ only. In development, you may want to see more logs, to help debugging. You can switch it to "verbose" mode by 2 ways:
 
 1. Run it manually
 
-- Stop systemd service by `sudo systemctl stop ss-susi-linux`
+- Stop systemd service by `sudo systemctl stop ss-susi-linux@pi`
 - Use Terminal, _cd_ to `susi_linux` directory and run
 
 ```
@@ -186,17 +186,17 @@ python3 -m main -vv
 
 2. Change command run by `systemd`
 
-- Edit the _/lib/systemd/system/ss-susi-linux.service_ and change the command in `ExecStart` parameter:
+- Edit the _/lib/systemd/system/ss-susi-linux@.service_ and change the command in `ExecStart` parameter:
 
 ```ini
 ExecStart=/usr/bin/python3 -m main -v --short-log
 ```
 - Reload systemd daemon: `sudo systemctl daemon-reload`
-- Restart the servive: `sudo systemctl restart ss-susi-linux`
+- Restart the servive: `sudo systemctl restart ss-susi-linux@pi`
 - Now you can read the log via `journalctl`:
 
-    + `journalctl -u ss-susi-linux`
-    + or `journalctl -fu ss-susi-linux` to get updated when the log is continuously produced.
+    + `journalctl -u ss-susi-linux@pi`
+    + or `journalctl -fu ss-susi-linux@pi` to get updated when the log is continuously produced.
 
 The `-v` option is actually the same as the 1st method. The `--short-log` option is to exclude some info which is already provided by `journalctl`. For more info about `logging` feature, see this GitHub [issue](https://github.com/fossasia/susi_linux/issues/423).
 
