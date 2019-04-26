@@ -1,17 +1,29 @@
 #!/bin/bash -e
 #
-# Target layout as with the developer-setup.md layou
-# SUSI.AI/susi_installer
-# SUSI.AI/susi_linux
-# SUSI.AI/susi_api_wrapper
-# SUSI.AI/susi_server
-# SUSI.AI/susi_skill_data
-# SUSI.AI/seeed_voicecard
-
-SCRIPT_PATH=$(realpath "$0")
-DIR_PATH=$(dirname "$SCRIPT_PATH")
-# on the Raspi that should be /home/pi/SUSI.AI
-BASE_PATH=$(realpath "$DIR_PATH/..")
+# 
+#
+# Target layout as with the developer-setup.md layout
+#
+# Two modes of installation: "user" and "system"
+# On the RPi we *always* run in user mode and use sudo
+# On the Desktop in user mode, no root rights (sudo) are necessary
+#   but required pip3 install calls are optionally started with sudo
+#
+# Installation directory defaults
+# User installation
+#   DESTDIR = ~/SUSI.AI
+#   WORKDIR = ~/SUSI.AI
+# System installation
+#   DESTDIR = /usr/local/SUSI.AI
+#   WORKDIR = ~/.SUSI.AI
+#
+# Layout withing DESTDIR
+#   susi_installer
+#   susi_linux
+#   susi_api_wrapper
+#   susi_server
+#   susi_skill_data
+#   seeed_voicecard
 
 #
 # determine Debian/Ubuntu release - we don't support anything else at the moment
@@ -55,47 +67,280 @@ case "$vendor" in
         exit 1
         ;;
 esac
-    
 
-add_debian_repo() {
-    # Will add additional APT repo in the future
-    sudo apt-get update
-}
+if [ $isRaspi = 1 ]
+then
+    USER=pi
+else
+    USER=`id -un`
+fi
 
-add_latest_drivers_vlc() {
-    # function to update the latest vlc drivers which will allow it to play MRL of latest videos
-    # Only do this on old systems (stretch etc)
-    if [ $isBuster = 0 ] ; then
-        wget -P /home/pi  https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
-        sudo mv /home/pi/youtube.lua /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/vlc/lua/playlist/youtube.luac
+#
+# Allow overriding the destination directory on the Desktop
+INSTALLMODE=user
+OPTDESTDIR=""
+if [ $isRaspi = 0 ]
+then
+    while [[ $# -gt 0 ]]
+    do
+        key="$1"
+
+        case $key in
+            --destdir)
+                OPTDESTDIR="$2"
+                shift; shift
+                ;;
+            --system)
+                INSTALLMODE=system
+                shift
+                ;;
+            *)
+                echo "Unknown option or argument: $key" >&2
+                exit 1
+        esac
+    done
+fi
+
+####### TODO ##############
+# FOR NOW WE DO NOT ALLOW SYSTEM MODE
+# There are too many TODOs here in this file concerning system mode
+#############################
+
+if [ $INSTALLMODE = system ] ; then
+    echo "Sorry, system installation mode is currently not supported. Aborting!" >&2
+    exit 1
+fi
+
+#
+# in the pi-gen pipeline we get SUSI_REVISION (by default "development") passed
+# into in the environment, but for Desktop installs we need to set it since we
+# use it to checkout a branch of susi_linux
+export SUSI_REVISION=${SUSI_REVISION:-"development"}
+
+#### TODO ###########
+# for now as we are testing the separate installation mode, we have to override
+# the SUSI_REVISION which is the branch/commit checked out of susi_linux
+export SUSI_REVISION=norbert/separate-installation
+
+#
+# in system mode, either use /usr/local/SUSI.AI or the option --destdir
+# if it was given
+if [ -n "$OPTDESTDIR" ] ; then
+    DESTDIR="$OPTDESTDIR"
+else
+    if [ $INSTALLMODE = system ] ; then
+        DESTDIR=/usr/local/SUSI.AI
+    else
+        if [ $isRaspi = 1 ] ; then
+            DESTDIR=/home/pi/SUSI.AI
+        else
+            DESTDIR=$HOME/SUSI.AI
+        fi
+    fi
+fi
+
+
+
+#
+# This script works in two modes
+# - when downloaded only by itself, it initiates the installation
+#   by downloading the installer and starting it
+# - when running the actual installer
+
+if [ ! -d "raspi" ]
+then
+    # we are in initial installer mode, where the user only downloaded
+    # the install.sh script and runs it
+    mkdir -p "$DESTDIR"
+    cd "$DESTDIR"
+    git clone https://github.com/fossasia/susi_installer.git
+    cd susi_installer
+    # TODO needs to be removed after merge
+    git checkout desktop
+    # Start real installation
+    sysarg=""
+    if [ $INSTALLMODE = system ]
+    then
+        sysarg="--system"
+    fi
+    exec ./install.sh $sysarg
+fi
+
+
+
+# Set up default sudo mode
+# on Raspi and in system mode, use sudo
+# Otherwise leave empty so that user is asked whether to use it
+if [ $isRaspi = 1 -o $INSTALLMODE = system ] ; then
+    # on the RPi we always can run sudo
+    # in system mode we expect root or sudo-able user to do it
+    SUDOCMD=sudo
+else
+    SUDOCMD=""
+fi
+
+
+SCRIPT_PATH=$(realpath "$0")
+DIR_PATH=$(dirname "$SCRIPT_PATH")
+# on the Raspi that should be $DESTDIR
+BASE_PATH=$(realpath "$DIR_PATH/..")
+
+HOSTARCH=`dpkg-architecture -qDEB_HOST_ARCH`
+
+ask_for_sudo()
+{
+    # we only ask once for sudo command!
+    if [ -z "$SUDOCMD" ] ; then
+        echo -n "Do you want to use 'sudo' for this and following tasks? (Y/n): "
+        REPLY=y
+        read REPLY
+        case $REPLY in
+            n*|N*) SUDOCMD="echo Command to be run by root/via sudo: " ;;
+            *) SUDOCMD="sudo" ; echo "Ok, running sudo!";;
+        esac
     fi
 }
 
+check_debian_installation_status()
+{
+    # we need to be careful since multiarch means that if multiple arch versions
+    # for one package are installed, a query without the ARchitecture returns all
+    # of them
+    stat=$(dpkg-query -W -f='${Status} ${Architecture}\n' $1 2>/dev/null || true)
+    case "$stat" in
+        *"install ok installed $HOSTARCH"*)
+            return 0
+            ;;
+        *"install ok installed all"*)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+check_python_installation_status()
+{
+    printf %b "try:\n import $1\n exit(0)\nexcept ImportError:\n exit(1)"  | python3
+}
 
 install_debian_dependencies()
 {
-    sudo -E apt-get install -y git openssl wget python3-pip sox libsox-fmt-all flac \
-    libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base vlc-plugin-video-splitter \
-    python3-cairo python3-flask flite default-jdk-headless pixz udisks2 \
-    python3-requests python3-service-identity python3-pyaudio python3-levenshtein \
-    python3-pafy python3-colorlog python3-watson-developer-cloud ca-certificates
+    DEBDEPS="
+  git openssl wget python3-pip sox libsox-fmt-all flac
+  libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
+  vlc-plugin-video-splitter python3-cairo python3-flask flite
+  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
+  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog
+  python3-watson-developer-cloud ca-certificates
+"
+    
+    SNOWBOYBUILDDEPS="
+  python3-setuptools perl libterm-readline-gnu-perl \
+  i2c-tools libasound2-plugins python3-dev \
+  swig libpulse-dev libasound2-dev \
+  libatlas-base-dev
+"
 
-    #
-    # TODO
-    # for development - building snowboy we probably need
-    # if [ $isRaspi = 0 ]
-    # then
-    #     sudo -E apt-get install -y python3-setuptools perl libterm-readline-gnu-perl \
-    #     i2c-tools libasound2-plugins python3-dev \
-    #     swig libpulse-dev libasound2-dev \
-    #     libatlas-base-dev
+    ALLDEPS="$DEBDEPS"
+    if [ $isRaspi = 0 ] ; then
+        ALLDEPS="$ALLDEPS $SNOWBOYBUILDDEPS"
+    fi
 
-    # libatlas3-base is to provide libf77blas.so, liblapack_atlas.so for snowboy.
-    # libportaudio2 is to provide libportaudio.so for PyAudio, which is snowboy's dependency.
+    # collect missing dependencies
+    missing_packages=""
+    for i in $ALLDEPS ; do
+        if check_debian_installation_status $i ; then
+            : all fine
+        else
+            missing_packages="$missing_packages $i"
+        fi
+    done
+    if [ -z "$missing_packages" ] ; then
+        # all packages are already installed, return happily
+        return 0
+    fi
 
-    # Updating to the latest VLC drivers
-    echo "Updating the latest Vlc Drivers"
-    add_latest_drivers_vlc
+    echo "The following packages are missing on your system:"
+    echo "  $missing_packages"
+    echo "Should we install them?"
+    ask_for_sudo
+
+    $SUDOCMD apt-get update
+    $SUDOCMD -E apt-get install -y $missing_packages
+}
+
+install_pip_dependencies()
+{
+    echo "Installing Python Dependencies"
+    if [ $isRaspi = 0 ] ; then
+        # TODO dynamically generate this list from the requirement files?!?
+        PIPDEPS="async_promises colorlog geocoder google_speech json_config pafy 
+                 pyalsaaudio pyaudio python-Levenshtein python-vlc
+                 rx service_identity snowboy watson-developer-cloud 
+                 websocket_server youtube-dl"
+
+        # not used here
+        PIPDEPSRPI="RPi.GPIO spidev"
+
+        declare -A PIPDEPSVERS
+        PIPDEPSVERS["speechRecognition"]="==3.8.1"
+        PIPDEPSVERS["pocketsphinx"]="==0.1.15"
+        PIPDEPSVERS["youtube-dl"]=">2018"
+        PIPDEPSVERS["requests"]=">=2.13.0"
+
+
+        # First check which of the packages are available
+        alldeps="$PIPDEPS ${!PIPDEPSVERS[@]}"
+
+        # For now ignore the versioned deps
+        missing_pips=""
+        echo "Checking for available Python modules: "
+        for i in $PIPDEPS ${!PIPDEPSVERS[@]} ; do
+            echo "checking for $i ..."
+            ret=`pip3 show $i`
+            if [ -z "$ret" ] ; then
+                missing_pips="$missing_pips $i"
+            else
+                :
+                # check version
+                # TODO ignore for now!
+            fi
+        done
+        if [ -n "$missing_pips" ] ; then
+            echo "The following Python packages are missing on your system:"
+            echo "  $missing_pips"
+            echo "Should we install them (using pip3)?"
+            ask_for_sudo
+            $SUDOCMD pip3 install $missing_pips
+        fi
+    else
+        # we are on the RPi now
+        $SUDOCMD pip3 install -U pip wheel
+        $SUDOCMD pip3 install -r susi_api_wrapper/python_wrapper/requirements.txt
+        $SUDOCMD pip3 install -r susi_linux/requirements-hw.txt
+        $SUDOCMD pip3 install -r susi_linux/requirements-special.txt
+    fi
+}
+
+function install_snowboy()
+{
+    ret=`pip3 show snowboy`
+    if [ -z "$ret" ] ; then
+        if [ ! -r v1.3.0.tar.gz ] ; then
+            wget https://github.com/Kitt-AI/snowboy/archive/v1.3.0.tar.gz
+        else
+            echo "Reusing v1.3.0.tar.gz in $BASE_PATH"
+        fi
+        tar -xf v1.3.0.tar.gz
+        cd snowboy-1.3.0
+        sed -i -e "s/version='1\.2\.0b1'/version='1.3.0'/" setup.py
+        python3 setup.py build
+        ask_for_sudo
+        $SUDOCMD python3 setup.py install
+        cd ..
+    fi
 }
 
 function install_seeed_voicecard_driver()
@@ -111,102 +356,107 @@ function install_seeed_voicecard_driver()
     cd "$BASE_PATH"
     git clone https://github.com/respeaker/seeed-voicecard.git
     cd seeed-voicecard
+    # This happens *ONLY* on the RPi, so we can do sudo!
     sudo ./install.sh
     cd ..
     #tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
     #rm -rf seeed-voicecard
 }
 
-function install_dependencies()
-{
-    if [ $isRaspi = 1 ]
-    then
-        install_seeed_voicecard_driver
-    fi
-}
 
-function install_susi_server() {
-    echo "To install SUSI Server"
-    SUSI_SERVER_PATH="$BASE_PATH/susi_server"
-    if [ ! -d "$SUSI_SERVER_PATH" ]
-    then
-        echo "Download susi_server_binary_latest.tar.gz"
-        wget -P /tmp/ http://download.susi.ai/susi_server/susi_server_binary_latest.tar.gz
-        tar -xzf /tmp/susi_server_binary_latest.tar.gz -C "/tmp"
-        echo "Move susi_server from /tmp to $SUSI_SERVER_PATH"
-        mv "/tmp/susi_server_binary_latest" "$SUSI_SERVER_PATH"
-        rm "/tmp/susi_server_binary_latest.tar.gz" || true
-    else
-        echo "$SUSI_SERVER_PATH already exists."
-    fi
-
-    SKILL_DATA_PATH="$BASE_PATH/susi_skill_data"
-    if [ ! -d "$SKILL_DATA_PATH" ]
-    then
-        git clone https://github.com/fossasia/susi_skill_data.git "$SKILL_DATA_PATH"
-    fi
-}
-
-disable_ipv6_avahi() {
-    # Avahi has bug with IPv6, and make it fail to propage mDNS domain.
-    sudo sed -i 's/use-ipv6=yes/use-ipv6=no/g' /etc/avahi/avahi-daemon.conf || true
-}
 
 
 ####  Main  ####
-add_debian_repo
-
 cd "$BASE_PATH"
 echo "Downloading: Susi Linux"
 if [ ! -d "susi_linux" ]
 then
     git clone https://github.com/fossasia/susi_linux.git
-    # TODO this needs to be removed after merge!!!
     cd susi_linux
-    git checkout norbert/merged-stuff
+    # pi-gen used before "SUSI_REVISION" and *not* SUSI_BRANCH, or SUSI_PULL_REQUEST
+    # we should simplify all these variables ...
+    git checkout "$SUSI_REVISION"
     cd ..
+else
+    echo "WARNING: susi_linux directory already present, not cloning it!" >&2
 fi
 echo "Creating initial configuration for Susi Linux"
 if [ ! -r "config.json" ]
 then
     cp susi_linux/config.json .
     # fix data_base_dir
-    sed -i -e 's!"data_base_dir": ".",!"data_base_dir": "susi_linux",!g' config.json
+    if [ $INSTALLMODE = user ] ; then
+        sed -i -e 's!"data_base_dir": ".",!"data_base_dir": "susi_linux",!g' config.json
+    else
+        : 
+        # do nothing here, system installation mode is not supported by now
+        # we need to push the initial config.json configuration into the
+        # starter scripts (see debian packaging scripts!)
+    fi
+else
+    echo "WARNING: config.json already present, not overwriting it!" >&2
 fi
 
-echo "Downloading dependency: Susi Python API Wrapper"
+echo "Downloading: Susi Python API Wrapper"
 if [ ! -d "susi_api_wrapper" ]
 then
     git clone https://github.com/fossasia/susi_api_wrapper.git
     ln -s ../susi_api_wrapper/python_wrapper/susi_python susi_linux/
+else
+    echo "WARNING: susi_api_wrapper directory already present, not cloning it!" >&2
 fi
 
-echo "Installing required Debian Packages"
-install_debian_dependencies
-install_dependencies
-
-echo "Installing Python Dependencies"
-# We don't use "sudo -H pip3" here, so that pip3 cannot store cache.
-# We want to discard cache to save disk space.
-if [ $isBuster = 0 ]
+echo "Downloading: Susi Skill Data"
+if [ ! -d "susi_skill_data" ]
 then
-  sudo pip3 install -U pip wheel
+    git clone https://github.com/fossasia/susi_skill_data.git
+else
+    echo "WARNING: susi_skill_data directory already present, not cloning it!" >&2
 fi
-sudo pip3 install -r susi_api_wrapper/python_wrapper/requirements.txt
-# we need to distinguish here because on non-Raspi the server provided
-# in the requirements-hw.txt are not usable for desktop systems
+
+echo "Downloading: Susi server"
+if [ ! -d susi_server ]
+then
+    # we don't use /tmp here since this allows for link attacks
+    rm -f susi_server_binary_latest.tar.gz
+    wget http://download.susi.ai/susi_server/susi_server_binary_latest.tar.gz
+    tar -xzf susi_server_binary_latest.tar.gz
+    mv susi_server_binary_latest susi_server
+    rm susi_server_binary_latest.tar.gz
+else
+    echo "WARNING: susi_server directory already present, not cloning it!" >&2
+fi
+
+
+echo "Installing required dependencies"
+install_debian_dependencies
+if [ $isRaspi = 0 ] ; then
+    # the repo of fossasia does not provide snowboy for all pythons .. install it
+    install_snowboy
+fi
+install_pip_dependencies
+# function to update the latest vlc drivers which will allow it to play MRL of latest videos
+# Only do this on old systems (stretch etc)
+if [ $isBuster = 0 ] ; then
+    wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
+    echo "Updating VLC drivers"
+    ask_for_sudo
+    $SUDOCMD mv youtube.lua /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/vlc/lua/playlist/youtube.luac
+    rm -f youtube.lua
+fi
+
+#
+# install seeed card driver only on RPi
 if [ $isRaspi = 1 ]
 then
-    sudo pip3 install -r susi_linux/requirements-hw.txt
-else
-    sudo pip3 install pip3 install speechRecognition==3.8.1 service_identity pocketsphinx==0.1.15 pyaudio json_config google_speech async_promises python-Levenshtein pyalsaaudio 'youtube-dl>2018' python-vlc pafy colorlog rx
+    install_seeed_voicecard_driver
 fi
-sudo pip3 install -r susi_linux/requirements-special.txt
 
-echo "Downloading Speech Data for flite TTS"
+
 
 if [ ! -f "susi_linux/extras/cmu_us_slt.flitevox" ]
 then
+    echo "Downloading Speech Data for flite TTS"
     wget "http://www.festvox.org/flite/packed/flite-2.0/voices/cmu_us_slt.flitevox" -P susi_linux/extras
 fi
 
@@ -217,10 +467,6 @@ then
     sudo ./raspi/media_daemon/media_udev_rule.sh
 fi
 
-echo "Cloning and building SUSI server"
-install_susi_server
-
-# TODO TODO 
 # systemd files rework
 if [ $isRaspi = 1 ]
 then
@@ -233,33 +479,70 @@ fi
 echo "Updating Susi Linux Systemd service file"
 cd "$BASE_PATH"
 cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
-sed -i -e 's!@SUSI_WORKING_DIR@!/home/%i/SUSI.AI!' -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_linux!' 'ss-susi-linux@.service'
-sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
+cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
+if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
+    sed -i -e "s!@SUSI_WORKING_DIR@!$BASE_PATH!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" ss-susi-linux.service
+    sed -i -e "s!@SUSI_WORKING_DIR@!$BASE_PATH!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" 'ss-susi-linux@.service'
+    # on RasPi, we install the system units into the system directories
+    if [ $isRaspi = 1 ] ; then
+        sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
+    else
+        # Desktop in user mode
+        mkdir -p $HOME/.config/systemd/user
+        cp ss-susi-linux.service $HOME/.config/systemd/user/
+    fi
+else
+    # System mode ... not supported by now ... but that is the correct definition
+    # %h cannot be expanded in system services
+    # because if it is on NIS or so it is not available
+    # at boot time - another systemd stupidity ...
+    # But it can be expanded in the user service file
+    sed -i -e "s!@SUSI_WORKING_DIR@!%h/.SUSI.AI!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" ss-susi-linux.service
+    sed -i -e "s!@SUSI_WORKING_DIR@!/home/%i/.SUSI.AI!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" 'ss-susi-linux@.service'
+    $SUDOCMD cp 'ss-susi-linux@.service' /lib/systemd/system/
+    $SUDOCMD cp ss-susi-linux.service /usr/lib/systemd/user/
+fi
+rm 'ss-susi-linux@.service'
+rm ss-susi-linux.service
 
 echo "Installing Susi Linux Server Systemd service file"
 cd "$BASE_PATH"
-if [ -d 'susi_server/systemd' ]
-then
+if [ -d 'susi_server/systemd' ] ; then
     cp 'susi_server/systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
     cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
 else
-    # falling back until susi_server releases are updated 
+    # falling back until susi_server releases are updated
     # See PR https://github.com/fossasia/susi_server/pull/1251
     cp 'susi_installer/susi-server-systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
     cp 'susi_installer/susi-server-systemd/ss-susi-server.service.in' 'ss-susi-server.service'
 fi
-sed -i -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_server!' 'ss-susi-server@.service'
-sed -i -e 's!@INSTALL_DIR@!/home/%i/SUSI.AI/susi_server!' 'ss-susi-server.service'
-
-sudo cp 'ss-susi-server@.service' /lib/systemd/system/
-sudo cp 'ss-susi-server.service' /usr/lib/systemd/user/
+if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
+    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-server.service
+    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" 'ss-susi-server@.service'
+    # on RasPi, we install the system units into the system directories
+    if [ $isRaspi = 1 ] ; then
+        sudo cp 'ss-susi-server@.service' /lib/systemd/system/
+    else
+        # Desktop in user mode
+        mkdir -p $HOME/.config/systemd/user
+        cp ss-susi-server.service $HOME/.config/systemd/user/
+    fi
+else
+    # System mode ... not supported by now ... but that is the correct definition
+    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-linux.service
+    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" 'ss-susi-linux@.service'
+    $SUDOCMD cp 'ss-susi-linux@.service' /lib/systemd/system/
+    $SUDOCMD cp ss-susi-linux.service /usr/lib/systemd/user/
+fi
 rm 'ss-susi-server@.service'
-rm 'ss-susi-server.service'
-# enable the service
-sudo systemd enable 'ss-susi-server@pi'
+rm ss-susi-server.service
 
-if [ $isRaspi = 1 ]
-then
+# enable the client service ONLY on Desktop, NOT on RPi
+# On raspi we do other setups like reset folder etc
+if [ $isRaspi = 1 ] ; then
+    # enable the server service unconditionally
+    sudo systemd enable ss-susi-server@pi
+
     echo "Enabling the SSH access"
     sudo systemctl enable ssh
 
@@ -273,7 +556,8 @@ then
     echo ""  # To add newline after tar's last checkpoint
     mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 
-    disable_ipv6_avahi
+    # Avahi has bug with IPv6, and make it fail to propage mDNS domain.
+    sudo sed -i 's/use-ipv6=yes/use-ipv6=no/g' /etc/avahi/avahi-daemon.conf || true
 
     # install wlan config files: files with . in the name are *NOT* include
     # into the global /etc/network/interfaces file, so we can keep them there.
@@ -284,11 +568,34 @@ then
     sudo bash $DIR_PATH/raspi/access_point/wap.sh
 fi
 
-echo -e "\033[0;92mSUSI is installed successfully!\033[0m"
-echo -e "Run configuration script by 'python3 susi_linux/config_generator.py \033[0;32m<stt engine> \033[0;33m<tts engine> \033[0;34m<snowboy or pocketsphinx> \033[0;35m<wake button?>' \033[0m"
-echo "For example, to configure SUSI as following: "
-echo -e "\t \033[0;32m-Google for speech-to-text"
-echo -e "\t \033[0;33m-Google for text-to-speech"
-echo -e "\t \033[0;34m-Use snowboy for hot-word detection"
-echo -e "\t \033[0;35m-Do not use GPIO for wake button\033[0m"
-echo -e "python3 susi_linux/config_generator.py \033[0;32mgoogle \033[0;33mgoogle \033[0;34my \033[0;35mn \033[0m"
+
+#
+# Final output
+if [ $isRaspi = 0 ] ; then
+    if [ $INSTALLMODE = user ] ; then
+        echo ""
+        echo "SUSI AI has been installed into $BASE_PATH."
+        echo "To start it once, type"
+        echo "  systemctl --user start ss-susi-server"
+        echo "  systemctl --user start ss-susi-linux"
+        echo "To enable it permanently, use"
+        echo "  systemctl --user enable ss-susi-server"
+        echo "  systemctl --user enable ss-susi-linux"
+        echo ""
+        echo "Enjoy."
+    else
+        echo "STILL NOT ACTIVATED AND NOT WORKING"
+        echo "WE NEED MORE TESTING HERE!!!!"
+    fi
+else
+    echo -e "\033[0;92mSUSI is installed successfully!\033[0m"
+    echo -e "Run configuration script by 'python3 susi_linux/config_generator.py \033[0;32m<stt engine> \033[0;33m<tts engine> \033[0;34m<snowboy or pocketsphinx> \033[0;35m<wake button?>' \033[0m"
+    echo "For example, to configure SUSI as following: "
+    echo -e "\t \033[0;32m-Google for speech-to-text"
+    echo -e "\t \033[0;33m-Google for text-to-speech"
+    echo -e "\t \033[0;34m-Use snowboy for hot-word detection"
+    echo -e "\t \033[0;35m-Do not use GPIO for wake button\033[0m"
+    echo -e "python3 susi_linux/config_generator.py \033[0;32mgoogle \033[0;33mgoogle \033[0;34my \033[0;35mn \033[0m"
+fi
+
+# vim: set expandtab shiftwidth=4 softtabstop=4 smarttab:
