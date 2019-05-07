@@ -249,6 +249,7 @@ install_debian_dependencies()
   python3-watson-developer-cloud ca-certificates
 "
     
+    # not be needed, snowboy for Python 3.7 is uploaded to fossasia gemruby
     SNOWBOYBUILDDEPS="
   python3-setuptools perl libterm-readline-gnu-perl \
   i2c-tools libasound2-plugins python3-dev \
@@ -258,7 +259,9 @@ install_debian_dependencies()
 
     ALLDEPS="$DEBDEPS"
     if [ $isRaspi = 0 ] ; then
-        ALLDEPS="$ALLDEPS $SNOWBOYBUILDDEPS"
+        # see above, snowboy should be available
+        # ALLDEPS="$ALLDEPS $SNOWBOYBUILDDEPS"
+        : 
     fi
 
     # collect missing dependencies
@@ -443,10 +446,11 @@ fi
 
 echo "Installing required dependencies"
 install_debian_dependencies
-if [ $isRaspi = 0 ] ; then
-    # the repo of fossasia does not provide snowboy for all pythons .. install it
-    install_snowboy
-fi
+# the repo of fossasia now does provide snowboy for python 3.7
+# if [ $isRaspi = 0 ] ; then
+#     # the repo of fossasia does not provide snowboy for all pythons .. install it
+#     install_snowboy
+# fi
 install_pip_dependencies
 # function to update the latest vlc drivers which will allow it to play MRL of latest videos
 # Only do this on old systems (stretch etc)
