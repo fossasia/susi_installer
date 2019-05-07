@@ -26,6 +26,19 @@
 #   seeed_voicecard
 
 #
+# TODO items
+# - how to deal with susi_linux wrapper scripts?
+#   in system mode install them into /usr/local/bin (link them?)
+#   but in user mode? maybe link them to $DESTDIR/bin (= ~/SUSI.AI/bin) and ask user to add to PATH?
+# - convert systemd unit files to use the wrapper scripts???
+#   problem is in the case of user install
+#   probably we need to put the full path into the unit file? - it is done in most service files like this!
+# - how would partial replacement of single packages with Debian packages work
+# - RedHat and SuSE and Alpine and Mint and ... support ???
+# - should we clean up seeed_voicecard directory after installation of module?
+#   this was done in the old installer (with tar.gz backup)
+
+#
 # determine Debian/Ubuntu release - we don't support anything else at the moment
 #                   Raspbian       Debian 9      Ubuntu          Debian 10
 # lsb_release -i    Raspbian       Debian        Ubuntu          Debian
