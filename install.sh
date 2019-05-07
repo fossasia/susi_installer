@@ -507,15 +507,8 @@ rm ss-susi-linux.service
 
 echo "Installing Susi Linux Server Systemd service file"
 cd "$BASE_PATH"
-if [ -d 'susi_server/systemd' ] ; then
-    cp 'susi_server/systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
-    cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
-else
-    # falling back until susi_server releases are updated
-    # See PR https://github.com/fossasia/susi_server/pull/1251
-    cp 'susi_installer/susi-server-systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
-    cp 'susi_installer/susi-server-systemd/ss-susi-server.service.in' 'ss-susi-server.service'
-fi
+cp 'susi_server/systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
+cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
 if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
     sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-server.service
     sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" 'ss-susi-server@.service'
