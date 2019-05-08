@@ -219,8 +219,6 @@ then
     cd "$DESTDIR"
     git clone https://github.com/fossasia/susi_installer.git
     cd susi_installer
-    # TODO needs to be removed after merge
-    git checkout desktop
     # Start real installation
     sysarg=""
     if [ $INSTALLMODE = system ]
