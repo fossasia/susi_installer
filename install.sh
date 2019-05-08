@@ -413,6 +413,7 @@ for i in *.in ; do
     wr=`basename $i .in`
     cp $i $BINDIR/$wr
     sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!g" $BINDIR/$wr
+    chmod ugo+x $BINDIR/$wr
 done
 cd ..
 cp common-script-start.in common-script-start
