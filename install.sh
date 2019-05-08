@@ -222,7 +222,7 @@ then
     sysarg=""
     if [ $INSTALLMODE = system ]
     then
-        sysarg="--system --prefix=\"$PREFIX\""
+        sysarg="--system --prefix \"$PREFIX\""
     fi
     exec ./install.sh $sysarg
 fi
