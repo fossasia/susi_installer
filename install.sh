@@ -38,6 +38,28 @@
 # - should we clean up seeed_voicecard directory after installation of module?
 #   this was done in the old installer (with tar.gz backup)
 
+
+# Dependencies of the packages or building
+# we try to move as many pip packages to Debian packages
+DEBDEPS="
+  git openssl wget python3-pip sox libsox-fmt-all flac
+  libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
+  vlc-plugin-video-splitter python3-cairo python3-flask flite
+  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
+  python3-pocketsphinx
+  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog
+  python3-watson-developer-cloud ca-certificates
+"
+
+# If snowboy cannot be installed via pip we need to build it
+SNOWBOYBUILDDEPS="
+  python3-setuptools perl libterm-readline-gnu-perl \
+  i2c-tools libasound2-plugins python3-dev \
+  swig libpulse-dev libasound2-dev \
+  libatlas-base-dev
+"
+
+
 #
 # determine Debian/Ubuntu release - we don't support anything else at the moment
 #                   Raspbian       Debian 9      Ubuntu          Debian 10
@@ -240,33 +262,9 @@ check_python_installation_status()
 
 install_debian_dependencies()
 {
-    DEBDEPS="
-  git openssl wget python3-pip sox libsox-fmt-all flac
-  libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
-  vlc-plugin-video-splitter python3-cairo python3-flask flite
-  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
-  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog
-  python3-watson-developer-cloud ca-certificates
-"
-    
-    # not be needed, snowboy for Python 3.7 is uploaded to fossasia gemruby
-    SNOWBOYBUILDDEPS="
-  python3-setuptools perl libterm-readline-gnu-perl \
-  i2c-tools libasound2-plugins python3-dev \
-  swig libpulse-dev libasound2-dev \
-  libatlas-base-dev
-"
-
-    ALLDEPS="$DEBDEPS"
-    if [ $isRaspi = 0 ] ; then
-        # see above, snowboy should be available
-        # ALLDEPS="$ALLDEPS $SNOWBOYBUILDDEPS"
-        : 
-    fi
-
     # collect missing dependencies
     missing_packages=""
-    for i in $ALLDEPS ; do
+    for i in "$@" ; do
         if check_debian_installation_status $i ; then
             : all fine
         else
@@ -289,31 +287,16 @@ install_debian_dependencies()
 
 install_pip_dependencies()
 {
+    reqfiles="susi_api_wrapper/python_wrapper/requirements.txt susi_linux/requirements.txt"
+
     echo "Installing Python Dependencies"
     if [ $isRaspi = 0 ] ; then
-        # TODO dynamically generate this list from the requirement files?!?
-        PIPDEPS="async_promises colorlog geocoder google_speech json_config pafy 
-                 pyalsaaudio pyaudio python-Levenshtein python-vlc
-                 rx service_identity snowboy watson-developer-cloud 
-                 websocket_server youtube-dl"
-
-        # not used here
-        PIPDEPSRPI="RPi.GPIO spidev"
-
-        declare -A PIPDEPSVERS
-        PIPDEPSVERS["speechRecognition"]="==3.8.1"
-        PIPDEPSVERS["pocketsphinx"]="==0.1.15"
-        PIPDEPSVERS["youtube-dl"]=">2018"
-        PIPDEPSVERS["requests"]=">=2.13.0"
-
-
-        # First check which of the packages are available
-        alldeps="$PIPDEPS ${!PIPDEPSVERS[@]}"
+        PIPDEPS="`cat $reqfiles | grep -v '^\(\s*#\|\s*$\|--\)' | sed -e 's/=.*//' -e 's/>.*$//' -e 's/\s.*$//'`"
 
         # For now ignore the versioned deps
         missing_pips=""
         echo "Checking for available Python modules: "
-        for i in $PIPDEPS ${!PIPDEPSVERS[@]} ; do
+        for i in $PIPDEPS ; do
             echo "checking for $i ..."
             ret=`pip3 show $i`
             if [ -z "$ret" ] ; then
@@ -329,34 +312,35 @@ install_pip_dependencies()
             echo "  $missing_pips"
             echo "Should we install them (using pip3)?"
             ask_for_sudo
-            $SUDOCMD pip3 install $missing_pips
         fi
-    else
-        # we are on the RPi now
+    fi
+
+    if [ $isRaspi = 1 ] ; then
         $SUDOCMD pip3 install -U pip wheel
-        $SUDOCMD pip3 install -r susi_api_wrapper/python_wrapper/requirements.txt
-        $SUDOCMD pip3 install -r susi_linux/requirements-hw.txt
-        $SUDOCMD pip3 install -r susi_linux/requirements-special.txt
+    fi
+
+    $SUDOCMD pip3 install -r susi_api_wrapper/python_wrapper/requirements.txt
+    $SUDOCMD pip3 install -r susi_linux/requirements.txt
+    if [ $isRaspi = 1 ] ; then
+        $SUDOCMD pip3 install -r susi_linux/requirements-rpi.txt
     fi
 }
 
 function install_snowboy()
 {
-    ret=`pip3 show snowboy`
-    if [ -z "$ret" ] ; then
-        if [ ! -r v1.3.0.tar.gz ] ; then
-            wget https://github.com/Kitt-AI/snowboy/archive/v1.3.0.tar.gz
-        else
-            echo "Reusing v1.3.0.tar.gz in $BASE_PATH"
-        fi
-        tar -xf v1.3.0.tar.gz
-        cd snowboy-1.3.0
-        sed -i -e "s/version='1\.2\.0b1'/version='1.3.0'/" setup.py
-        python3 setup.py build
-        ask_for_sudo
-        $SUDOCMD python3 setup.py install
-        cd ..
+    install_debian_dependencies $SNOWBOYBUILDDEPS
+    if [ ! -r v1.3.0.tar.gz ] ; then
+        wget https://github.com/Kitt-AI/snowboy/archive/v1.3.0.tar.gz
+    else
+        echo "Reusing v1.3.0.tar.gz in $BASE_PATH"
     fi
+    tar -xf v1.3.0.tar.gz
+    cd snowboy-1.3.0
+    sed -i -e "s/version='1\.2\.0b1'/version='1.3.0'/" setup.py
+    python3 setup.py build
+    ask_for_sudo
+    $SUDOCMD python3 setup.py install
+    cd ..
 }
 
 function install_seeed_voicecard_driver()
@@ -445,13 +429,14 @@ fi
 
 
 echo "Installing required dependencies"
-install_debian_dependencies
-# the repo of fossasia now does provide snowboy for python 3.7
-# if [ $isRaspi = 0 ] ; then
-#     # the repo of fossasia does not provide snowboy for all pythons .. install it
-#     install_snowboy
-# fi
+install_debian_dependencies $DEBDEPS
 install_pip_dependencies
+# in case that snowboy installation failed, build it from source
+ret=`pip3 show snowboy`
+if [ -z "$ret" ] ; then
+    install_snowboy
+fi
+
 # function to update the latest vlc drivers which will allow it to play MRL of latest videos
 # Only do this on old systems (stretch etc)
 if [ $isBuster = 0 ] ; then
