@@ -1,7 +1,5 @@
 #!/bin/bash -e
 #
-# 
-#
 # Target layout as with the developer-setup.md layout
 #
 # Two modes of installation: "user" and "system"
@@ -11,13 +9,16 @@
 #
 # Installation directory defaults
 # User installation
-#   DESTDIR = ~/SUSI.AI
+#   DESTDIR = ~/SUSI.AI                 --destdir can override this
 #   BINDIR  = $DESTDIR/bin
-#   WORKDIR = ~/SUSI.AI
+#   WORKDIR = $DESTDIR
 # System installation
-#   DESTDIR = $prefix/lib/SUSI.AI
+#   DESTDIR = $prefix/lib/SUSI.AI       --prefix can be given
 #   BINDIR  = $prefix/bin
 #   WORKDIR = ~/.SUSI.AI
+#   
+#   In system mode the susi-server starts as user $SUSI_SERVER_USER
+#   which defaults to _susiserver and can be configured via --susi-server-user
 #
 # Layout withing DESTDIR
 #   susi_installer
@@ -131,6 +132,22 @@ then
             --susi-server-user)
                 SUSI_SERVER_USER="$2"
                 shift ; shift
+                ;;
+            --help)
+                cat <<'EOF'
+SUSI.AI Installer
+
+Possible options:
+  --system         install system-wide
+  --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
+  --destdir <ARG>  (only without --system) install into <ARG>
+                   defaults to $HOME/SUSI.AI
+  --susi-server-user <ARG> (only with --system)
+                   user under which the susi server is run, default: _susiserver
+
+EOF
+                exit 0
+                shift
                 ;;
             *)
                 echo "Unknown option or argument: $key" >&2
