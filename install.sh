@@ -40,7 +40,6 @@ DEBDEPS="
   libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
   vlc-plugin-video-splitter python3-cairo python3-flask flite
   default-jdk-headless pixz udisks2 python3-requests python3-service-identity
-  python3-pocketsphinx
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog
   python3-watson-developer-cloud ca-certificates
 "
