@@ -12,9 +12,11 @@
 # Installation directory defaults
 # User installation
 #   DESTDIR = ~/SUSI.AI
+#   BINDIR  = $DESTDIR/bin
 #   WORKDIR = ~/SUSI.AI
 # System installation
-#   DESTDIR = /usr/local/SUSI.AI
+#   DESTDIR = $prefix/lib/SUSI.AI
+#   BINDIR  = $prefix/bin
 #   WORKDIR = ~/.SUSI.AI
 #
 # Layout withing DESTDIR
@@ -27,16 +29,8 @@
 
 #
 # TODO items
-# - how to deal with susi_linux wrapper scripts?
-#   in system mode install them into /usr/local/bin (link them?)
-#   but in user mode? maybe link them to $DESTDIR/bin (= ~/SUSI.AI/bin) and ask user to add to PATH?
-# - convert systemd unit files to use the wrapper scripts???
-#   problem is in the case of user install
-#   probably we need to put the full path into the unit file? - it is done in most service files like this!
 # - how would partial replacement of single packages with Debian packages work
 # - RedHat and SuSE and Alpine and Mint and ... support ???
-# - should we clean up seeed_voicecard directory after installation of module?
-#   this was done in the old installer (with tar.gz backup)
 
 
 # Dependencies of the packages or building
@@ -114,6 +108,8 @@ fi
 # Allow overriding the destination directory on the Desktop
 INSTALLMODE=user
 OPTDESTDIR=""
+PREFIX=""
+SUSI_SERVER_USER=
 if [ $isRaspi = 0 ]
 then
     while [[ $# -gt 0 ]]
@@ -129,6 +125,14 @@ then
                 INSTALLMODE=system
                 shift
                 ;;
+            --prefix)
+                PREFIX="$2"
+                shift ; shift
+                ;;
+            --susi-server-user)
+                SUSI_SERVER_USER="$2"
+                shift ; shift
+                ;;
             *)
                 echo "Unknown option or argument: $key" >&2
                 exit 1
@@ -136,15 +140,26 @@ then
     done
 fi
 
-####### TODO ##############
-# FOR NOW WE DO NOT ALLOW SYSTEM MODE
-# There are too many TODOs here in this file concerning system mode
-#############################
-
+#
+# Consistency checks:
+# --prefix can only be given in with --system
+# --destdir can only be given without --system
 if [ $INSTALLMODE = system ] ; then
-    echo "Sorry, system installation mode is currently not supported. Aborting!" >&2
-    exit 1
+    if [ -n "$OPTDESTDIR" ] ; then
+        echo "option --destdir cannot be used with --system" >&2
+        exit 1
+    fi
+else
+    if [ -n "$PREFIX" ] ; then
+        echo "option --prefix can only be used with --system" >&2
+        exit 1
+    fi
+    if [ -n "$SUSI_SERVER_USER" ] ; then
+        echo "option --susi-server-user can only be used with --system" >&2
+        exit 1
+    fi
 fi
+
 
 #
 # in the pi-gen pipeline we get SUSI_REVISION (by default "development") passed
@@ -157,21 +172,35 @@ export SUSI_REVISION=${SUSI_REVISION:-"development"}
 # the SUSI_REVISION which is the branch/commit checked out of susi_linux
 export SUSI_REVISION=norbert/separate-installation
 
+
 #
-# in system mode, either use /usr/local/SUSI.AI or the option --destdir
-# if it was given
-if [ -n "$OPTDESTDIR" ] ; then
-    DESTDIR="$OPTDESTDIR"
+# set up relevant paths and settings
+if [ -z "$SUSI_SERVER_USER" ] ; then
+    # on RPi this will be changed to "pi"
+    SUSI_SERVER_USER=_susiserver
+fi
+if [ $INSTALLMODE = system ] ; then
+    if [ -z "$PREFIX" ] ; then
+        PREFIX="/usr/local"
+    fi
+    DESTDIR="$PREFIX/lib/SUSI.AI"
+    BINDIR="$PREFIX/bin"
+    # note that we do NOT expand $HOME here, since it must be replaced as is
+    # in the common-script-start.in of susi_linux!
+    WORKDIR='$HOME/.SUSI.AI'
 else
-    if [ $INSTALLMODE = system ] ; then
-        DESTDIR=/usr/local/SUSI.AI
+    if [ $isRaspi = 1 ] ; then
+        DESTDIR=/home/pi/SUSI.AI
+        SUSI_SERVER_USER=pi
     else
-        if [ $isRaspi = 1 ] ; then
-            DESTDIR=/home/pi/SUSI.AI
+        if [ -z "$OPTDESTDIR" ] ; then
+            DESTDIR="$HOME/SUSI.AI"
         else
-            DESTDIR=$HOME/SUSI.AI
+            DESTDIR="$OPTDESTDIR"
         fi
     fi
+    BINDIR="$DESTDIR/bin"
+    WORKDIR="DESTDIR"
 fi
 
 
@@ -196,7 +225,7 @@ then
     sysarg=""
     if [ $INSTALLMODE = system ]
     then
-        sysarg="--system"
+        sysarg="--system --prefix=\"$PREFIX\""
     fi
     exec ./install.sh $sysarg
 fi
@@ -359,8 +388,8 @@ function install_seeed_voicecard_driver()
     # This happens *ONLY* on the RPi, so we can do sudo!
     sudo ./install.sh
     cd ..
-    #tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
-    #rm -rf seeed-voicecard
+    tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
+    rm -rf seeed-voicecard
 }
 
 
@@ -380,22 +409,19 @@ then
 else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
 fi
-echo "Creating initial configuration for Susi Linux"
-if [ ! -r "config.json" ]
-then
-    cp susi_linux/config.json .
-    # fix data_base_dir
-    if [ $INSTALLMODE = user ] ; then
-        sed -i -e 's!"data_base_dir": ".",!"data_base_dir": "susi_linux",!g' config.json
-    else
-        : 
-        # do nothing here, system installation mode is not supported by now
-        # we need to push the initial config.json configuration into the
-        # starter scripts (see debian packaging scripts!)
-    fi
-else
-    echo "WARNING: config.json already present, not overwriting it!" >&2
-fi
+echo "Setting up wrapper scripts for susi_linux"
+cd susi_linux/wrapper
+mkdir -p $BINDIR
+for i in *.in ; do
+    wr=`basename $i .in`
+    cp $i $BINDIR/$wr
+    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!g" $BINDIR/$wr
+done
+cd ..
+cp common-script-start.in common-script-start
+sed -i -e "s!@SUSI_WORKING_DIR@!$WORKDIR!g" -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!g" common-script-start
+cd ..
+
 
 echo "Downloading: Susi Python API Wrapper"
 if [ ! -d "susi_api_wrapper" ]
@@ -472,8 +498,6 @@ fi
 # systemd files rework
 if [ $isRaspi = 1 ]
 then
-    #
-    #
     echo "Installing RPi specific Systemd Rules"
     sudo bash $DIR_PATH/raspi/Deploy/auto_boot.sh
 fi
@@ -482,9 +506,9 @@ echo "Updating Susi Linux Systemd service file"
 cd "$BASE_PATH"
 cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
 cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
+sed -i -e "s!@BINDIR@!$BINDIR!" ss-susi-linux.service
+sed -i -e "s!@BINDIR@!$BINDIR!" 'ss-susi-linux@.service'
 if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
-    sed -i -e "s!@SUSI_WORKING_DIR@!$BASE_PATH!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" ss-susi-linux.service
-    sed -i -e "s!@SUSI_WORKING_DIR@!$BASE_PATH!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" 'ss-susi-linux@.service'
     # on RasPi, we install the system units into the system directories
     if [ $isRaspi = 1 ] ; then
         sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
@@ -494,13 +518,6 @@ if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
         cp ss-susi-linux.service $HOME/.config/systemd/user/
     fi
 else
-    # System mode ... not supported by now ... but that is the correct definition
-    # %h cannot be expanded in system services
-    # because if it is on NIS or so it is not available
-    # at boot time - another systemd stupidity ...
-    # But it can be expanded in the user service file
-    sed -i -e "s!@SUSI_WORKING_DIR@!%h/.SUSI.AI!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" ss-susi-linux.service
-    sed -i -e "s!@SUSI_WORKING_DIR@!/home/%i/.SUSI.AI!" -e "s!@INSTALL_DIR@!$BASE_PATH/susi_linux!" 'ss-susi-linux@.service'
     $SUDOCMD cp 'ss-susi-linux@.service' /lib/systemd/system/
     $SUDOCMD cp ss-susi-linux.service /usr/lib/systemd/user/
 fi
@@ -509,34 +526,45 @@ rm ss-susi-linux.service
 
 echo "Installing Susi Linux Server Systemd service file"
 cd "$BASE_PATH"
-cp 'susi_server/systemd/ss-susi-server@.service.in' 'ss-susi-server@.service'
 cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
+sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-server.service
+sed -i -e "s!@SUSI_SERVER_USER@!$SUSI_SERVER_USER!" ss-susi-server.service
 if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
-    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-server.service
-    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" 'ss-susi-server@.service'
     # on RasPi, we install the system units into the system directories
     if [ $isRaspi = 1 ] ; then
-        sudo cp 'ss-susi-server@.service' /lib/systemd/system/
+        sudo cp 'ss-susi-server.service' /lib/systemd/system/
     else
         # Desktop in user mode
         mkdir -p $HOME/.config/systemd/user
-        cp ss-susi-server.service $HOME/.config/systemd/user/
+        # we need to filter out the User= line from user units!
+        grep -v '^User=' ss-susi-server.service > $HOME/.config/systemd/user/ss-susi-server.service
     fi
 else
-    # System mode ... not supported by now ... but that is the correct definition
-    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-linux.service
-    sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" 'ss-susi-linux@.service'
-    $SUDOCMD cp 'ss-susi-linux@.service' /lib/systemd/system/
-    $SUDOCMD cp ss-susi-linux.service /usr/lib/systemd/user/
+    # susi-server does not support multi-user functionality by now
+    # since data/log dirs are shared
+    # $SUDOCMD cp ss-susi-server.service /usr/lib/systemd/user/
+    #
+    # add a new user for susi-server
+    $SUDOCMD adduser --system \
+            --quiet \
+            --home /nonexistent \
+            --no-create-home \
+            --disabled-password \
+            --group \
+            --force-badname \
+            $SUSI_SERVER_USER
+    $SUDOCMD mkdir -p /var/lib/susi-server/data
+    $SUDOCMD chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
+    $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
+    $SUDOCMD cp ss-susi-server.service /lib/systemd/system/
 fi
-rm 'ss-susi-server@.service'
 rm ss-susi-server.service
 
 # enable the client service ONLY on Desktop, NOT on RPi
 # On raspi we do other setups like reset folder etc
 if [ $isRaspi = 1 ] ; then
     # enable the server service unconditionally
-    sudo systemd enable ss-susi-server@pi
+    sudo systemd enable ss-susi-server
 
     echo "Enabling the SSH access"
     sudo systemctl enable ssh
@@ -567,21 +595,30 @@ fi
 #
 # Final output
 if [ $isRaspi = 0 ] ; then
+    echo ""
+    echo "SUSI AI has been installed into $BASE_PATH."
     if [ $INSTALLMODE = user ] ; then
-        echo ""
-        echo "SUSI AI has been installed into $BASE_PATH."
         echo "To start it once, type"
         echo "  systemctl --user start ss-susi-server"
         echo "  systemctl --user start ss-susi-linux"
         echo "To enable it permanently, use"
         echo "  systemctl --user enable ss-susi-server"
         echo "  systemctl --user enable ss-susi-linux"
-        echo ""
-        echo "Enjoy."
     else
-        echo "STILL NOT ACTIVATED AND NOT WORKING"
-        echo "WE NEED MORE TESTING HERE!!!!"
+        echo "To start it once, type"
+        echo "  sudo systemctl start ss-susi-server"
+        echo "  systemctl --user start ss-susi-linux"
+        echo "To enable it permanently, use"
+        echo "  sudo systemctl enable ss-susi-server"
+        echo "  systemctl --user enable ss-susi-linux"
+        echo ""
+        echo "There is also a ss-susi-linux@.service file which can be"
+        echo "started/enabled for specific users via"
+        echo "  sudo systemctl start/enable ss-susi-linux@USER"
+        echo "instead of using the --user variant from above."
     fi
+    echo ""
+    echo "Enjoy."
 else
     echo -e "\033[0;92mSUSI is installed successfully!\033[0m"
     echo -e "Run configuration script by 'python3 susi_linux/config_generator.py \033[0;32m<stt engine> \033[0;33m<tts engine> \033[0;34m<snowboy or pocketsphinx> \033[0;35m<wake button?>' \033[0m"
