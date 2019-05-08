@@ -579,7 +579,7 @@ rm ss-susi-server.service
 # On raspi we do other setups like reset folder etc
 if [ $isRaspi = 1 ] ; then
     # enable the server service unconditionally
-    sudo systemd enable ss-susi-server
+    sudo systemctl enable ss-susi-server
 
     echo "Enabling the SSH access"
     sudo systemctl enable ssh
