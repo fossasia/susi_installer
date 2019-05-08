@@ -199,7 +199,7 @@ else
         fi
     fi
     BINDIR="$DESTDIR/bin"
-    WORKDIR="DESTDIR"
+    WORKDIR="$DESTDIR"
 fi
 
 
