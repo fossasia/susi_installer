@@ -23,7 +23,7 @@
 # Layout withing DESTDIR
 #   susi_installer
 #   susi_linux
-#   susi_api_wrapper
+#   susi_python
 #   susi_server
 #   susi_skill_data
 #   seeed_voicecard
@@ -324,7 +324,7 @@ install_debian_dependencies()
 
 install_pip_dependencies()
 {
-    reqfiles="susi_api_wrapper/python_wrapper/requirements.txt susi_linux/requirements.txt"
+    reqfiles="susi_python/requirements.txt susi_linux/requirements.txt"
 
     echo "Installing Python Dependencies"
     if [ $isRaspi = 0 ] ; then
@@ -356,7 +356,7 @@ install_pip_dependencies()
         $SUDOCMD pip3 install -U pip wheel
     fi
 
-    $SUDOCMD pip3 install -r susi_api_wrapper/python_wrapper/requirements.txt
+    $SUDOCMD pip3 install -r susi_python/requirements.txt
     $SUDOCMD pip3 install -r susi_linux/requirements.txt
     if [ $isRaspi = 1 ] ; then
         $SUDOCMD pip3 install -r susi_linux/requirements-rpi.txt
@@ -433,12 +433,12 @@ cd ..
 
 
 echo "Downloading: Susi Python API Wrapper"
-if [ ! -d "susi_api_wrapper" ]
+if [ ! -d "susi_python" ]
 then
-    git clone https://github.com/fossasia/susi_api_wrapper.git
-    ln -s ../susi_api_wrapper/python_wrapper/susi_python susi_linux/
+    git clone https://github.com/fossasia/susi_python.git
+    ln -s ../susi_python/susi_python susi_linux/
 else
-    echo "WARNING: susi_api_wrapper directory already present, not cloning it!" >&2
+    echo "WARNING: susi_python directory already present, not cloning it!" >&2
 fi
 
 echo "Downloading: Susi Skill Data"
@@ -584,7 +584,7 @@ if [ $isRaspi = 1 ] ; then
     cd "$BASE_PATH"
     echo "Creating a backup folder for future factory_reset"
     sudo rm -Rf .git
-    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_api_wrapper
+    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python
     echo ""  # To add newline after tar's last checkpoint
     mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 
