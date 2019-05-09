@@ -183,12 +183,6 @@ fi
 # use it to checkout a branch of susi_linux
 export SUSI_REVISION=${SUSI_REVISION:-"development"}
 
-#### TODO ###########
-# for now as we are testing the separate installation mode, we have to override
-# the SUSI_REVISION which is the branch/commit checked out of susi_linux
-export SUSI_REVISION=norbert/separate-installation
-
-
 #
 # set up relevant paths and settings
 if [ -z "$SUSI_SERVER_USER" ] ; then
