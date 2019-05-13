@@ -1,0 +1,103 @@
+#!/bin/bash
+
+export LANG=C
+export LC_ALL=C
+
+/usr/bin/qemu-system-x86_64 --version
+
+mount="mnt" # Local directory to mount the image (automatically created/delete as needed)
+script="setup" # Local setup script to run inside the image
+
+cleanup() {
+    [[ -f "${mount}/tmp/${script}" ]] && rm "${mount}/tmp/${script}"
+    if [[ -d "${mount}" ]]; then
+        umount "${mount}/dev" || true
+        umount "${mount}/proc" || true
+        umount "${mount}/sys" || true
+        umount "${mount}/boot" || true
+        umount "${mount}" || true
+        rmdir "${mount}" || true
+    fi
+    [ -n "${loopdev}" ] && losetup --detach "${loopdev}" || true
+}
+trap cleanup EXIT
+
+wget -O raspbian-latest-lite.zip https://downloads.raspberrypi.org/raspbian_lite_latest
+unzip raspbian-latest-lite.zip
+mv ????-??-??-raspbian-stretch-lite.img raspbian.img
+ls
+
+qemu-img resize raspbian.img 3G
+echo ", +" | sfdisk -N 2 raspbian.img
+
+loopdev=$(losetup -fP --show raspbian.img)
+lsblk
+bootdev=${loopdev}p1
+rootdev=${loopdev}p2
+
+
+e2fsck -f $rootdev
+resize2fs $rootdev
+
+
+# Mount the image
+[ ! -d "${mount}" ] && mkdir "${mount}"
+mount "${rootdev}" "${mount}"
+[ ! -d "${mount}/boot" ] && mkdir "${mount}/boot"
+mount "${bootdev}" "${mount}/boot"
+ls ${mount}
+
+
+install -Dm755 ".travis/${script}" "${mount}/tmp/${script}"
+
+# Prep the chroot
+mount -t proc none ${mount}/proc
+mount -t sysfs none ${mount}/sys
+mount -o bind /dev ${mount}/dev
+rm ${mount}/etc/resolv.conf
+cp /etc/resolv.conf ${mount}/etc/resolv.conf
+# download newer qemu
+wget -O ${mount}/usr/bin/qemu-arm-static http://www.preining.info/susi.ai/qemu-arm-static
+chmod ugo+x ${mount}/usr/bin/qemu-arm-static
+# cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
+
+df -h ${mount}
+# Run the setup script inside the chroot
+chroot ${mount}  "/tmp/${script}"
+
+# cleanup tmp directories in image!!!
+# basically code from pi-gen.git/export-image/04-finalise/01-run.sh
+
+chroot ${mount} << EOF
+apt-get clean
+/etc/init.d/fake-hwclock stop
+hardlink -t /usr/share/doc
+EOF
+
+rm -f "${mount}/etc/apt/apt.conf.d/51cache"
+rm -f "${mount}/usr/bin/qemu-arm-static"
+
+rm -f "${mount}/etc/apt/sources.list~"
+rm -f "${mount}/etc/apt/trusted.gpg~"
+
+rm -f "${mount}/etc/passwd-"
+rm -f "${mount}/etc/group-"
+rm -f "${mount}/etc/shadow-"
+rm -f "${mount}/etc/gshadow-"
+rm -f "${mount}/etc/subuid-"
+rm -f "${mount}/etc/subgid-"
+
+rm -f "${mount}"/var/cache/debconf/*-old
+rm -f "${mount}"/var/lib/dpkg/*-old
+
+rm -f "${mount}"/usr/share/icons/*/icon-theme.cache
+
+rm -f "${mount}/var/lib/dbus/machine-id"
+
+find "${mount}/var/log/" -type f -exec cp /dev/null {} \;
+
+rm -f "${mount}/root/.vnc/private.key"
+rm -f "${mount}/etc/vnc/updateid"
+
+echo 'Susibian based on Raspbian GNU/Linux 9 \n \l' > "${mount}/boot/issue.txt"
+

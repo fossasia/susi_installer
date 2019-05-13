@@ -1,0 +1,19 @@
+dist: xenial
+language: generic
+sudo: required
+addons:
+  apt:
+    packages:
+    - qemu
+    - qemu-user-static
+    - binfmt-support
+    - parted
+    - wget
+    - dosfstools
+    - zip
+script:
+- sudo bash ./.travis/create-image
+- mv raspbian.img susibian.img
+- zip susibian.img.zip susibian.img
+- ls -lh susibian.img.zip susibian.img
+
