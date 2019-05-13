@@ -257,7 +257,19 @@ DIR_PATH=$(dirname "$SCRIPT_PATH")
 # on the Raspi that should be $DESTDIR
 BASE_PATH=$(realpath "$DIR_PATH/..")
 
-HOSTARCH=`dpkg-architecture -qDEB_HOST_ARCH`
+#
+# dpkg-architecture is in dpkg-dev, which might not be installed
+HOSTARCH=`dpkg --print-architecture`
+if [ $HOSTARCH = amd64 ] ; then
+    HOSTARCHTRIPLE=x86_64-linux-gnu
+elif [ $HOSTARCH = armhf ] ; then
+    HOSTARCHTRIPLE=arm-linux-gnueabihf
+elif [ $HOSTARCH = "i386" ] ; then
+    HOSTARCHTRIPLE=i386-linux-gnu
+else
+    echo "Unknown host architecture: $HOSTARCH" >&2
+    exit 1
+fi
 
 ask_for_sudo()
 {
@@ -478,7 +490,11 @@ if [ $isBuster = 0 ] ; then
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
     ask_for_sudo
-    $SUDOCMD mv youtube.lua /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/vlc/lua/playlist/youtube.luac
+    if [ -d /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/ ] ; then
+        $SUDOCMD mv youtube.lua /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac
+    else
+        echo "Cannot find directory /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/ - not updating youtube.lua" >&2
+    fi
     rm -f youtube.lua
 fi
 
