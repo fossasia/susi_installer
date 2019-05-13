@@ -18,7 +18,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 #   DESTDIR = $prefix/lib/SUSI.AI       --prefix can be given
 #   BINDIR  = $prefix/bin
 #   WORKDIR = ~/.SUSI.AI
-#   
+#
 #   In system mode the susi-server starts as user $SUSI_SERVER_USER
 #   which defaults to _susiserver and can be configured via --susi-server-user
 #
@@ -89,7 +89,6 @@ case "$vendor" in
     Ubuntu)
         case "$version" in
             18.*|19.*|20.*) isBuster=1 ;;
-            16.*|17.*) ;;
             *) echo "Unsupported Ubuntu version: $version" >&2 ; exit 1 ;;
         esac
         ;;
