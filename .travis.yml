@@ -24,3 +24,4 @@ deploy:
   skip_cleanup: true
   on:
     repo: alok760/susi_installer
+    all_branches: true
