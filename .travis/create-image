@@ -1,5 +1,5 @@
 #!/bin/bash
-
+TRAVIS_TAG=$(date +%Y%m%d%H)
 export LANG=C
 export LC_ALL=C
 
@@ -100,4 +100,3 @@ rm -f "${mount}/root/.vnc/private.key"
 rm -f "${mount}/etc/vnc/updateid"
 
 echo 'Susibian based on Raspbian GNU/Linux 9 \n \l' > "${mount}/boot/issue.txt"
-
