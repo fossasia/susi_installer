@@ -23,5 +23,6 @@ deploy:
   file: susibian.img.zip
   skip_cleanup: true
   on:
+    tags: true
     repo: alok760/susi_installer
     all_branches: true
