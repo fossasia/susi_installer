@@ -133,7 +133,7 @@ then
             --clean)
                 CLEAN=1
                 shift
-                ::
+                ;;
             --susi-server-user)
                 SUSI_SERVER_USER="$2"
                 shift ; shift
