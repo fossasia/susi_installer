@@ -360,7 +360,8 @@ install_pip_dependencies()
         echo "Checking for available Python modules: "
         for i in $PIPDEPS ; do
             echo "checking for $i ..."
-            ret=`pip3 show $i`
+            # we are running under -e, so a not present packages would exit the script
+            ret=`pip3 show $i || true`
             if [ -z "$ret" ] ; then
                 missing_pips="$missing_pips $i"
             else
@@ -504,7 +505,8 @@ echo "Installing required dependencies"
 install_debian_dependencies $DEBDEPS
 install_pip_dependencies
 # in case that snowboy installation failed, build it from source
-ret=`pip3 show snowboy`
+# also, make sure that we don't exit in case of not present snowboy
+ret=`pip3 show snowboy || true`
 if [ -z "$ret" ] ; then
     install_snowboy
 fi
