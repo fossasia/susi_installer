@@ -207,6 +207,7 @@ else
     if [ $isRaspi = 1 ] ; then
         DESTDIR=/home/pi/SUSI.AI
         SUSI_SERVER_USER=pi
+        CLEAN=1
     else
         if [ -z "$OPTDESTDIR" ] ; then
             DESTDIR="$HOME/SUSI.AI"
