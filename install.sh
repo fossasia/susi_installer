@@ -55,7 +55,6 @@ SNOWBOYBUILDDEPS="
   libatlas-base-dev
 "
 
-
 #
 # determine Debian/Ubuntu release - we don't support anything else at the moment
 #                   Raspbian       Debian 9      Ubuntu          Debian 10
@@ -110,6 +109,7 @@ fi
 INSTALLMODE=user
 OPTDESTDIR=""
 PREFIX=""
+CLEAN=0
 SUSI_SERVER_USER=
 if [ $isRaspi = 0 ]
 then
@@ -130,6 +130,10 @@ then
                 PREFIX="$2"
                 shift ; shift
                 ;;
+            --clean)
+                CLEAN=1
+                shift
+                ::
             --susi-server-user)
                 SUSI_SERVER_USER="$2"
                 shift ; shift
@@ -236,6 +240,10 @@ then
     then
         sysarg="--system --prefix $PREFIX"
     fi
+    if [ $CLEAN = 1 ]
+    then
+        sysarg="--system --prefix $PREFIX --clean"
+    fi
     exec ./install.sh $sysarg
 fi
 
@@ -332,7 +340,10 @@ install_debian_dependencies()
     ask_for_sudo
 
     $SUDOCMD apt-get update
-    $SUDOCMD -E apt-get install -y $missing_packages
+    $SUDOCMD -E apt-get install --no-install-recommends -y $missing_packages
+    if [ $CLEAN = 1 ] ; then
+        $SUDOCMD apt-get clean
+    fi
 }
 
 install_pip_dependencies()
@@ -364,15 +375,21 @@ install_pip_dependencies()
             ask_for_sudo
         fi
     fi
-
-    if [ $isRaspi = 1 ] ; then
-        $SUDOCMD pip3 install -U pip wheel
+    
+    PIP=pip3
+    if [ $CLEAN = 1 ] ; then
+        PIP="pip3 --no-cache-dir"
     fi
 
-    $SUDOCMD pip3 install -r susi_python/requirements.txt
-    $SUDOCMD pip3 install -r susi_linux/requirements.txt
     if [ $isRaspi = 1 ] ; then
-        $SUDOCMD pip3 install -r susi_linux/requirements-rpi.txt
+        $SUDOCMD $PIP install -U pip
+        $SUDOCMD $PIP install -U wheel
+    fi
+
+    $SUDOCMD $PIP install -r susi_python/requirements.txt
+    $SUDOCMD $PIP install -r susi_linux/requirements.txt
+    if [ $isRaspi = 1 ] ; then
+        $SUDOCMD $PIP install -r susi_linux/requirements-rpi.txt
     fi
 }
 
@@ -391,6 +408,9 @@ function install_snowboy()
     ask_for_sudo
     $SUDOCMD python3 setup.py install
     cd ..
+    if [ $CLEAN = 1 ] ; then
+        rm -f v1.3.0.tar.gz
+    fi
 }
 
 function install_seeed_voicecard_driver()
@@ -411,6 +431,9 @@ function install_seeed_voicecard_driver()
     cd ..
     tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
     rm -rf seeed-voicecard
+    if [ $CLEAN = 1 ] ; then
+        sudo apt-get clean
+    fi
 }
 
 

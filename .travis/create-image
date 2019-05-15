@@ -27,7 +27,7 @@ unzip raspbian-latest-lite.zip
 mv ????-??-??-raspbian-stretch-lite.img raspbian.img
 ls
 
-qemu-img resize raspbian.img 3G
+qemu-img resize raspbian.img 2G
 echo ", +" | sfdisk -N 2 raspbian.img
 
 loopdev=$(losetup -fP --show raspbian.img)
