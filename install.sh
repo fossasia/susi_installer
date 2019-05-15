@@ -35,26 +35,6 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 # - how would partial replacement of single packages with Debian packages work
 # - RedHat and SuSE and Alpine and Mint and ... support ???
 
-
-# Dependencies of the packages or building
-# we try to move as many pip packages to Debian packages
-DEBDEPS="
-  git openssl wget python3-pip sox libsox-fmt-all flac
-  libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
-  vlc-plugin-video-splitter python3-cairo python3-flask flite
-  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
-  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog
-  python3-watson-developer-cloud ca-certificates
-"
-
-# If snowboy cannot be installed via pip we need to build it
-SNOWBOYBUILDDEPS="
-  python3-setuptools perl libterm-readline-gnu-perl \
-  i2c-tools libasound2-plugins python3-dev \
-  swig libpulse-dev libasound2-dev \
-  libatlas-base-dev
-"
-
 #
 # determine Debian/Ubuntu release - we don't support anything else at the moment
 #                   Raspbian       Debian 9      Ubuntu          Debian 10
@@ -65,30 +45,33 @@ SNOWBOYBUILDDEPS="
 # Debian release: 9.N (2017/06 released, stretch, current stable, Raspbian), 10 (2019/0? released, buster), 11 (???)
 # Raspbian release: 9.N (like Debian stretch)
 #
-# We classify systems into two categories:
-# - isRaspi=0|1 -- only 1 on Raspbian)
-# - isBuster=0|1 -- at least Debian 10 or Ubuntu 18.04
+# We classify systems according to distribution and version
+# - targetSystem = raspi | debian | ubuntu
 vendor=`lsb_release -i -s 2>/dev/null`
 version=`lsb_release -r -s 2>/dev/null`
-isRaspi=0
-isBuster=0
+targetSystem=""
+targetVersion=""
 case "$vendor" in
     Debian)
         # remove Debian .N version number
-        version=${version%.*}
-        case "$version" in
-            9) isBuster=0 ;;
-            10|11) isBuster=1 ;;
-            *) echo "Unsupported Debian version: $version" >&2 ; exit 1 ;;
+        targetSystem=debian
+        targetVersion=${version%.*}
+        case "$targetVersion" in
+            9|10|11) ;;
+            *) echo "Unsupported Debian version: $targetVersion" >&2 ; exit 1 ;;
         esac
         ;;
     Raspbian)
-        isRaspi=1
+        # raspbian is Debian, so version numbers are the same - I hope
+        targetSystem=raspi
+        targetVersion=${version%.*}
         ;;
     Ubuntu)
-        case "$version" in
-            18.*|19.*|20.*) isBuster=1 ;;
-            *) echo "Unsupported Ubuntu version: $version" >&2 ; exit 1 ;;
+        targetSystem=ubuntu
+        targetVersion=$version
+        case "$targetVersion" in
+            18.*|19.*|20.*) ;;
+            *) echo "Unsupported Ubuntu version: $targetVersion" >&2 ; exit 1 ;;
         esac
         ;;
     *)
@@ -97,7 +80,7 @@ case "$vendor" in
         ;;
 esac
 
-if [ $isRaspi = 1 ]
+if [ $targetSystem = raspi ]
 then
     USER=pi
 else
@@ -111,7 +94,7 @@ OPTDESTDIR=""
 PREFIX=""
 CLEAN=0
 SUSI_SERVER_USER=
-if [ $isRaspi = 0 ]
+if [ ! $targetSystem = raspi ]
 then
     while [[ $# -gt 0 ]]
     do
@@ -182,6 +165,35 @@ else
 fi
 
 
+
+# Dependencies of the packages or building
+# we try to move as many pip packages to Debian packages
+DEBDEPS="
+  git openssl wget python3-pip sox libsox-fmt-all flac
+  libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
+  vlc-plugin-video-splitter python3-cairo python3-flask flite
+  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
+  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog
+  python3-watson-developer-cloud ca-certificates
+"
+
+# If snowboy cannot be installed via pip we need to build it
+SNOWBOYBUILDDEPS="
+  python3-setuptools perl libterm-readline-gnu-perl \
+  i2c-tools libasound2-plugins python3-dev \
+  swig libpulse-dev libasound2-dev \
+  libatlas-base-dev
+"
+
+# on Debian buster and upwards, and Ubuntu 19.04 and upwards, install python3-alsaaudio
+if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
+      || \
+      ( $targetSystem = ubuntu && ! $targetVersion = 18.04 ) \
+   ]]  ; then
+  DEBDEPS="$DEBDEPS python3-alsaaudio"
+fi
+ 
+
 #
 # in the pi-gen pipeline we get SUSI_REVISION (by default "development") passed
 # into in the environment, but for Desktop installs we need to set it since we
@@ -204,7 +216,7 @@ if [ $INSTALLMODE = system ] ; then
     # in the common-script-start.in of susi_linux!
     WORKDIR='$HOME/.SUSI.AI'
 else
-    if [ $isRaspi = 1 ] ; then
+    if [ $targetSystem = raspi ] ; then
         DESTDIR=/home/pi/SUSI.AI
         SUSI_SERVER_USER=pi
         CLEAN=1
@@ -253,7 +265,7 @@ fi
 # Set up default sudo mode
 # on Raspi and in system mode, use sudo
 # Otherwise leave empty so that user is asked whether to use it
-if [ $isRaspi = 1 -o $INSTALLMODE = system ] ; then
+if [ $targetSystem = raspi -o $INSTALLMODE = system ] ; then
     # on the RPi we always can run sudo
     # in system mode we expect root or sudo-able user to do it
     SUDOCMD=sudo
@@ -352,7 +364,7 @@ install_pip_dependencies()
     reqfiles="susi_python/requirements.txt susi_linux/requirements.txt"
 
     echo "Installing Python Dependencies"
-    if [ $isRaspi = 0 ] ; then
+    if [ ! $targetSystem = raspi ] ; then
         PIPDEPS="`cat $reqfiles | grep -v '^\(\s*#\|\s*$\|--\)' | sed -e 's/=.*//' -e 's/>.*$//' -e 's/\s.*$//'`"
 
         # For now ignore the versioned deps
@@ -383,14 +395,14 @@ install_pip_dependencies()
         PIP="pip3 --no-cache-dir"
     fi
 
-    if [ $isRaspi = 1 ] ; then
+    if [ $targetSystem = raspi ] ; then
         $SUDOCMD $PIP install -U pip
         $SUDOCMD $PIP install -U wheel
     fi
 
     $SUDOCMD $PIP install -r susi_python/requirements.txt
     $SUDOCMD $PIP install -r susi_linux/requirements.txt
-    if [ $isRaspi = 1 ] ; then
+    if [ $targetSystem = raspi ] ; then
         $SUDOCMD $PIP install -r susi_linux/requirements-rpi.txt
     fi
 }
@@ -513,7 +525,10 @@ fi
 
 # function to update the latest vlc drivers which will allow it to play MRL of latest videos
 # Only do this on old systems (stretch etc)
-if [ $isBuster = 0 ] ; then
+if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
+      || \
+      ( $targetSystem = ubuntu && $targetVersion = 18.04 ) \
+   ]]  ; then
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
     ask_for_sudo
@@ -527,7 +542,7 @@ fi
 
 #
 # install seeed card driver only on RPi
-if [ $isRaspi = 1 ]
+if [ $targetSystem = raspi ]
 then
     install_seeed_voicecard_driver
 fi
@@ -540,7 +555,7 @@ then
     wget "http://www.festvox.org/flite/packed/flite-2.0/voices/cmu_us_slt.flitevox" -P susi_linux/extras
 fi
 
-if [ $isRaspi = 1 ]
+if [ $targetSystem = raspi ]
 then
     echo "Updating the Udev Rules"
     cd $DIR_PATH
@@ -548,7 +563,7 @@ then
 fi
 
 # systemd files rework
-if [ $isRaspi = 1 ]
+if [ $targetSystem = raspi ]
 then
     echo "Installing RPi specific Systemd Rules"
     sudo bash $DIR_PATH/raspi/Deploy/auto_boot.sh
@@ -560,9 +575,9 @@ cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
 cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
 sed -i -e "s!@BINDIR@!$BINDIR!" ss-susi-linux.service
 sed -i -e "s!@BINDIR@!$BINDIR!" 'ss-susi-linux@.service'
-if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
+if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     # on RasPi, we install the system units into the system directories
-    if [ $isRaspi = 1 ] ; then
+    if [ $targetSystem = raspi ] ; then
         sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
     else
         # Desktop in user mode
@@ -581,9 +596,9 @@ cd "$BASE_PATH"
 cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
 sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-server.service
 sed -i -e "s!@SUSI_SERVER_USER@!$SUSI_SERVER_USER!" ss-susi-server.service
-if [ $isRaspi = 1 -o $INSTALLMODE = user ] ; then
+if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     # on RasPi, we install the system units into the system directories
-    if [ $isRaspi = 1 ] ; then
+    if [ $targetSystem = raspi ] ; then
         sudo cp 'ss-susi-server.service' /lib/systemd/system/
     else
         # Desktop in user mode
@@ -614,7 +629,7 @@ rm ss-susi-server.service
 
 # enable the client service ONLY on Desktop, NOT on RPi
 # On raspi we do other setups like reset folder etc
-if [ $isRaspi = 1 ] ; then
+if [ $targetSystem = raspi ] ; then
     # enable the server service unconditionally
     sudo systemctl enable ss-susi-server
 
@@ -646,7 +661,7 @@ fi
 
 #
 # Final output
-if [ $isRaspi = 0 ] ; then
+if [ ! $targetSystem = raspi ] ; then
     echo ""
     echo "SUSI AI has been installed into $BASE_PATH."
     if [ $INSTALLMODE = user ] ; then
