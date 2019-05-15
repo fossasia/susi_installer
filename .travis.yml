@@ -13,7 +13,19 @@ addons:
     - zip
 script:
 - sudo bash ./.travis/create-image
-- mv raspbian.img susibian.img
-- zip susibian.img.zip susibian.img
-- ls -lh susibian.img.zip susibian.img
+- ls -lh raspbian.img
+
+before_deploy:
+  - export TSTAMP=$(date +'%Y%m%d%H%M')
+  - mv raspbian.img susibian-$TSTAMP.img
+  - zip susibian-$TSTAMP.zip susibian-$TSTAMP.img
+
+deploy:
+  provider: releases
+  api_key: $GH_TOKEN
+  file_glob: true
+  file: susibian-*.zip
+  skip_cleanup: true
+  on:
+    tags: true
 
