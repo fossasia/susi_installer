@@ -297,6 +297,11 @@ ask_for_sudo()
 {
     # we only ask once for sudo command!
     if [ -z "$SUDOCMD" ] ; then
+        if [[ $EUID -ne 0 ]]; then
+            # root can always run sudo so we use it
+            SUDOCMD="sudo"
+            return
+        fi
         echo -n "Do you want to use 'sudo' for this and following tasks? (Y/n): "
         REPLY=y
         read REPLY
