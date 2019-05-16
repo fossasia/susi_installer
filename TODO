@@ -1,7 +1,2 @@
-- travis integration
-  move to separate project susi_builder
-  trigger from all depending projects into susi_builder using trigger-travis.sh
-- travis matrix
-  test also installation on buster and stretch, and maybe ubuntu *
-- travis deployments
-  deploy images when a release is tagged
+- install youtube_dl on buster and above?
+

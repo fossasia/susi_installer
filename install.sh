@@ -56,6 +56,10 @@ case "$vendor" in
         # remove Debian .N version number
         targetSystem=debian
         targetVersion=${version%.*}
+        # rewrite testing to 10
+        if [ $targetVersion = "testing" ] ; then
+            targetVersion=10
+        fi
         case "$targetVersion" in
             9|10|11) ;;
             *) echo "Unsupported Debian version: $targetVersion" >&2 ; exit 1 ;;
@@ -406,11 +410,10 @@ install_pip_dependencies()
         PIP="pip3 --no-cache-dir"
     fi
 
-    if [ $targetSystem = raspi ] ; then
-        $SUDOCMD $PIP install -U pip
-        $SUDOCMD $PIP install -U wheel
-    fi
-
+    # we need to update pip, since pip 18 or so is too old and cannot work with --extra-index-url
+    # properly
+    $SUDOCMD $PIP install -U pip
+    $SUDOCMD $PIP install -U wheel
     $SUDOCMD $PIP install -r susi_python/requirements.txt
     $SUDOCMD $PIP install -r susi_linux/requirements.txt
     if [ $targetSystem = raspi ] ; then
