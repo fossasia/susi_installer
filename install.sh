@@ -297,7 +297,7 @@ ask_for_sudo()
 {
     # we only ask once for sudo command!
     if [ -z "$SUDOCMD" ] ; then
-        if [[ $EUID -ne 0 ]]; then
+        if [[ $EUID -eq 0 ]]; then
             # root can always run sudo so we use it
             SUDOCMD="sudo"
             return
