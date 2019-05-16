@@ -239,8 +239,7 @@ fi
 #   by downloading the installer and starting it
 # - when running the actual installer
 
-if [ ! -d "raspi" ]
-then
+if [ ! -d "raspi" ] ; then
     # we are in initial installer mode, where the user only downloaded
     # the install.sh script and runs it
     mkdir -p "$DESTDIR"
@@ -249,19 +248,32 @@ then
     cd susi_installer
     # Start real installation
     sysarg=""
-    if [ $INSTALLMODE = system ]
-    then
+    if [ $INSTALLMODE = system ] ; then
         sysarg="--system --prefix $PREFIX"
     fi
-    if [ $CLEAN = 1 ]
-    then
+    if [ $CLEAN = 1 ] ; then
         sysarg="--system --prefix $PREFIX --clean"
     fi
     exec ./install.sh $sysarg
 fi
 
 
+#
+# if the installer is download somewhere else then $DESTDIR, copy it over
+INSTALLERDIR=$(dirname $(realpath "$0"))
+if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
+    echo "Copying installer to destination $DESTDIR ..."
+    mkdir -p "$DESTDIR"
+    if [ -d "$DESTDIR/susi_installer" ] ; then
+        echo "SUSI Installer already present in $DESTDIR/susi_installer, please remove!"
+        exit 1
+    fi
+    cp -a "$INSTALLERDIR" "$DESTDIR/susi_installer"
+    # reset the INSTALLERDIR variable since we don't want to exec again
+    INSTALLERDIR="$DESTDIR/susi_installer"
+fi
 
+    
 # Set up default sudo mode
 # on Raspi and in system mode, use sudo
 # Otherwise leave empty so that user is asked whether to use it
@@ -272,12 +284,6 @@ if [ $targetSystem = raspi -o $INSTALLMODE = system ] ; then
 else
     SUDOCMD=""
 fi
-
-
-SCRIPT_PATH=$(realpath "$0")
-DIR_PATH=$(dirname "$SCRIPT_PATH")
-# on the Raspi that should be $DESTDIR
-BASE_PATH=$(realpath "$DIR_PATH/..")
 
 #
 # dpkg-architecture is in dpkg-dev, which might not be installed
@@ -414,11 +420,12 @@ install_pip_dependencies()
 
 function install_snowboy()
 {
+    cd "$DESTDIR"
     install_debian_dependencies $SNOWBOYBUILDDEPS
     if [ ! -r v1.3.0.tar.gz ] ; then
         wget https://github.com/Kitt-AI/snowboy/archive/v1.3.0.tar.gz
     else
-        echo "Reusing v1.3.0.tar.gz in $BASE_PATH"
+        echo "Reusing v1.3.0.tar.gz in $DESTDIR"
     fi
     tar -xf v1.3.0.tar.gz
     cd snowboy-1.3.0
@@ -442,7 +449,7 @@ function install_seeed_voicecard_driver()
         return 0
     fi
     echo "Installing Respeaker Mic Array drivers from source"
-    cd "$BASE_PATH"
+    cd "$DESTDIR"
     git clone https://github.com/respeaker/seeed-voicecard.git
     cd seeed-voicecard
     # This happens *ONLY* on the RPi, so we can do sudo!
@@ -459,7 +466,7 @@ function install_seeed_voicecard_driver()
 
 
 ####  Main  ####
-cd "$BASE_PATH"
+cd "$DESTDIR"
 echo "Downloading: Susi Linux"
 if [ ! -d "susi_linux" ]
 then
@@ -563,19 +570,18 @@ fi
 if [ $targetSystem = raspi ]
 then
     echo "Updating the Udev Rules"
-    cd $DIR_PATH
-    sudo ./raspi/media_daemon/media_udev_rule.sh
+    sudo bash $INSTALLERDIR/raspi/media_daemon/media_udev_rule.sh
 fi
 
 # systemd files rework
 if [ $targetSystem = raspi ]
 then
     echo "Installing RPi specific Systemd Rules"
-    sudo bash $DIR_PATH/raspi/Deploy/auto_boot.sh
+    sudo bash $INSTALLERDIR/raspi/Deploy/auto_boot.sh
 fi
 
 echo "Updating Susi Linux Systemd service file"
-cd "$BASE_PATH"
+cd "$DESTDIR"
 cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
 cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
 sed -i -e "s!@BINDIR@!$BINDIR!" ss-susi-linux.service
@@ -597,9 +603,9 @@ rm 'ss-susi-linux@.service'
 rm ss-susi-linux.service
 
 echo "Installing Susi Linux Server Systemd service file"
-cd "$BASE_PATH"
+cd "$DESTDIR"
 cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
-sed -i -e "s!@INSTALL_DIR@!$BASE_PATH/susi_server!" ss-susi-server.service
+sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.service
 sed -i -e "s!@SUSI_SERVER_USER@!$SUSI_SERVER_USER!" ss-susi-server.service
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     # on RasPi, we install the system units into the system directories
@@ -644,7 +650,7 @@ if [ $targetSystem = raspi ] ; then
     echo "Disable dhcpcd"
     sudo systemctl disable dhcpcd
 
-    cd "$BASE_PATH"
+    cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"
     sudo rm -Rf .git
     tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python
@@ -657,10 +663,10 @@ if [ $targetSystem = raspi ] ; then
     # install wlan config files: files with . in the name are *NOT* include
     # into the global /etc/network/interfaces file, so we can keep them there.
     echo "Installing ETH/WLAN device configuration files"
-    sudo cp $DIR_PATH/raspi/access_point/interfaces.d/* /etc/network/interfaces.d/
+    sudo cp $INSTALLERDIR/raspi/access_point/interfaces.d/* /etc/network/interfaces.d/
 
     echo "Converting RasPi into an Access Point"
-    sudo bash $DIR_PATH/raspi/access_point/wap.sh
+    sudo bash $INSTALLERDIR/raspi/access_point/wap.sh
 fi
 
 
@@ -668,7 +674,7 @@ fi
 # Final output
 if [ ! $targetSystem = raspi ] ; then
     echo ""
-    echo "SUSI AI has been installed into $BASE_PATH."
+    echo "SUSI AI has been installed into $DESTDIR."
     if [ $INSTALLMODE = user ] ; then
         echo "To start it once, type"
         echo "  systemctl --user start ss-susi-server"
