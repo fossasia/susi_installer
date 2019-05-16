@@ -56,8 +56,7 @@ mount -t sysfs none ${mount}/sys
 mount -o bind /dev ${mount}/dev
 rm ${mount}/etc/resolv.conf
 cp /etc/resolv.conf ${mount}/etc/resolv.conf
-# download newer qemu
-wget -O ${mount}/usr/bin/qemu-arm-static http://www.preining.info/susi.ai/qemu-arm-static
+cp ".travis/qemu-arm-static" ${mount}/usr/bin/qemu-arm-static
 chmod ugo+x ${mount}/usr/bin/qemu-arm-static
 # cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
 
