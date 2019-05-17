@@ -33,7 +33,7 @@ jobs:
 before_deploy:
   - export TSTAMP=$(date +'%Y%m%d%H%M')
   - mv raspbian.img susibian-$TSTAMP.img
-  - xz --compress --verbose susibian-$TSTAMP.img
+  - travis_wait 30 xz --compress --verbose susibian-$TSTAMP.img 2>&1
   - rm susibian-$TSTAMP.img
 
 deploy:
