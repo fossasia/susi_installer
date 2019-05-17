@@ -25,7 +25,7 @@ jobs:
       env:
         - TARGET=raspi
         - VERSION=stretch
-      before_install: sudo apt-get update ; sudo apt-get install qemu qemu-user-static binfmt-support parted wget dosfstools zip pixz
+      before_install: sudo apt-get update ; sudo apt-get install qemu qemu-user-static binfmt-support parted wget dosfstools zip xz-utils
       script:
         - sudo bash ./.travis/create-image
         - ls -lh raspbian.img
@@ -33,7 +33,7 @@ jobs:
 before_deploy:
   - export TSTAMP=$(date +'%Y%m%d%H%M')
   - mv raspbian.img susibian-$TSTAMP.img
-  - pixz < susibian-$TSTAMP.img > susibian-$TSTAMP.img.xz
+  - xz --compress --verbose susibian-$TSTAMP.img
   - rm susibian-$TSTAMP.img
 
 deploy:
