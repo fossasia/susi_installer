@@ -196,7 +196,7 @@ if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
    ]]  ; then
   DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
- 
+
 
 #
 # in the pi-gen pipeline we get SUSI_REVISION (by default "development") passed
@@ -277,7 +277,7 @@ if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
     INSTALLERDIR="$DESTDIR/susi_installer"
 fi
 
-    
+
 # Set up default sudo mode
 # on Raspi and in system mode, use sudo
 # Otherwise leave empty so that user is asked whether to use it
@@ -404,7 +404,7 @@ install_pip_dependencies()
             ask_for_sudo
         fi
     fi
-    
+
     PIP=pip3
     if [ $CLEAN = 1 ] ; then
         PIP="pip3 --no-cache-dir"
@@ -460,6 +460,7 @@ function install_seeed_voicecard_driver()
     cd ..
     tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
     rm -rf seeed-voicecard
+    sudo apt install pulseaudio
     if [ $CLEAN = 1 ] ; then
         sudo apt-get clean
     fi
