@@ -38,11 +38,12 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: $GH_TOKEN
+  api_key:
+    secure: IpZN2h1PA89svsfzuxbgFKlljYAXRF/0wZ2+C6VyiZ4AYe3jASbk9WaAnMYLgJT0sAtjhze6IPiCc9luhOkZZVqap1sx6BAeZx+df5OHnBtojw7b8wmU67X+vlhB/4pOBo4RyIQpdCKKfXs7Fi/G/72Sc3FCBE/stE/ctlxknIiSjCcpC2tmDl5/5+CQJuazR8HoGzK7N0seNaIUMUW0+/hbFypgqXr+xZppJqulZxQw7JqDUPyB2nZDMcbpD8+ISYszZPjVgmWQp6iId7AJ4KVNdWIVUPAkME7aEQ0BDkB9cQevgZnDjJfKZywSqLlm5QzMfgjK7SUTZPK5jrwLuZbujzL+be/dAHA0sfVJp/cfxrVkQd33Dd2eMF6/0ilsthWs/LAOQ+/BCA17Ew0RYJzr4waXyMtIAVccdmqRV3h9KXPblCJwCy54ARrYy97UKvvVogEQyyOGIzNLFutVDe2/FhyDEg6i6cqmzkboiWn7weusABmf1VgiuRslv3xfH0ZCRq+kMF7IXPzoY2olir/u+oZC+bmFR0UrKc3E3F6zdBk33jDxpDw9Q0BOM9Ln3zOj3mWp8pFcdmCeBDMl8mhyoZW54B26pda4UMXNaAXya8xvrKlh6YCfmArSLpAFUI9dLsxUTEGUoxNFJXcnhoa//GY6gnBgvXeGV1C0L9s=
   file_glob: true
   file: susibian-*.img.xz
   skip_cleanup: true
   on:
     tags: true
     condition: $TARGET = raspi
-
+    all_branches: true
