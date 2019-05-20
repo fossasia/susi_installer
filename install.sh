@@ -198,11 +198,13 @@ if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
 fi
  
 
-#
-# in the pi-gen pipeline we get SUSI_REVISION (by default "development") passed
-# into in the environment, but for Desktop installs we need to set it since we
-# use it to checkout a branch of susi_linux
-export SUSI_REVISION=${SUSI_REVISION:-"development"}
+# default branches of the various components
+export SUSI_LINUX_BRANCH=${SUSI_LINUX_BRANCH:-"development"}
+export SUSI_PYTHON_BRANCH=${SUSI_PYTHON_BRANCH:-"master"}
+# if we are travis testing, then the correct branch is already
+# checked out, so no need to do anything (see below).
+# But if we git clone, we use this variable
+export SUSI_INSTALLER_BRANCH=${SUSI_INSTALLER_BRANCH:-"development"}
 
 #
 # set up relevant paths and settings
@@ -250,6 +252,7 @@ if [ ! -d "raspi" ] ; then
     cd "$DESTDIR"
     git clone https://github.com/fossasia/susi_installer.git
     cd susi_installer
+    git checkout $SUSI_INSTALLER_BRANCH
     # Start real installation
     sysarg=""
     if [ $INSTALLMODE = system ] ; then
@@ -272,6 +275,7 @@ if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
         echo "SUSI Installer already present in $DESTDIR/susi_installer, please remove!"
         exit 1
     fi
+    # we keep the current branch - eg on travis - and only copy the current status
     cp -a "$INSTALLERDIR" "$DESTDIR/susi_installer"
     # reset the INSTALLERDIR variable since we don't want to exec again
     INSTALLERDIR="$DESTDIR/susi_installer"
@@ -475,9 +479,7 @@ if [ ! -d "susi_linux" ]
 then
     git clone https://github.com/fossasia/susi_linux.git
     cd susi_linux
-    # pi-gen used before "SUSI_REVISION" and *not* SUSI_BRANCH, or SUSI_PULL_REQUEST
-    # we should simplify all these variables ...
-    git checkout "$SUSI_REVISION"
+    git checkout $SUSI_LINUX_BRANCH
     cd ..
 else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
@@ -501,6 +503,7 @@ echo "Downloading: Susi Python API Wrapper"
 if [ ! -d "susi_python" ]
 then
     git clone https://github.com/fossasia/susi_python.git
+    git checkout $SUSI_PYTHON_BRANCH
     ln -s ../susi_python/susi_python susi_linux/
 else
     echo "WARNING: susi_python directory already present, not cloning it!" >&2
