@@ -13,6 +13,8 @@ env:
 
 # the default script for docker tests
 script:
+  - echo "TRIGGER SOURCE = $TRIGGER_SOURCE"
+  - echo "TRIGGER BRANCH = $TRIGGER_BRANCH"
   - docker run -v ${TRAVIS_BUILD_DIR}:/tmp/installer -w /tmp/installer -it --rm $TARGET:$VERSION sh -c "
       export DEBIAN_FRONTEND=noninteractive ;
       apt-get update ;
