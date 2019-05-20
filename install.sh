@@ -503,7 +503,9 @@ echo "Downloading: Susi Python API Wrapper"
 if [ ! -d "susi_python" ]
 then
     git clone https://github.com/fossasia/susi_python.git
+    cd susi_python
     git checkout $SUSI_PYTHON_BRANCH
+    cd ..
     ln -s ../susi_python/susi_python susi_linux/
 else
     echo "WARNING: susi_python directory already present, not cloning it!" >&2
