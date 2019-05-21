@@ -6,10 +6,14 @@ services:
   - docker
 
 env:
-  - TARGET=debian VERSION=stretch
-  - TARGET=debian VERSION=buster
-  - TARGET=ubuntu VERSION=18.04
-  - TARGET=ubuntu VERSION=19.04
+  global:
+    TRIGGER_BRANCH=""
+    TRIGGER_SOURCE=""
+  matrix:
+    - TARGET=debian VERSION=stretch
+    - TARGET=debian VERSION=buster
+    - TARGET=ubuntu VERSION=18.04
+    - TARGET=ubuntu VERSION=19.04
 
 # the default script for docker tests
 script:
