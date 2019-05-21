@@ -23,7 +23,7 @@ script:
       export DEBIAN_FRONTEND=noninteractive ;
       apt-get update ;
       apt-get install -y --no-install-recommends lsb-release git ca-certificates wget sudo ;
-      ./install.sh"
+      env TRIGGER_SOURCE=$TRIGGER_SOURCE TRIGGER_BRANCH=$TRIGGER_BRANCH ./install.sh"
 
 jobs:
   include:
@@ -33,7 +33,7 @@ jobs:
         - VERSION=stretch
       before_install: sudo apt-get update ; sudo apt-get install qemu qemu-user-static binfmt-support parted wget dosfstools zip pixz
       script:
-        - sudo bash ./.travis/create-image
+        - sudo -E bash ./.travis/create-image
         - ls -lh raspbian.img
 
 before_deploy:
