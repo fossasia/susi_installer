@@ -5,6 +5,11 @@ sudo: required
 services:
   - docker
 
+#
+# note, the global variables NEED to be defined like this, because travis-ci is broken
+# wrt deep merge of env settings, see
+# https://github.com/travis-ci/travis-ci/issues/8655
+# https://github.com/travis-ci/docs-travis-ci-com/issues/1485#issuecomment-351726416
 env:
   global:
     TRIGGER_BRANCH=""
