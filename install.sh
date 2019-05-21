@@ -198,6 +198,19 @@ if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
 fi
  
 
+# support external triggers in Travis builds, 
+TRIGGER_BRANCH=${TRIGGER_BRANCH:-""}
+TRIGGER_SOURCE=${TRIGGER_SOURCE:-""}
+if [[ ( -n $TRIGGER_SOURCE ) && ( -n $TRIGGER_BRANCH ) ]] ; then
+    # we only accept triggers from fossasia
+    TRIGGER_REPO=${TRIGGER_SOURCE#fossasia/}
+    case "$TRIGGER_REPO" in
+        susi_linux) SUSI_LINUX_BRANCH=$TRIGGER_BRANCH ;;
+        susi_python) SUSI_PYTHON_BRANCH=$TRIGGER_BRANCH ;;
+        *) echo "Unknown trigger source: $TRIGGER_SOURCE, ignoring it" ;;
+    esac
+fi
+
 # default branches of the various components
 export SUSI_LINUX_BRANCH=${SUSI_LINUX_BRANCH:-"development"}
 export SUSI_PYTHON_BRANCH=${SUSI_PYTHON_BRANCH:-"master"}
