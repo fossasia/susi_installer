@@ -21,14 +21,19 @@ env:
     - TARGET=ubuntu VERSION=19.04
 
 # the default script for docker tests
+# try running installation as user pi instead of root
 script:
-  - echo "TRIGGER SOURCE = $TRIGGER_SOURCE"
-  - echo "TRIGGER BRANCH = $TRIGGER_BRANCH"
+  - echo "TRIGGER SOURCE = $TRIGGER_SOURCE, TRIGGER BRANCH = $TRIGGER_BRANCH"
   - docker run -v ${TRAVIS_BUILD_DIR}:/tmp/installer -w /tmp/installer -it --rm $TARGET:$VERSION sh -c "
       export DEBIAN_FRONTEND=noninteractive ;
-      apt-get update ;
+      apt-get update ; apt-get -y --no-install-recommends upgrade ;
       apt-get install -y --no-install-recommends lsb-release git ca-certificates wget sudo ;
-      env TRIGGER_SOURCE=$TRIGGER_SOURCE TRIGGER_BRANCH=$TRIGGER_BRANCH ./install.sh"
+      useradd -m -U pi ;
+      echo 'pi ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/010-pi ;
+      export TRIGGER_SOURCE=$TRIGGER_SOURCE ;
+      export TRIGGER_BRANCH=$TRIGGER_BRANCH ;
+      export HOME=/home/pi ;
+      sudo -E -u pi ./install.sh --use-sudo"
 
 jobs:
   include:

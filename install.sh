@@ -121,6 +121,10 @@ then
                 CLEAN=1
                 shift
                 ;;
+            --use-sudo)
+                SUDOCMD="sudo"
+                shift
+                ;;
             --susi-server-user)
                 SUSI_SERVER_USER="$2"
                 shift ; shift
@@ -134,6 +138,7 @@ Possible options:
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
                    defaults to $HOME/SUSI.AI
+  --use-sudo       use sudo for installation of packages without asking
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
 
@@ -303,7 +308,7 @@ if [ $targetSystem = raspi -o $INSTALLMODE = system ] ; then
     # in system mode we expect root or sudo-able user to do it
     SUDOCMD=sudo
 else
-    SUDOCMD=""
+    SUDOCMD=${SUDOCMD:-""}
 fi
 
 #
