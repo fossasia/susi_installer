@@ -637,13 +637,13 @@ if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     # on RasPi, we install the system units into the system directories
     if [ $targetSystem = raspi ] ; then
         sudo cp 'ss-susi-server.service' /lib/systemd/system/
-        sudo systemctl daemon-reload
+        sudo systemctl daemon-reload || true
     else
         # Desktop in user mode
         mkdir -p $HOME/.config/systemd/user
         # we need to filter out the User= line from user units!
         grep -v '^User=' ss-susi-server.service > $HOME/.config/systemd/user/ss-susi-server.service
-        systemctl --user daemon-reload
+        systemctl --user daemon-reload || true
     fi
 else
     # susi-server does not support multi-user functionality by now
@@ -663,7 +663,7 @@ else
     $SUDOCMD chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
     $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
     $SUDOCMD cp ss-susi-server.service /lib/systemd/system/
-    $SUDOCMD systemctl daemon-reload
+    $SUDOCMD systemctl daemon-reload || true
 fi
 rm ss-susi-server.service
 
