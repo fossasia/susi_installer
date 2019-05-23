@@ -18,6 +18,7 @@ env:
     - TARGET=debian VERSION=stretch
     - TARGET=debian VERSION=buster
     - TARGET=ubuntu VERSION=18.04
+    - TARGET=ubuntu VERSION=19.01
     - TARGET=ubuntu VERSION=19.04
 
 # the default script for docker tests
