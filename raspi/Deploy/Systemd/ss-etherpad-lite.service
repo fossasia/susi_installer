@@ -1,0 +1,15 @@
+[Unit]
+Description=SUSI.AI Etherpad-Lite
+After=network.target
+
+[Service]
+Environment=NODE_PORT=9001
+Environment=NODE_ENV=production
+Type=simple
+User=pi
+
+ExecStart=/usr/bin/node /home/pi/SUSI.AI/etherpad-lite/node_modules/ep_etherpad-lite/node/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

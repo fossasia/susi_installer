@@ -29,6 +29,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 #   susi_server
 #   susi_skill_data
 #   seeed_voicecard
+#   etherpad-lite (for raspi)
 
 #
 # TODO items
@@ -550,7 +551,6 @@ else
     echo "WARNING: susi_server directory already present, not cloning it!" >&2
 fi
 
-
 echo "Installing required dependencies"
 install_debian_dependencies $DEBDEPS
 install_pip_dependencies
@@ -585,7 +585,24 @@ then
     install_seeed_voicecard_driver
 fi
 
-
+# install Etherpad on RPi, including the depending modules
+if [ $targetSystem = raspi ]
+then
+    echo "Downloading: Etherpad-lite"
+    cd "$DESTDIR"
+    if [ ! -d etherpad-lite ] ; then
+        git clone --branch master https://github.com/ether/etherpad-lite.git
+    else
+        echo "WARNING: etherpad-lite directory already present, not cloning it!" >&2
+    fi
+    echo "Adding node.js repository"
+    curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+    echo "Installing node modules for etherpad"
+    cd etherpad-lite
+    bin/installDeps.sh
+    cd ..
+    # systemd file is automatically installed using Deploy/auto... further below
+fi
 
 if [ ! -f "susi_linux/extras/cmu_us_slt.flitevox" ]
 then
