@@ -197,7 +197,7 @@ SNOWBOYBUILDDEPS="
 # on Debian buster and upwards, and Ubuntu 19.04 and upwards, install python3-alsaaudio
 if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
       || \
-      ( $targetSystem = ubuntu && ! $targetVersion = 18.04 ) \
+      ( $targetSystem = ubuntu && ! $targetVersion = 18.04 && ! $targetVersion = 19.01 && ! $targetVersion = 19.1 ) \
    ]]  ; then
   DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
