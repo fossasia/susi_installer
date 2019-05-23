@@ -70,7 +70,7 @@ case "$vendor" in
         targetSystem=raspi
         targetVersion=${version%.*}
         ;;
-    Ubuntu)
+    Ubuntu|LinuxMint)
         targetSystem=ubuntu
         targetVersion=$version
         case "$targetVersion" in
