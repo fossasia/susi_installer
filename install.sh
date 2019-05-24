@@ -597,6 +597,7 @@ then
     fi
     echo "Adding node.js repository"
     curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+    sudo apt-get install --no-install-recommends -y nodejs
     echo "Installing node modules for etherpad"
     cd etherpad-lite
     bin/installDeps.sh
