@@ -709,7 +709,6 @@ if [ $targetSystem = raspi ] ; then
     mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 
     # link etherpad database file to $WORKDIR
-    mkdir $DESTDIR/etherpad-lite/var
     touch $WORKDIR/etherpad.db
     ln -s $WORKDIR/etherpad.db $DESTDIR/etherpad-lite/var/dirty.db
 
