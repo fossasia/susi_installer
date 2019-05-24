@@ -30,6 +30,10 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 #   susi_skill_data
 #   seeed_voicecard
 #   etherpad-lite (for raspi)
+# Contents of WORKDIR
+#   config.json
+#   susidata (link target for susi_server/data)
+#   etherpad.db (link target foretherpad-lite/var/dirty.db)
 
 #
 # TODO items
@@ -700,9 +704,18 @@ if [ $targetSystem = raspi ] ; then
     cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"
     sudo rm -Rf .git
-    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python
+    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python etherpad-lite
     echo ""  # To add newline after tar's last checkpoint
     mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
+
+    # link etherpad database file to $WORKDIR
+    mkdir $DESTDIR/etherpad-lite/var
+    touch $WORKDIR/etherpad.db
+    ln -s $WORKDIR/etherpad.db $DESTDIR/etherpad-lite/var/dirty.db
+
+    # save susi_linux server data outside of server dir
+    mkdir $WORKDIR/susi_server_data
+    ln -s $WORKDIR/susi_server_data $DESTDIR/susi_server/data
 
     # Avahi has bug with IPv6, and make it fail to propage mDNS domain.
     sudo sed -i 's/use-ipv6=yes/use-ipv6=no/g' /etc/avahi/avahi-daemon.conf || true
