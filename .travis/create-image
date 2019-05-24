@@ -22,8 +22,19 @@ cleanup() {
 }
 trap cleanup EXIT
 
-wget -O raspbian-latest-lite.zip https://downloads.raspberrypi.org/raspbian_lite_latest
-unzip raspbian-latest-lite.zip
+if [ ! -r raspbian-latest-lite.zip ] ; then
+    if [ ! -r ../raspbian-latest-lite.zip ] ; then
+        echo "Downloading latest raspbian lite image"
+        wget -O raspbian-latest-lite.zip https://downloads.raspberrypi.org/raspbian_lite_latest
+	unzip raspbian-latest-lite.zip
+    else
+	echo "Reusing ../raspbian-latest-lite.zip"
+	unzip ../raspbian-latest-lite.zip
+    fi
+else
+    echo "Reusing ./raspbian-latest-lite.zip"
+    unzip raspbian-latest-lite.zip
+fi
 mv ????-??-??-raspbian-stretch-lite.img raspbian.img
 ls
 
