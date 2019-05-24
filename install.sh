@@ -694,6 +694,7 @@ rm ss-susi-server.service
 if [ $targetSystem = raspi ] ; then
     # enable the server service unconditionally
     sudo systemctl enable ss-susi-server
+    sudo systemctl enable ss-etherpad-lite
 
     echo "Enabling the SSH access"
     sudo systemctl enable ssh

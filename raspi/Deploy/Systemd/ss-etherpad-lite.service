@@ -7,7 +7,7 @@ Environment=NODE_PORT=9001
 Environment=NODE_ENV=production
 Type=simple
 User=pi
-
+WorkingDirectory=/home/pi/SUSI.AI/etherpad-lite
 ExecStart=/usr/bin/node /home/pi/SUSI.AI/etherpad-lite/node_modules/ep_etherpad-lite/node/server.js
 Restart=on-failure
 
