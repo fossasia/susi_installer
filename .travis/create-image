@@ -72,8 +72,11 @@ chmod ugo+x ${mount}/usr/bin/qemu-arm-static
 # cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
 
 df -h ${mount}
+
 # Run the setup script inside the chroot
-chroot ${mount}  "/tmp/${script}"
+# $TRAVIS_BRANCH is set by Travis CI to indicate the current branch
+# $TRIGGER_* is set by .travis.yml to the triggering repo and branch
+chroot ${mount}  "/tmp/${script}" $TRAVIS_BRANCH $TRIGGER_SOURCE $TRIGGER_BRANCH
 
 # cleanup tmp directories in image!!!
 # basically code from pi-gen.git/export-image/04-finalise/01-run.sh

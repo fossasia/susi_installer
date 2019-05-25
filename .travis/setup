@@ -3,7 +3,15 @@ set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 uname -r
-ls
+
+#
+# three arguments can be passed in: current branch, trigger source, and trigger branch
+# the first two arguments give TRIGGER_SOURCE and TRIGGER_BRANCH
+CURRENT_BRANCH=${1:-development}
+TRIGGER_SOURCE=${2:-""}
+TRIGGER_BRANCH=${3:-""}
+# using export we pass on these values to the install.sh call
+export TRIGGER_SOURCE TRIGGER_BRANCH
 
 export LANG=C
 export LC_ALL=C
@@ -16,7 +24,7 @@ sudo -u pi mkdir /home/pi/SUSI.AI
 cd /home/pi/SUSI.AI && sudo -u pi git clone https://github.com/fossasia/susi_installer.git
 
 # Run SUSI Linux's install script
-cd /home/pi/SUSI.AI/susi_installer && git checkout development && sudo -Hu pi ./install.sh --clean
+cd /home/pi/SUSI.AI/susi_installer && git checkout $CURRENT_BRANCH && sudo -Hu pi ./install.sh --clean
 
 # After ./install.sh, the /dev is occupied by some processes and cannot be released by build script.
 # We stop those processes to let the build script continue.
