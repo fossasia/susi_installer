@@ -42,16 +42,17 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 #
 # determine Debian/Ubuntu release - we don't support anything else at the moment
-#                   Raspbian       Debian 9      Ubuntu          Debian 10
-# lsb_release -i    Raspbian       Debian        Ubuntu          Debian
-# lsb_release -r    9.N            9.N           14.04/16.04     10.N
+#                   Raspbian       Debian 9      Ubuntu          Debian 10  Mint
+# lsb_release -i    Raspbian       Debian        Ubuntu          Debian     LinuxMint
+# lsb_release -r    9.N            9.N           14.04/16.04     10.N       18.2
 #
 # Ubuntu release: 14.04, 16.04, 18.04, 18.10, 19.04, ...
 # Debian release: 9.N (2017/06 released, stretch, current stable, Raspbian), 10 (2019/0? released, buster), 11 (???)
 # Raspbian release: 9.N (like Debian stretch)
+# Linux Mint: 18.*, 19.*, 18, 19
 #
 # We classify systems according to distribution and version
-# - targetSystem = raspi | debian | ubuntu
+# - targetSystem = raspi | debian | ubuntu | mint
 vendor=`lsb_release -i -s 2>/dev/null`
 version=`lsb_release -r -s 2>/dev/null`
 targetSystem=""
@@ -75,12 +76,20 @@ case "$vendor" in
         targetSystem=raspi
         targetVersion=${version%.*}
         ;;
-    Ubuntu|LinuxMint)
+    Ubuntu)
         targetSystem=ubuntu
         targetVersion=$version
         case "$targetVersion" in
             18.*|19.*|20.*) ;;
             *) echo "Unsupported Ubuntu version: $targetVersion" >&2 ; exit 1 ;;
+        esac
+        ;;
+    LinuxMint)
+        targetSystem=mint
+        targetVersion=$version
+        case "$targetVersion" in
+            18.*|18|19.*|19|20.*|20) ;;
+            *) echo "Unsupported Linux Mint version: $targetVersion" >&2 ; exit 1 ;;
         esac
         ;;
     *)
@@ -199,10 +208,14 @@ SNOWBOYBUILDDEPS="
   libatlas-base-dev
 "
 
-# on Debian buster and upwards, and Ubuntu 19.04 and upwards, install python3-alsaaudio
+# python3-alsaaudio is not available on older distributions
+# only install it on:
+# - Debian buster and upwards
+# - Ubuntu 19.04 and upwards
+# - Linux Mint by now doesn't have python3-alsaaudio
 if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
       || \
-      ( $targetSystem = ubuntu && ! $targetVersion = 18.04 && ! $targetVersion = 18.10 && ! $targetVersion = 19.01 && ! $targetVersion = 19.1 ) \
+      ( $targetSystem = ubuntu && ! $targetVersion = 18.04 && ! $targetVersion = 18.10 && ! $targetVersion = 19.01 ) \
    ]]  ; then
   DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
@@ -570,6 +583,8 @@ fi
 if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
       || \
       ( $targetSystem = ubuntu && $targetVersion = 18.04 ) \
+      ||
+      ( $targetSystem = mint ) \
    ]]  ; then
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
