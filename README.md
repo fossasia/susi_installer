@@ -45,6 +45,12 @@ How to assembly a smart speaker: [Video](https://www.youtube.com/watch?v=jAEmRvQ
 * Wait for re-boot of the speaker, SUSI will say "SUSI has started" as soon it is ready.
 * If you want to return to the installation process (i.e. to configure another network), you can reset the device by pushing and holding the button for at least 10 seconds.
 
+### Configuring the Smart Speaker through the Android App
+* After Running the installation script , you'll have a RasPi in access point mode. With a Flask Server running at port 5000.
+* You can use the mobile clients to configure the device automatically.<br>
+<img src="docs/images/ios_app.gif" height="400px">
+
+
 ### Update Daemon
 
 At any point of time, we may want to check if the current version of susi linux is updated. Hence we compare against the corresponding remote repository and we update it accordingly every time the raspberry Pi has started.
