@@ -30,10 +30,20 @@ This projects aims at installing the various components of SUSI.AI in your Raspb
 How to assembly a smart speaker: [Video](https://www.youtube.com/watch?v=jAEmRvQLmc0)
 
 ### Installation Guide
-* Rasberry Pi
-  - Download and flash the latest img file from: [Susibian.img](https://github.com/fossasia/susi_installer/releases)
+* Rasberry Pi (smart speaker)
+  - Download and flash the latest img file from: [Susibian.img](https://github.com/fossasia/susi_installer/releases) follow [setup guide.](docs/development_device_handout.md)
   - Manually setup using susi_installer - [Raspberry Pi setup guide.](docs/raspberry-pi_install.md)
 * For installation on Ubuntu and other Debian based distributions, read [Ubuntu Setup Guide](docs/ubuntu_install.md)
+
+### Configuring Smart Speaker
+* Power on the device
+* Connect your computer or mobile phone to the SUSI.AI hotspot using the password "password".
+* Open http://10.0.0.1:5000 which will show you the set-up page as visible below:
+![SUSI.AI Wifi Setup](docs/images/SUSI.AI-Wifi-Setup.png "SUSI.AI Wifi Setup")
+* Put in your Wifi credentials. For an open network set an empty password. If The device should connect automatically to any open network, leave SSID and password empty.
+* Click on "Reboot Smart Speaker"
+* Wait for re-boot of the speaker, SUSI will say "SUSI has started" as soon it is ready.
+* If you want to return to the installation process (i.e. to configure another network), you can reset the device by pushing and holding the button for at least 10 seconds.
 
 ### Update Daemon
 
