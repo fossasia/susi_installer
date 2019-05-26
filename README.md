@@ -15,7 +15,6 @@ This projects aims at installing the various components of SUSI.AI in your Raspb
 * A hardware device capable to run Linux. Currently on Raspberry Pi 3 is supported. Other embedded computers, like BeagleBone Black, Orange Pi, will be supported in the future.
 * A Debian based Linux Distribution. Tested on
     - Raspbian on Raspberry Pi 3
-    - Ubuntu 64bit on x64 architecture
 * A microphone for input. Currently the development team is using [ReSpeaker 2-Mics Pi HAT](https://www.seeedstudio.com/ReSpeaker-2-Mics-Pi-HAT-p-2874.html) for Raspberry Pi.
 * A speaker for output. On development boards like Raspberry Pi, you can use a portable speaker that connects through
 3.5mm audio jack. If you are using _ReSpeaker 2-Mics Pi HAT_, the speaker should be plugged to this board.
@@ -23,5 +22,15 @@ This projects aims at installing the various components of SUSI.AI in your Raspb
 #### For using SUSI.AI on your desktop
 * A desktop with any of the following linux distribution :
   - Ubuntu 16.04/17.04/18.04
-  - Linux Mint 18.3 (10 July 2018)
+  - Linux Mint 18.3
 * A microphone for input
+
+### Smart speaker assembly tutorial
+
+How to assembly a smart speaker: [Video](https://www.youtube.com/watch?v=jAEmRvQLmc0)
+
+### Installation Guide
+* Rasberry Pi
+  - Download and flash the latest img file from: [Susibian.img](https://github.com/fossasia/susi_installer/releases)
+  - Manually setup using susi_installer - [Raspberry Pi setup guide.](docs/raspberry-pi_install.md)
+* For installation on Ubuntu and other Debian based distributions, read [Ubuntu Setup Guide](docs/ubuntu_install.md)
