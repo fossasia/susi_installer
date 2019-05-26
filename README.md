@@ -34,3 +34,18 @@ How to assembly a smart speaker: [Video](https://www.youtube.com/watch?v=jAEmRvQ
   - Download and flash the latest img file from: [Susibian.img](https://github.com/fossasia/susi_installer/releases)
   - Manually setup using susi_installer - [Raspberry Pi setup guide.](docs/raspberry-pi_install.md)
 * For installation on Ubuntu and other Debian based distributions, read [Ubuntu Setup Guide](docs/ubuntu_install.md)
+
+### Update Daemon
+
+At any point of time, we may want to check if the current version of susi linux is updated. Hence we compare against the corresponding remote repository and we update it accordingly every time the raspberry Pi has started.
+Use the following commands.
+* `cd update_daemon/`
+* `./update_check.sh`
+
+### Factory Reset
+
+To initiate the factory reset command.<br/>
+Use the following commands.
+* `cd factory_reset/`
+* `chmod +x factory_reset.sh`
+* `./factory_reset.sh`
