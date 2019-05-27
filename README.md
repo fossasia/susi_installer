@@ -21,7 +21,8 @@ This projects aims at installing the various components of SUSI.AI in your Raspb
 
 #### For using SUSI.AI on your desktop
 * A desktop with any of the following linux distribution :
-  - Ubuntu 16.04/17.04/18.04
+  - Ubuntu 18.04 or above
+  - Debian stretch or above
   - Linux Mint 18.3
 * A microphone for input
 
