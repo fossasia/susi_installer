@@ -707,6 +707,9 @@ rm ss-susi-server.service
 # enable the client service ONLY on Desktop, NOT on RPi
 # On raspi we do other setups like reset folder etc
 if [ $targetSystem = raspi ] ; then
+    # make sure that the susi_server does not open the browser on startup
+    sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
+
     # enable the server service unconditionally
     sudo systemctl enable ss-susi-server
     sudo systemctl enable ss-etherpad-lite
@@ -717,13 +720,6 @@ if [ $targetSystem = raspi ] ; then
     echo "Disable dhcpcd"
     sudo systemctl disable dhcpcd
 
-    cd "$DESTDIR"
-    echo "Creating a backup folder for future factory_reset"
-    sudo rm -Rf .git
-    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python etherpad-lite
-    echo ""  # To add newline after tar's last checkpoint
-    mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
-
     # link etherpad database file to $WORKDIR
     touch $WORKDIR/etherpad.db
     ln -s $WORKDIR/etherpad.db $DESTDIR/etherpad-lite/var/dirty.db
@@ -731,6 +727,13 @@ if [ $targetSystem = raspi ] ; then
     # save susi_linux server data outside of server dir
     mkdir $WORKDIR/susi_server_data
     ln -s $WORKDIR/susi_server_data $DESTDIR/susi_server/data
+
+    cd "$DESTDIR"
+    echo "Creating a backup folder for future factory_reset"
+    sudo rm -Rf .git
+    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python etherpad-lite
+    echo ""  # To add newline after tar's last checkpoint
+    mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 
     # Avahi has bug with IPv6, and make it fail to propage mDNS domain.
     sudo sed -i 's/use-ipv6=yes/use-ipv6=no/g' /etc/avahi/avahi-daemon.conf || true
