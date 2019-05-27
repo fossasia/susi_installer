@@ -38,8 +38,8 @@ network={
     ```
     $ mkdir SUSI.AI
     $ cd SUSI.AI
-    $ git clone https://github.com/fossasia/susi_linux.git
-    $ cd susi_linux
+    $ git clone https://github.com/fossasia/susi_installer.git
+    $ cd susi_installer
     ```
 - Run the install script by running
     ```
@@ -75,9 +75,9 @@ Refer to this article for step by step instructions on changing locale to ```en_
     - http://rohankapoor.com/2012/04/americanizing-the-raspberry-pi/
 
     - You just need to change locale. Timezone and other changes illustrated in article are not needed.
-- For installation on devices running on Armv6 processors (e.g. Raspberry Pi Zero / Zero W/ Zero WH/ 1A/ 1B): 
-    - Please use Java 8 (Either Oracle or OpenJDK). 
-        - For most debian based OS, including Raspbian, you may install OpenJDK's Java 8 JRE and JDK by running 
+- For installation on devices running on Armv6 processors (e.g. Raspberry Pi Zero / Zero W/ Zero WH/ 1A/ 1B):
+    - Please use Java 8 (Either Oracle or OpenJDK).
+        - For most debian based OS, including Raspbian, you may install OpenJDK's Java 8 JRE and JDK by running
         - `sudo apt install openjdk-8-jre* openjdk-8-jdk*`
 
 ## Steps
@@ -88,10 +88,10 @@ Refer to this article for step by step instructions on changing locale to ```en_
 ```
 $ mkdir SUSI.AI
 $ cd SUSI.AI
-$ git clone https://github.com/fossasia/susi_linux.git
-$ cd susi_linux
+$ git clone https://github.com/fossasia/susi_installer.git
+$ cd susi_installer
 ```
-- Run the install script by running 
+- Run the install script by running
 ```
 $ ./install.sh
 ```
