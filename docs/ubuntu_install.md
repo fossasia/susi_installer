@@ -28,8 +28,8 @@ Tested on:
 
 - Clone the Github Repository and open folder
 ```
-$ git clone https://github.com/fossasia/susi_linux.git
-$ cd susi_linux
+$ git clone https://github.com/fossasia/susi_installer
+$ cd susi_installer
 ```
 - Run the install script
 ````bash
