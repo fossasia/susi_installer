@@ -1,4 +1,6 @@
 #!/bin/bash
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 export LANG=C
 export LC_ALL=C
