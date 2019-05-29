@@ -10,11 +10,6 @@ APPASS="password"
 APSSID="SUSI.AI"
 
 
-apt-get remove --purge hostapd -yqq
-apt-get update -yqq
-apt-get upgrade -yqq
-apt-get install hostapd dnsmasq -yqq
-
 cat > /etc/dnsmasq.conf <<EOF
 interface=wlan0
 dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h

@@ -220,6 +220,10 @@ if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
   DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
  
+# we need hostapd and dnsmask for access point mode
+if [ $targetSystem = raspi ] ; then
+  DEBDEPS="$DEBDEPS hostapd dnsmasq"
+fi
 
 # support external triggers in Travis builds, 
 TRIGGER_BRANCH=${TRIGGER_BRANCH:-""}
