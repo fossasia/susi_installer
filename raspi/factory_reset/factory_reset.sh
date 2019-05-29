@@ -1,6 +1,13 @@
 #! /bin/bash
 
-echo "running factory reset process"
+mode="$1"
+
+if [ -z "$mode" ] ; then
+  echo "No mode given, not doing factory reset. Pass in 'soft' or 'hard'" >&2
+  exit 1
+fi
+
+echo "running $mode factory reset process"
 
 # stop running processes
 # killall python3
@@ -18,11 +25,15 @@ mv /home/pi/SUSI.AI.NEW /home/pi/SUSI.AI
 
 # rescue the rescue dump before cleaning up
 echo "rescuing the rescue folder"
-mv /home/pi/SUSI.AI.OLD/susi_installer/raspi/factory_reset/reset_folder.tar.xz /home/pi/SUSI.AI/susi__installer/raspi/factory_reset/
+mv /home/pi/SUSI.AI.OLD/susi_installer/raspi/factory_reset/reset_folder.tar.xz /home/pi/SUSI.AI/susi_installer/raspi/factory_reset/
 
 # rescue config file 
 # TODO we can provide options for full reset and partial reset
-cp /home/pi/SUSI.AI.OLD/config.json /home/pi/SUSI.AI/
+if [ $mode = soft ] ; then
+  cp -a /home/pi/SUSI.AI.OLD/config.json /home/pi/SUSI.AI/
+  cp -a /home/pi/SUSI.AI.OLD/etherpad.db /home/pi/SUSI.AI/
+  cp -a /home/pi/SUSI.AI.OLD/susi_server_data /home/pi/SUSI.AI/
+fi
 
 # clean up
 echo "cleaning up"
