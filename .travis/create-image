@@ -5,6 +5,10 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 export LANG=C
 export LC_ALL=C
 
+TRAVIS_BRANCH=${TRAVIS_BRANCH:-""}
+TRIGGER_SOURCE=${TRIGGER_SOURCE:-""}
+TRIGGER_BRANCH=${TRIGGER_BRANCH:-""}
+
 /usr/bin/qemu-system-x86_64 --version
 
 mount="mnt" # Local directory to mount the image (automatically created/delete as needed)
@@ -49,7 +53,7 @@ bootdev=${loopdev}p1
 rootdev=${loopdev}p2
 
 
-e2fsck -f $rootdev
+e2fsck -f -y $rootdev
 resize2fs $rootdev
 
 
