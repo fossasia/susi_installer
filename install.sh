@@ -72,6 +72,7 @@ OPTDESTDIR=""
 PREFIX=""
 CLEAN=0
 SUSI_SERVER_USER=
+CORAL=0
 # we save arguments in case we need to re-exec the installer after git clone
 saved_args=""
 if [ ! "$vendor" = Raspbian ]
@@ -120,6 +121,11 @@ then
                 version="$2"
                 saved_args="$saved_args --force-version \"$2\""
                 shift ; shift
+                ;;
+            --with-coral)
+                CORAL=1
+                saved_args="$saved_args --with-coral"
+                shift
                 ;;
             --help)
                 cat <<'EOF'
@@ -237,6 +243,9 @@ SNOWBOYBUILDDEPS="
   libatlas-base-dev
 "
 
+# CORAL dependencies
+CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil"
+
 # python3-alsaaudio is not available on older distributions
 # only install it on:
 # - Debian buster and upwards
@@ -252,6 +261,11 @@ fi
 # we need hostapd and dnsmask for access point mode
 if [ $targetSystem = raspi ] ; then
   DEBDEPS="$DEBDEPS hostapd dnsmasq"
+fi
+
+# add necessary dependencies for Coral device
+if [ $CORAL = 1 ] ; then
+    DEBDEPS="$DEBDEPS $CORALDEPS"
 fi
 
 # support external triggers in Travis builds, 
@@ -486,6 +500,19 @@ install_pip_dependencies()
     fi
 }
 
+function install_coral()
+{
+    cd "$DESTDIR"
+    wget https://dl.google.com/coral/edgetpu_api/edgetpu_api_latest.tar.gz -O edgetpu_api.tar.gz --trust-server-names
+    tar -xzf edgetpu_api.tar.gz
+    cd edgetpu_api/
+    bash install.sh
+    cd ..
+    rm -rf edgetpu_api
+    rm -f edgetpu_api.tar.gz
+}
+
+
 function install_snowboy()
 {
     cd "$DESTDIR"
@@ -622,6 +649,13 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
         echo "Cannot find directory /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/ - not updating youtube.lua" >&2
     fi
     rm -f youtube.lua
+fi
+
+#
+# Add coral if selected
+#
+if [ $CORAL = 1 ] ; then
+    install_coral
 fi
 
 #
