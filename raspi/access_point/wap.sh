@@ -36,10 +36,15 @@ sed -i -- 's/#DAEMON_CONF=""/DAEMON_CONF="\/etc\/hostapd\/hostapd.conf"/g' /etc/
 rm -f /etc/network/interfaces.d/wlan-client
 cp /etc/network/interfaces.d/wlan.hostap /etc/network/interfaces.d/wlan-hostap
 
+# systemctl unit setup
+# these are dual to rwap.sh
 systemctl enable hostapd
 systemctl enable dnsmasq
+systemctl disable ss-susi-linux@pi.service
+systemctl disable ss-susi-login.service
+systemctl enable ss-python-flask.service
 
 # add server in the auto-boot up list
 echo "All done! Rebooting"
 
-sudo reboot
+reboot
