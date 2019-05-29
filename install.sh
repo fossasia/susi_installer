@@ -57,6 +57,93 @@ vendor=`lsb_release -i -s 2>/dev/null`
 version=`lsb_release -r -s 2>/dev/null`
 targetSystem=""
 targetVersion=""
+
+if [ "$vendor" = Raspbian ]
+then
+    USER=pi
+else
+    USER=`id -un`
+fi
+
+#
+# Allow overriding the destination directory on the Desktop
+INSTALLMODE=user
+OPTDESTDIR=""
+PREFIX=""
+CLEAN=0
+SUSI_SERVER_USER=
+if [ ! "$vendor" = Raspbian ]
+then
+    while [[ $# -gt 0 ]]
+    do
+        key="$1"
+
+        case $key in
+            --destdir)
+                OPTDESTDIR="$2"
+                shift; shift
+                ;;
+            --system)
+                INSTALLMODE=system
+                shift
+                ;;
+            --prefix)
+                PREFIX="$2"
+                shift ; shift
+                ;;
+            --clean)
+                CLEAN=1
+                shift
+                ;;
+            --use-sudo)
+                SUDOCMD="sudo"
+                shift
+                ;;
+            --susi-server-user)
+                SUSI_SERVER_USER="$2"
+                shift ; shift
+                ;;
+            --force-vendor)
+                vendor="$2"
+                shift ; shift
+                ;;
+            --force-version)
+                version="$2"
+                shift ; shift
+                ;;
+            --help)
+                cat <<'EOF'
+SUSI.AI Installer
+
+Possible options:
+  --system         install system-wide
+  --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
+  --destdir <ARG>  (only without --system) install into <ARG>
+                   defaults to $HOME/SUSI.AI
+  --use-sudo       use sudo for installation of packages without asking
+  --susi-server-user <ARG> (only with --system)
+                   user under which the susi server is run, default: _susiserver
+  --force-vendor
+  --force-version  the installer uses `lsb_release` to determine the vendor and version
+                   and has a limited set of allowed combinations that are supported.
+                   These two options allow to override the detection using lsb_release.
+                   Typical usage case are Debian/Ubuntu-based distributions that have
+                   a different vendor name/version. Use with care. Currently supported
+                   combinations:
+                   - Debian: 9, 10, 11
+                   - Ubuntu and LinuxMint: 18*, 19*, 20*
+
+EOF
+                exit 0
+                shift
+                ;;
+            *)
+                echo "Unknown option or argument: $key" >&2
+                exit 1
+        esac
+    done
+fi
+
 case "$vendor" in
     Debian)
         # remove Debian .N version number
@@ -98,74 +185,6 @@ case "$vendor" in
         ;;
 esac
 
-if [ $targetSystem = raspi ]
-then
-    USER=pi
-else
-    USER=`id -un`
-fi
-
-#
-# Allow overriding the destination directory on the Desktop
-INSTALLMODE=user
-OPTDESTDIR=""
-PREFIX=""
-CLEAN=0
-SUSI_SERVER_USER=
-if [ ! $targetSystem = raspi ]
-then
-    while [[ $# -gt 0 ]]
-    do
-        key="$1"
-
-        case $key in
-            --destdir)
-                OPTDESTDIR="$2"
-                shift; shift
-                ;;
-            --system)
-                INSTALLMODE=system
-                shift
-                ;;
-            --prefix)
-                PREFIX="$2"
-                shift ; shift
-                ;;
-            --clean)
-                CLEAN=1
-                shift
-                ;;
-            --use-sudo)
-                SUDOCMD="sudo"
-                shift
-                ;;
-            --susi-server-user)
-                SUSI_SERVER_USER="$2"
-                shift ; shift
-                ;;
-            --help)
-                cat <<'EOF'
-SUSI.AI Installer
-
-Possible options:
-  --system         install system-wide
-  --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
-  --destdir <ARG>  (only without --system) install into <ARG>
-                   defaults to $HOME/SUSI.AI
-  --use-sudo       use sudo for installation of packages without asking
-  --susi-server-user <ARG> (only with --system)
-                   user under which the susi server is run, default: _susiserver
-
-EOF
-                exit 0
-                shift
-                ;;
-            *)
-                echo "Unknown option or argument: $key" >&2
-                exit 1
-        esac
-    done
-fi
 
 #
 # Consistency checks:
