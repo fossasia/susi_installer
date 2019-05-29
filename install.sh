@@ -72,6 +72,8 @@ OPTDESTDIR=""
 PREFIX=""
 CLEAN=0
 SUSI_SERVER_USER=
+# we save arguments in case we need to re-exec the installer after git clone
+saved_args=""
 if [ ! "$vendor" = Raspbian ]
 then
     while [[ $# -gt 0 ]]
@@ -81,34 +83,42 @@ then
         case $key in
             --destdir)
                 OPTDESTDIR="$2"
+                # not saving arguments since we copy there/clone there before re-exec
                 shift; shift
                 ;;
             --system)
                 INSTALLMODE=system
+                saved_args="$saved_args --system"
                 shift
                 ;;
             --prefix)
                 PREFIX="$2"
+                saved_args="$saved_args --prefix \"$2\""
                 shift ; shift
                 ;;
             --clean)
                 CLEAN=1
+                saved_args="$saved_args --clean"
                 shift
                 ;;
             --use-sudo)
                 SUDOCMD="sudo"
+                saved_args="$saved_args --use-sudo"
                 shift
                 ;;
             --susi-server-user)
                 SUSI_SERVER_USER="$2"
+                saved_args="$saved_args --susi-server-user \"$2\""
                 shift ; shift
                 ;;
             --force-vendor)
                 vendor="$2"
+                saved_args="$saved_args --force-vendor \"$2\""
                 shift ; shift
                 ;;
             --force-version)
                 version="$2"
+                saved_args="$saved_args --force-version \"$2\""
                 shift ; shift
                 ;;
             --help)
@@ -312,15 +322,7 @@ if [ ! -d "raspi" ] ; then
     git clone https://github.com/fossasia/susi_installer.git
     cd susi_installer
     git checkout $SUSI_INSTALLER_BRANCH
-    # Start real installation
-    sysarg=""
-    if [ $INSTALLMODE = system ] ; then
-        sysarg="--system --prefix $PREFIX"
-    fi
-    if [ $CLEAN = 1 ] ; then
-        sysarg="--system --prefix $PREFIX --clean"
-    fi
-    exec ./install.sh $sysarg
+    exec ./install.sh $saved_args
 fi
 
 
