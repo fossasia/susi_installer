@@ -9,4 +9,6 @@ cp $DIR_PATH/Systemd/ss-*.service /lib/systemd/system/
 
 systemctl enable ss-update-daemon.service
 systemctl enable ss-python-flask.service
-systemctl enable ss-susi-youtube.service
+# disabled for now since susi_linux has no need for it anymore
+# after the youtube query code has been merged into development branch
+# systemctl enable ss-susi-youtube.service
