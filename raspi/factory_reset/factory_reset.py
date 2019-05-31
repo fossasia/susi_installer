@@ -20,7 +20,10 @@ try:
         elif GPIO.input(17) == 0 :
             start = time.time()
             while GPIO.input(17) == 0 :
-                time.sleep(0.2)
+                time.sleep(0.1)
+                duration = round(time.time()-start,1)
+                if(duration == 7.0 or duration == 15.0 or duration == 25.0):
+                    subprocess.Popen(['play', current_folder + '/beep.wav'])
             end = time.time()
             total = end - start
             if total >= 25 :

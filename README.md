@@ -65,9 +65,8 @@ Use the following commands.
 To initiate the factory reset.<br/>
 Press and hold the button on the Respeaker HAT to perform the following functions
 
-| Button Press Duration| Action           | Description|
-| -------------------- |:-------------|:-----|
-| 7-15 seconds      | Access Point Mode | Smart Speaker is set to access point mode: Use this for setting up wifi again |
-| 15-25 seconds      | Soft Factory Reset | Factory reset the device : User configuration is preserved|
-| >25 seconds | Hard Factory Reset      |  Factory reset the device : User configuration is not preserved  |
-
+| Button Press Duration       | Action              | Description                                                                   |
+| --------------------------- |:--------------------|:------------------------------------------------------------------------------|
+| 7-15 seconds(first beep)    | Access Point Mode   | Smart Speaker is set to access point mode: Use this for setting up wifi again |
+| 15-25 seconds(second beep)  | Soft Factory Reset  | Factory reset the device : User configuration is preserved                    |
+| >25 seconds(third beep)     | Hard Factory Reset  |  Factory reset the device : User configuration is not preserved               |
