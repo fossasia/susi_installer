@@ -257,10 +257,11 @@ if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
    ]]  ; then
   DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
- 
+
 # we need hostapd and dnsmask for access point mode
+# usbmount is needed to automount usb drives on susibian(raspbian lite)
 if [ $targetSystem = raspi ] ; then
-  DEBDEPS="$DEBDEPS hostapd dnsmasq"
+  DEBDEPS="$DEBDEPS hostapd dnsmasq usbmount"
 fi
 
 # add necessary dependencies for Coral device
@@ -268,7 +269,7 @@ if [ $CORAL = 1 ] ; then
     DEBDEPS="$DEBDEPS $CORALDEPS"
 fi
 
-# support external triggers in Travis builds, 
+# support external triggers in Travis builds,
 TRIGGER_BRANCH=${TRIGGER_BRANCH:-""}
 TRIGGER_SOURCE=${TRIGGER_SOURCE:-""}
 if [[ ( -n $TRIGGER_SOURCE ) && ( -n $TRIGGER_BRANCH ) ]] ; then
@@ -356,7 +357,7 @@ if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
     INSTALLERDIR="$DESTDIR/susi_installer"
 fi
 
-    
+
 # Set up default sudo mode
 # on Raspi and in system mode, use sudo
 # Otherwise leave empty so that user is asked whether to use it
@@ -483,7 +484,7 @@ install_pip_dependencies()
             ask_for_sudo
         fi
     fi
-    
+
     PIP=pip3
     if [ $CLEAN = 1 ] ; then
         PIP="pip3 --no-cache-dir"
@@ -695,6 +696,7 @@ if [ $targetSystem = raspi ]
 then
     echo "Updating the Udev Rules"
     sudo bash $INSTALLERDIR/raspi/media_daemon/media_udev_rule.sh
+    sudo sed -i 's/slave/shared/' /lib/systemd/system/systemd-udevd.service
 fi
 
 # systemd files rework
