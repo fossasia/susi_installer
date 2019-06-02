@@ -696,7 +696,10 @@ if [ $targetSystem = raspi ]
 then
     echo "Updating the Udev Rules"
     sudo bash $INSTALLERDIR/raspi/media_daemon/media_udev_rule.sh
+    # systemd-udevd creates its own filesystem namespace, so mount is done, but it is not visible in the principal namespace.
     sudo sed -i 's/slave/shared/' /lib/systemd/system/systemd-udevd.service
+    # readonly mount for external USB drives
+    sudo sed '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
 fi
 
 # systemd files rework
