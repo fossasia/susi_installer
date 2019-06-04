@@ -42,21 +42,12 @@ def play_route():
 # /volume?val=NN  0 <= NN <= 100
 @app.route('/volume', methods=['GET'])
 def volume_route():
-    if 'val' in request.args:
-        val = request.args.get('val')
-        if val == 'up':
-            vlcplayer.volume('up')
-            return do_return('Ok', 200)
-        elif val == 'down':
-            vlcplayer.volume('dn')
-            return do_return('Ok', 200)
-        elif (isinstance(val, int) or val.isdigit()) and (int(val) <= 100) and (int(val) >= 0):
-            vlcplayer.volume(val)
-            return do_return('Ok', 200)
-        else:
-            return do_return('Unknown volume value', 400)
-    else:
-        return do_return('Unknown volume call', 400)
+    try:
+        vlcplayer.volume(request.args.get('val'))
+        return do_return('Ok', 200)
+    except Exception as e:
+        logger.error(e)
+        return do_return('Volume adjustment error' + e, 400)
 
 # /say?mrl=???
 @app.route('/say', methods=['GET'])

@@ -3,16 +3,36 @@
 import vlc
 import pafy
 import time
+from hwmixer import mixer
 
+#
+# we have two mixers available
+# - software mixer via python-vlc
+# - hardware mixer via hwmixer/mixer which controls Master only
+# The total audio output is the product of the two (by 100*100)
+# BUT
+# if one adjusts sets the volume via python_vlc && the master is less than
+# the desired output, then BOTH software and master is adusted to the new
+# desired output!
+# Similarily, if one changes the HW mixer, the values of the software mixer
+# are scaled down!
+#
+# When starting, the *last* volume of the vlc player is used
+#
+# Thus we will do the following
+# - when starting, adjust the softvolume to be == with hwvolume
+# - when silencing, do this as fractional of the hwvolume
+# - all values send to volume adjustments of vlc player are
+#   fraction between [0, current_master_volume]
 
 
 class VlcPlayer():
 
-    saved_volume = -1
-
     def __init__(self):
+        self.saved_volume = -1
         self.instance = vlc.Instance("--no-video")
         self.player = self.instance.media_player_new()
+        self.sayplayer = self.instance.media_player_new()
         self.list_player =  self.instance.media_list_player_new()
         self.list_player.set_media_player(self.player)
 
@@ -25,6 +45,7 @@ class VlcPlayer():
         self.player.set_media(media)
         self.list_player.set_media_list(media_list)
         self.list_player.play()
+        self.softvolume(100, self.player)
 
     def pause(self):
         if self.is_playing():
@@ -38,11 +59,11 @@ class VlcPlayer():
     def stop(self):
         self.list_player.stop()
 
-    def wait_till_end(self):
+    def wait_till_end(self, pl):
         playing = set([vlc.State.Playing, vlc.State.Buffering])
         time_left = True
         while time_left == True:
-            pstate = self.list_player.get_state()
+            pstate = pl.get_state()
             if pstate not in playing:
                 time_left = False
             print("Sleeping for audio output")
@@ -58,44 +79,47 @@ class VlcPlayer():
     def say(self, mrl, wait_restore = True):
         curvol = -1
         if (self.list_player.is_playing()):
-            curvol = self.volume(None)
-            self.volume(20)
+            cursoftvol = self.softvolume(None, self.player)
+            print("CurVolume = ", cursoftvol)
+            # reduce volume to 20% of the current volume
+            self.softvolume(int(0.2 * cursoftvol), self.player)
             time.sleep(0.2)
-        # create a temporary player to say something, then continue to play
-        tmpPlayer = VlcPlayer()
-        if (curvol > 0):
-            tmpPlayer.volume(curvol)
+        # play additional stream via sayplayer
+        media = self.instance.media_new(mrl)
+        self.sayplayer.set_media(media)
+        self.sayplayer.play()
+        if curvol > 0:
+            self.softvolume(cursoftvol, self.sayplayer)
         else:
-            # if we don't have any volume available, use a default of 50
-            tmpPlayer.volume(50)
-        tmpPlayer.play(mrl)
+            self.softvolume(100, self.sayplayer)
         if wait_restore:
-            tmpPlayer.wait_till_end()
-            if (curvol >= 0):
-                self.volume(curvol)
+            self.wait_till_end(self.sayplayer)
+            # readjust volume of the previous music playback
+            self.softvolume(cursoftvol, self.player)
 
     def volume(self, val):
+        return mixer.volume(val)
+
+    def softvolume(self, val, pl):
         if (val is None):
-            return self.player.audio_get_volume()
-        elif (val == 'up'):
-            perc = self.player.audio_get_volume()
-            newperc = min(100, perc + 10)
-            self.player.audio_set_volume(newperc)
-        elif (val == 'dn'):
-            perc = self.player.audio_get_volume()
-            newperc = max(0, perc - 10)
-            self.player.audio_set_volume(newperc)
+            absvol = mixer.volume(None)
+            sf = pl.audio_get_volume()
+            return int(sf * 100 / absvol)
         elif ((isinstance(val, int) or val.isdigit()) and (int(val) <= 100) and (int(val) >= 0)):
-            self.player.audio_set_volume(int(val))
+            p = int(val)
+            absvol = mixer.volume(None)
+            softvol = min(absvol, round(absvol * p / 100))
+            pl.audio_set_volume(softvol)
         else:
-            raise Exception('Unknown volume control')
+            raise Exception('Invalid argument to softvolume: ' + str(val))
 
     def save_volume(self):
-        self.saved_volume = self.player.audio_get_volume()
+        self.saved_volume = mixer.volume(None)
 
     def restore_volume(self):
-        if (self.saved_volume > 0):
-            self.player.audio_set_volume(self.saved_volume)
+        if (self.saved_volume >= 0):
+            mixer.volume(self.saved_volume)
+
 
 def vid2youtubeMRL(vid):
     url = 'https://www.youtube.com/watch?v=' + vid
