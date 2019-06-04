@@ -81,13 +81,23 @@ def resume_route():
 def stop_route():
     vlcplayer.stop()
     return do_return('Ok', 200)
-@app.route('/save_volume', methods=['GET'])
-def save_volume_route():
-    vlcplayer.save_volume()
+
+@app.route('/save_softvolume', methods=['GET'])
+def save_softvolume_route():
+    vlcplayer.save_softvolume()
     return do_return('Ok', 200)
-@app.route('/restore_volume', methods=['GET'])
-def restore_volume_route():
-    vlcplayer.restore_volume()
+@app.route('/restore_softvolume', methods=['GET'])
+def restore_softvolume_route():
+    vlcplayer.restore_softvolume()
+    return do_return('Ok', 200)
+
+@app.route('/save_hardvolume', methods=['GET'])
+def save_hardvolume_route():
+    vlcplayer.save_hardvolume()
+    return do_return('Ok', 200)
+@app.route('/restore_hardvolume', methods=['GET'])
+def restore_hardvolume_route():
+    vlcplayer.restore_hardvolume()
     return do_return('Ok', 200)
 
 

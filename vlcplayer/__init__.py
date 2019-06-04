@@ -29,7 +29,8 @@ from hwmixer import mixer
 class VlcPlayer():
 
     def __init__(self):
-        self.saved_volume = -1
+        self.saved_softvolume = -1
+        self.saved_hardvolume = -1
         self.instance = vlc.Instance("--no-video")
         self.player = self.instance.media_player_new()
         self.sayplayer = self.instance.media_player_new()
@@ -73,29 +74,26 @@ class VlcPlayer():
         return self.list_player.is_playing()
 
     def beep(self, mrl):
-        self.save_volume()
+        self.save_softvolume()
         self.say(mrl, False)
 
     def say(self, mrl, wait_restore = True):
-        curvol = -1
+        self.save_softvolume()
         if (self.list_player.is_playing()):
-            cursoftvol = self.softvolume(None, self.player)
-            print("CurVolume = ", cursoftvol)
             # reduce volume to 20% of the current volume
-            self.softvolume(int(0.2 * cursoftvol), self.player)
+            self.softvolume(int(0.2 * self.saved_softvolume), self.player)
             time.sleep(0.2)
         # play additional stream via sayplayer
         media = self.instance.media_new(mrl)
         self.sayplayer.set_media(media)
         self.sayplayer.play()
-        if curvol > 0:
-            self.softvolume(cursoftvol, self.sayplayer)
+        if self.saved_softvolume > 0:
+            self.softvolume(self.saved_softvolume, self.sayplayer)
         else:
             self.softvolume(100, self.sayplayer)
         if wait_restore:
             self.wait_till_end(self.sayplayer)
-            # readjust volume of the previous music playback
-            self.softvolume(cursoftvol, self.player)
+            self.restore_softvolume()
 
     def volume(self, val):
         return mixer.volume(val)
@@ -110,15 +108,27 @@ class VlcPlayer():
             absvol = mixer.volume(None)
             softvol = min(absvol, round(absvol * p / 100))
             pl.audio_set_volume(softvol)
+            return(softvol)
         else:
             raise Exception('Invalid argument to softvolume: ' + str(val))
 
-    def save_volume(self):
-        self.saved_volume = mixer.volume(None)
+    def save_softvolume(self):
+        self.saved_softvolume = self.softvolume(None, self.player)
+        return self.saved_softvolume
 
-    def restore_volume(self):
-        if (self.saved_volume >= 0):
-            mixer.volume(self.saved_volume)
+    def restore_softvolume(self):
+        if (self.saved_softvolume >= 0):
+            self.softvolume(self.saved_softvolume, self.player)
+        return self.saved_softvolume
+
+    def save_hardvolume(self):
+        self.saved_hardvolume = mixer.volume(None)
+        return self.saved_hardvolume
+
+    def restore_hardvolume(self):
+        if (self.saved_hardvolume >= 0):
+            mixer.volume(self.saved_hardvolume)
+        return self.saved_hardvolume
 
 
 def vid2youtubeMRL(vid):
