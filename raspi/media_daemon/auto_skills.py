@@ -5,10 +5,10 @@ import subprocess #nosec #pylint-disable type: ignore
 
 # To get media_daemon folder
 media_daemon_folder = os.path.dirname(os.path.abspath(__file__))
-base_folder = os.path.dirname(media_daemon_folder)
-server_skill_folder = os.path.join(base_folder, 'susi_server/susi_server/data/generic_skills/media_discovery')
-server_settings_folder = os.path.join(base_folder, 'susi_server/susi_server/data/settings')
-server_restart_script = os.path.join(base_folder, 'susi_server/susi_server/bin/restart.sh')
+base_folder = os.path.dirname(os.path.dirname(os.path.dirname(media_daemon_folder)))
+server_skill_folder = os.path.join(base_folder, 'susi_server/data/generic_skills/media_discovery')
+server_settings_folder = os.path.join(base_folder, 'susi_server/data/settings')
+server_restart_script = os.path.join(base_folder, 'susi_server/bin/restart.sh')
 
 def list_media_devices():
     with open("/proc/partitions", "r") as f:

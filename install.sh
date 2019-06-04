@@ -693,13 +693,10 @@ fi
 
 if [ $targetSystem = raspi ]
 then
-    echo "Updating the Udev Rules"
-    sudo bash $INSTALLERDIR/raspi/media_daemon/media_udev_rule.sh
-fi
+    echo "Updating the Udev Rules for media daemon"
+    mkdir -p /etc/udev/rules.d
+    sudo cp $INSTALLERDIR/raspi/media_daemon/99-susi-usb-drive.rules /etc/udev/rules.d
 
-# systemd files rework
-if [ $targetSystem = raspi ]
-then
     echo "Installing RPi specific Systemd Rules"
     sudo bash $INSTALLERDIR/raspi/Deploy/auto_boot.sh
 fi
