@@ -1,41 +1,54 @@
 import os
+import sys
 from glob import glob
 import shutil
 import subprocess #nosec #pylint-disable type: ignore
+import psutil
 
 # To get media_daemon folder
+if len(sys.argv) <= 1:
+    raise Exception('Missing argument')
+
+plugged_device = sys.argv[1]
+plugged_device_name = os.path.basename(device)
+plugged_device_name_len = len(plugged_device_name)
 media_daemon_folder = os.path.dirname(os.path.abspath(__file__))
 base_folder = os.path.dirname(os.path.dirname(os.path.dirname(media_daemon_folder)))
 server_skill_folder = os.path.join(base_folder, 'susi_server/data/generic_skills/media_discovery')
 server_settings_folder = os.path.join(base_folder, 'susi_server/data/settings')
 server_restart_script = os.path.join(base_folder, 'susi_server/bin/restart.sh')
 
-def list_media_devices():
+def list_media_partitions():
     with open("/proc/partitions", "r") as f:
-        devices = []
+        partitions = []
         for line in f.readlines()[2:]:  # skip header lines
             words = [ word.strip() for word in line.split() ]
             minor_number = int(words[1])
             device_name = words[3]
-            if (minor_number % 16) == 0:
-                path = "/sys/class/block/" + device_name
-
-                if os.path.islink(path):
-                    if os.path.realpath(path).find("/usb") > 0:
-                        devices.append("/dev/" + device_name)
-
-        return devices
-
-def get_device_name(device):
-    return os.path.basename(device)
-
-def get_media_path(device):
-    return "/media/" + get_device_name(device)
+            if device_name[0:plugged_device_name_len] == plugged_device_name:
+                if not (minor_number % 16) == 0:
+                    # only partitions have minor number 17, 18, ...
+                    path = "/sys/class/block/" + device_name
+                    if os.path.islink(path):
+                        if os.path.realpath(path).find("/usb") > 0:
+                            partitions.append("/dev/" + device_name)
+        return partitions
 
 def make_skill(): # pylint-enable
-    devices = list_media_devices()
-    path = get_media_path(devices[0])
-    subprocess.call(['udisksctl','mount','-b',path])  #nosec #pylint-disable type: ignore
+    mount_devices = list_media_partitions(device)
+    if len(partitions) == 0:
+        # try full disk without partition
+        mount_devices = [ device ]
+    for dev in mount_devices:
+        subprocess.call(['udisksctl', 'mount', '-b', dev])  #nosec #pylint-disable type: ignore
+    # get mount points
+    mntfs = []
+    for part in psutil.disk_partitions():
+        if part.device in mount_devices:
+            mntfs.append((part.device, part.mountpoint, part.fstype))
+    # from here TODO!!!
+
+
     name_of_usb = get_mount_points()
     usb = name_of_usb[1]
     mp3_files = glob(str(usb) + '/*.mp3')
