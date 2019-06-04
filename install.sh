@@ -697,7 +697,8 @@ then
     echo "Updating the Udev Rules"
     sudo bash $INSTALLERDIR/raspi/media_daemon/media_udev_rule.sh
     # systemd-udevd creates its own filesystem namespace, so mount is done, but it is not visible in the principal namespace.
-    sudo sed -i 's/slave/shared/' /lib/systemd/system/systemd-udevd.service
+    sudo mkdir /etc/systemd/system/systemd-udevd.service.d/
+    echo -e "[Service]\nMountFlags=shared" | sudo tee /etc/systemd/system/systemd-udevd.service.d/mountFlagOverride.conf
     # readonly mount for external USB drives
     sudo sed '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
 fi
