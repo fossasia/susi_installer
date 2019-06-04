@@ -9,7 +9,7 @@ class HwMixer():
     def __init__(self):
         self.mixerid = ''
         for i in alsaaudio.mixers():
-            if i == 'Master' or i == 'Speaker':
+            if i == 'Master' or i == 'PCM' or i == 'Speaker':
                 self.mixerid = i
         if self.mixerid == '':
             raise Exception('Cannot find mixer')
