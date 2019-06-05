@@ -16,7 +16,6 @@ media_daemon_folder = os.path.dirname(os.path.abspath(__file__))
 base_folder = os.path.dirname(os.path.dirname(os.path.dirname(media_daemon_folder)))
 server_skill_folder = os.path.join(base_folder, 'susi_server/data/generic_skills/media_discovery')
 server_settings_folder = os.path.join(base_folder, 'susi_server/data/settings')
-server_restart_script = os.path.join(base_folder, 'susi_server/bin/restart.sh')
 
 def list_media_partitions():
     with open("/proc/partitions", "r") as f:
@@ -74,7 +73,7 @@ def make_skill(): # pylint-enable
     shutil.move(os.path.join(media_daemon_folder, 'custom_skill.txt'), server_skill_folder)
     with open(os.path.join(server_settings_folder, 'customized_config.properties'), 'a') as f2:
         f2.write('local.mode = true')
-    subprocess.call(['sudo', 'bash', server_restart_script])  #nosec #pylint-disable type: ignore
+    subprocess.call(['sudo', 'systemctl', 'restart', 'ss-susi-server'])  #nosec #pylint-disable type: ignore
 
 if __name__ == '__main__':
     make_skill()
