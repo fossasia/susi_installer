@@ -568,6 +568,9 @@ then
     git clone https://github.com/fossasia/susi_linux.git
     cd susi_linux
     git checkout $SUSI_LINUX_BRANCH
+    # link the vlcplayer and hwmixer
+    ln -s ../susi_installer/hwmixer .
+    ln -s ../susi_installer/vlcplayer .
     cd ..
 else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
