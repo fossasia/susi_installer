@@ -102,7 +102,8 @@ class VlcPlayer():
         if (val is None):
             absvol = mixer.volume(None)
             sf = pl.audio_get_volume()
-            return int(sf * 100 / absvol)
+            # sometimes the softvolume is bigger than 100 while hw volume is 100, catch that
+            return min( 100, int(sf * 100 / absvol) )
         elif ((isinstance(val, int) or val.isdigit()) and (int(val) <= 100) and (int(val) >= 0)):
             p = int(val)
             absvol = mixer.volume(None)
