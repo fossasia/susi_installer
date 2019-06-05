@@ -10,7 +10,7 @@ if len(sys.argv) <= 1:
     raise Exception('Missing argument')
 
 plugged_device = sys.argv[1]
-plugged_device_name = os.path.basename(device)
+plugged_device_name = os.path.basename(plugged_device)
 plugged_device_name_len = len(plugged_device_name)
 media_daemon_folder = os.path.dirname(os.path.abspath(__file__))
 base_folder = os.path.dirname(os.path.dirname(os.path.dirname(media_daemon_folder)))
@@ -35,37 +35,38 @@ def list_media_partitions():
         return partitions
 
 def make_skill(): # pylint-enable
-    mount_devices = list_media_partitions(device)
+    partitions = list_media_partitions()
     if len(partitions) == 0:
         # try full disk without partition
-        mount_devices = [ device ]
-    for dev in mount_devices:
-        subprocess.call(['udisksctl', 'mount', '-b', dev])  #nosec #pylint-disable type: ignore
+        mount_devices = [ plugged_device ]
+    for dev in partitions:
+        subprocess.call(['udisksctl', 'mount', '-o', 'ro', '-b', dev])  #nosec #pylint-disable type: ignore
     # get mount points
-    mntfs = []
+    mntpts = []
     for part in psutil.disk_partitions():
-        if part.device in mount_devices:
-            mntfs.append((part.device, part.mountpoint, part.fstype))
-    # from here TODO!!!
-
-
-    name_of_usb = get_mount_points()
-    usb = name_of_usb[1]
-    mp3_files = glob(str(usb) + '/*.mp3')
-    ogg_files = glob(str(usb) + '/*.ogg')
-    flac_files = glob(str(usb) + '/*.flac')
-    wav_files = glob(str(usb) + '/*.wav')
+        if part.device in partitions:
+            mntpts.append(part.mountpoint)
+    mp3_files = []
+    ogg_files = []
+    flac_files = []
+    wav_files = []
+    for mntpt in mntpts:
+        mp3_files += glob(mntpt + '/**/*.[mM][pP]3', recursive = True)
+        ogg_files += glob(mntpt + '/**/*.[oO]gg', recursive = True)
+        flac_files += glob(mntpt + '/**/*.flac', recursive = True)
+        wav_files += glob(mntpt + '/**/*.wav', recursive = True)
     f = open( media_daemon_folder +'/custom_skill.txt','w')
     music_path = list()
     for mp in mp3_files:
-        music_path.append("{}".format(usb) + "/{}".format(mp))
+        music_path.append("{}".format(mp))
     for ogg in ogg_files:
-        music_path.append("{}".format(usb) + "/{}".format(ogg))
+        music_path.append("{}".format(ogg))
     for flac in flac_files:
-        music_path.append("{}".format(usb) + "/{}".format(flac))
+        music_path.append("{}".format(flac))
     for wav in wav_files:
-        music_path.append("{}".format(usb) + "/{}".format(wav))
+        music_path.append("{}".format(wav))
     song_list = " ".join(music_path)
+    # TODO format of the skill looks strange!!!
     skills = ['play audio','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"file://'+str(song_list) +'"}',']}','eol']
     for skill in skills:
         f.write(skill + '\n')
@@ -74,21 +75,6 @@ def make_skill(): # pylint-enable
     with open(os.path.join(server_settings_folder, 'customized_config.properties'), 'a') as f2:
         f2.write('local.mode = true')
     subprocess.call(['sudo', 'bash', server_restart_script])  #nosec #pylint-disable type: ignore
-
-def get_usb_devices():
-    sdb_devices = map(os.path.realpath, glob('/sys/block/sd*'))
-    usb_devices = (dev for dev in sdb_devices
-        if 'usb' in dev.split('/')[5])
-    return dict((os.path.basename(dev), dev) for dev in usb_devices)
-
-def get_mount_points(devices=None):
-    devices = devices or get_usb_devices() # if devices are None: get_usb_devices
-    output = subprocess.check_output(['mount']).splitlines() #nosec #pylint-disable type: ignore
-    output = [tmp.decode('UTF-8') for tmp in output ] # pytlint-enable
-    def is_usb(path):
-        return any(dev in path for dev in devices)
-    usb_info = (line for line in output if is_usb(line.split()[0]))
-    return [(info.split()[0], info.split()[2]) for info in usb_info]
 
 if __name__ == '__main__':
     make_skill()
