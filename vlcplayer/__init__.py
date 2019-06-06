@@ -49,6 +49,10 @@ class VlcPlayer():
         self.list_player.play()
         self.softvolume(100, self.player)
 
+    def next(self):
+        if self.is_playing():
+            self.list_player.next()
+
     def pause(self):
         if self.is_playing():
             self.list_player.pause()
