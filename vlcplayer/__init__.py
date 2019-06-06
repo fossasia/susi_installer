@@ -40,10 +40,11 @@ class VlcPlayer():
     def playytb(self, vid):
         self.play(vid2youtubeMRL(vid))
 
-    def play(self, mrl):
-        media = self.instance.media_new(mrl)
-        media_list = self.instance.media_list_new([mrl])
-        self.player.set_media(media)
+    def play(self, mrl_string):
+        mrl = mrl_string.split(";")
+        #media = self.instance.media_new(mrl)
+        media_list = self.instance.media_list_new(mrl)
+        #self.player.set_media(media)
         self.list_player.set_media_list(media_list)
         self.list_player.play()
         self.softvolume(100, self.player)
@@ -138,5 +139,5 @@ def vid2youtubeMRL(vid):
     return best.url
 
 
-            
+
 vlcplayer = VlcPlayer()
