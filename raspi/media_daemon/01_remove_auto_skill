@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+set -e
+
+# clean out the custom_skill after media is unplugged
+echo -n > /home/pi/SUSI.AI/susi_server_data/generic_skills/media_discovery/custom_skill.txt
+
+exit 0
+

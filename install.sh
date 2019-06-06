@@ -257,10 +257,11 @@ if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
    ]]  ; then
   DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
- 
+
 # we need hostapd and dnsmask for access point mode
+# usbmount is needed to automount usb drives on susibian(raspbian lite)
 if [ $targetSystem = raspi ] ; then
-  DEBDEPS="$DEBDEPS hostapd dnsmasq"
+  DEBDEPS="$DEBDEPS hostapd dnsmasq usbmount"
 fi
 
 # add necessary dependencies for Coral device
@@ -268,7 +269,7 @@ if [ $CORAL = 1 ] ; then
     DEBDEPS="$DEBDEPS $CORALDEPS"
 fi
 
-# support external triggers in Travis builds, 
+# support external triggers in Travis builds,
 TRIGGER_BRANCH=${TRIGGER_BRANCH:-""}
 TRIGGER_SOURCE=${TRIGGER_SOURCE:-""}
 if [[ ( -n $TRIGGER_SOURCE ) && ( -n $TRIGGER_BRANCH ) ]] ; then
@@ -356,7 +357,7 @@ if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
     INSTALLERDIR="$DESTDIR/susi_installer"
 fi
 
-    
+
 # Set up default sudo mode
 # on Raspi and in system mode, use sudo
 # Otherwise leave empty so that user is asked whether to use it
@@ -483,7 +484,7 @@ install_pip_dependencies()
             ask_for_sudo
         fi
     fi
-    
+
     PIP=pip3
     if [ $CLEAN = 1 ] ; then
         PIP="pip3 --no-cache-dir"
@@ -696,10 +697,14 @@ fi
 
 if [ $targetSystem = raspi ]
 then
-    echo "Updating the Udev Rules for media daemon and polkit localauthority"
-    mkdir -p /etc/udev/rules.d
-    sudo cp $INSTALLERDIR/raspi/media_daemon/99-susi-usb-drive.rules /etc/udev/rules.d
-    sudo cp $INSTALLERDIR/raspi/media_daemon/01-allow-plugdev-mount.pkla /etc/polkit-1/localauthority/50-local.d/
+    echo "Preparing USB automount"
+    # systemd-udevd creates its own filesystem namespace, so mount is done, but it is not visible in the principal namespace.
+    sudo mkdir /etc/systemd/system/systemd-udevd.service.d/
+    echo -e "[Service]\nMountFlags=shared" | sudo tee /etc/systemd/system/systemd-udevd.service.d/mountFlagOverride.conf
+    # readonly mount for external USB drives
+    sudo sed '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
+    sudo cp $INSTALLERDIR/raspi/media_daemon/01_create_skill /etc/usbmount/mount.d/
+    sudo cp $INSTALLERDIR/raspi/media_daemon/01_remove_auto_skill /etc/usbmount/umount.d/
 
     echo "Installing RPi specific Systemd Rules"
     sudo bash $INSTALLERDIR/raspi/Deploy/auto_boot.sh
@@ -794,6 +799,12 @@ if [ $targetSystem = raspi ] ; then
     # save susi_linux server data outside of server dir
     mkdir $WORKDIR/susi_server_data
     ln -s $WORKDIR/susi_server_data $DESTDIR/susi_server/data
+
+    # create empty custom_skill file and make susi server read it
+    mkdir -p $WORKDIR/susi_server_data/generic_skills/media_discovery
+    touch $WORKDIR/susi_server_data/generic_skills/media_discovery/custom_skill.txt
+    mkdir -p $WORKDIR/susi_server_data/settings
+    echo "local.mode = true" > $WORKDIR/susi_server_data/settings/customized_config.properties
 
     cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"

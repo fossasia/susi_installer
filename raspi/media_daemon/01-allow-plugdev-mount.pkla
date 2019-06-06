@@ -1,7 +1,0 @@
-# needs to be installed into /etc/polkit-1/localauthority/50-local.d/01-allow-plugdev-mount.pkla
-[Allow plugdev members to mount]
-Identity=unix-group:plugdev
-Action=org.freedesktop.udisks2.filesystem-mount-other-seat
-ResultAny=yes
-ResultInactive=yes
-ResultActive=yes
