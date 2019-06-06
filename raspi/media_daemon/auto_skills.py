@@ -64,7 +64,9 @@ def make_skill(): # pylint-enable
         music_path.append("{}".format(flac))
     for wav in wav_files:
         music_path.append("{}".format(wav))
-    song_list = " ".join( map ( lambda x: "file://" + x, music_path ) )
+    # we choose ; as separation char since this seems not to be used in
+    # any normal file system path naming
+    song_list = ";".join( map ( lambda x: "file://" + x, music_path ) )
     # TODO format of the skill looks strange!!!
     skills = ['play audio','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(song_list) +'"}',']}','eol']
     for skill in skills:
