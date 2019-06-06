@@ -42,9 +42,7 @@ class VlcPlayer():
 
     def play(self, mrl_string):
         mrl = mrl_string.split(";")
-        #media = self.instance.media_new(mrl)
         media_list = self.instance.media_list_new(mrl)
-        #self.player.set_media(media)
         self.list_player.set_media_list(media_list)
         self.list_player.play()
         self.softvolume(100, self.player)
