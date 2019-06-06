@@ -231,7 +231,7 @@ DEBDEPS="
   libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
   vlc-plugin-video-splitter python3-cairo python3-flask flite
   default-jdk-headless pixz udisks2 python3-requests python3-service-identity
-  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog
+  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
   python3-watson-developer-cloud ca-certificates
 "
 
@@ -696,9 +696,10 @@ fi
 
 if [ $targetSystem = raspi ]
 then
-    echo "Updating the Udev Rules for media daemon"
+    echo "Updating the Udev Rules for media daemon and polkit localauthority"
     mkdir -p /etc/udev/rules.d
     sudo cp $INSTALLERDIR/raspi/media_daemon/99-susi-usb-drive.rules /etc/udev/rules.d
+    sudo cp $INSTALLERDIR/raspi/media_daemon/01-allow-plugdev-mount.pkla /etc/polkit-1/localauthority/50-local.d/
 
     echo "Installing RPi specific Systemd Rules"
     sudo bash $INSTALLERDIR/raspi/Deploy/auto_boot.sh
@@ -774,6 +775,11 @@ if [ $targetSystem = raspi ] ; then
     # enable the server service unconditionally
     sudo systemctl enable ss-susi-server
     sudo systemctl enable ss-etherpad-lite
+
+    # we need UTF8 char encoding, otherwise files with UTF8 names cannot
+    # be dealt with in Python
+    echo "Setting default locale to en_GB.UTF8"
+    echo "LC_ALL=en_GB.UTF8" | sudo tee -a /etc/environment
 
     echo "Enabling the SSH access"
     sudo systemctl enable ssh
