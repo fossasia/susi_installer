@@ -7,7 +7,7 @@ if [ -d "$DIR_PATH/../../../susi_server" ]
 then
     cd $DIR_PATH
     # DEVNAME is exported from the udevd on the start/stop script
-    sudo -u pi python3 auto_skills.py "$DEVNAME"
+    python3 auto_skills.py "$DEVNAME"
 else
     echo "Please download Skill Data"
 fi 
