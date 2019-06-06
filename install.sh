@@ -789,6 +789,17 @@ if [ $targetSystem = raspi ] ; then
     echo "Enabling the SSH access"
     sudo systemctl enable ssh
 
+    # we need to restart udev once after reboot to get rw filesystems
+    # see:
+    # - https://github.com/raspberrypi/linux/issues/2497
+    # - https://unix.stackexchange.com/questions/401394/udev-rule-triggers-but-any-run-command-fails
+    # - https://www.raspberrypi.org/forums/viewtopic.php?t=210243
+    # this is a recent change from udev somewhen in 2018?
+    echo "Working around broken udev and ro file systems"
+    sudo mkdir -p /etc/systemd/system
+    sudo cp $INSTALLERDIR/raspi/media_daemon/udev-restart-after-boot.service /etc/systemd/system/udev-restart-after-boot.service
+    sudo systemctl enable udev-restart-after-boot
+
     echo "Disable dhcpcd"
     sudo systemctl disable dhcpcd
 

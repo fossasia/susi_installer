@@ -1,0 +1,12 @@
+# /etc/systemd/system/udev-restart-after-boot.service
+
+[Unit]
+Description=Restart udev service after boot (ugly hack to work around file system being readonly)
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/systemctl restart systemd-udevd.service
+
+[Install]
+WantedBy=multi-user.target
