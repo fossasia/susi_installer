@@ -92,6 +92,11 @@ def previous_route():
     vlcplayer.previous()
     return do_return('Ok', 200)
 
+@app.route('/restart', methods=['GET'])
+def restart_route():
+    vlcplayer.restart()
+    return do_return('Ok', 200)
+
 @app.route('/save_softvolume', methods=['GET'])
 def save_softvolume_route():
     vlcplayer.save_softvolume()
