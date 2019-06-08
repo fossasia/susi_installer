@@ -55,6 +55,12 @@ class VlcPlayer():
         if self.is_playing():
             self.list_player.previous()
 
+    def restart(self):
+        if self.is_playing():
+            self.list_player.previous()
+            time.sleep(0.01)
+            self.list_player.next()
+
     def pause(self):
         if self.is_playing():
             self.list_player.pause()
