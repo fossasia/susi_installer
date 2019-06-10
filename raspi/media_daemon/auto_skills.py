@@ -23,10 +23,9 @@ def make_skill(): # pylint-enable
     f = open( base_folder + '/susi_installer/raspi/media_daemon/custom_skill.txt', 'w')
     music_path = list()
     artists={}
-    for mp in mp3_files:
+    for mp in mp3_files[:]:
         music_path.append("{}".format(mp))
         audiofile = eyed3.load(mp)
-        print(audiofile.tag.artist)
         artists.setdefault(audiofile.tag.artist, []).append(mp)
     for ogg in ogg_files:
         music_path.append("{}".format(ogg))
@@ -34,18 +33,20 @@ def make_skill(): # pylint-enable
         music_path.append("{}".format(flac))
     for wav in wav_files:
         music_path.append("{}".format(wav))
-    print(artists)
     # we choose ; as separation char since this seems not to be used in
     # any normal file system path naming
     song_list = ";".join( map ( lambda x: "file://" + x, music_path ) )
-    # TODO add more skills
     skills = ['play audio','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(song_list) +'"}',']}','eol']
-    skills1 = ['play linkin park from usb','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(artists["Linkin Park"]) +'"}',']}','eol']
     for skill in skills:
         f.write(skill + '\n')
     f.write("\n")
-    for skill in skills1:
-        f.write(skill + '\n')
+
+    for artist_name in artists:
+        song_list = ";".join( map ( lambda x: "file://" + x, artists[artist_name] ) )
+        skills_artist = ['play '+ artist_name +' from usb','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(song_list) +'"}',']}','eol']
+        for skill in skills_artist:
+            f.write(skill + '\n')
+        f.write("\n")
     f.close()
 
     shutil.move(os.path.join(media_daemon_folder, 'custom_skill.txt'), os.path.join(server_skill_folder, 'custom_skill.txt'))
