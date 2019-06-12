@@ -3,6 +3,7 @@
 import vlc
 import pafy
 import time
+import random
 from hwmixer import mixer
 
 #
@@ -41,8 +42,8 @@ class VlcPlayer():
         self.play(vid2youtubeMRL(vid))
 
     def play(self, mrl_string):
-        mrl = mrl_string.split(";")
-        media_list = self.instance.media_list_new(mrl)
+        self.mrl = mrl_string.split(";")
+        media_list = self.instance.media_list_new(self.mrl)
         self.list_player.set_media_list(media_list)
         self.list_player.play()
         self.softvolume(100, self.player)
@@ -60,6 +61,15 @@ class VlcPlayer():
             self.list_player.previous()
             time.sleep(0.01)
             self.list_player.next()
+
+    def shuffle(self):
+        if self.is_playing():
+            self.list_player.stop()
+            random.shuffle(self.mrl)
+            media_list = self.instance.media_list_new(self.mrl)
+            self.list_player.set_media_list(media_list)
+            self.list_player.play()
+            self.softvolume(100, self.player)
 
     def pause(self):
         if self.is_playing():

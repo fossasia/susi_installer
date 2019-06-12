@@ -97,6 +97,11 @@ def restart_route():
     vlcplayer.restart()
     return do_return('Ok', 200)
 
+@app.route('/shuffle', methods=['GET'])
+def shuffle_route():
+    vlcplayer.shuffle()
+    return do_return('Ok', 200)
+
 @app.route('/save_softvolume', methods=['GET'])
 def save_softvolume_route():
     vlcplayer.save_softvolume()
