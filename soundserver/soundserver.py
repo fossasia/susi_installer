@@ -20,9 +20,9 @@ def do_return(msg, val):
 def index():
     return render_template('index.html')
 
-@app.route('/status')
+@app.route('/status', methods=['POST', 'PUT'])
 def status_route():
-    return do_return('Ok', 400)
+    return do_return('Ok', 200)
 
 # /play?ytb=???
 # /play?mrl=???
