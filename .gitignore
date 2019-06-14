@@ -3,12 +3,10 @@
 .vscode
 .response
 extras/cmu_us_slt.flitevox
-requirements.txt
 **/__pycache__/
 /susi_python/
 main/hotword_engine/snowboy/_snowboydetect.so
 main/hotword_engine/snowboy/snowboydetect.py
 /extras/output.wav
 /snowboy/
-susi_server/
 seeed-voicecard/
