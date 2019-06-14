@@ -570,8 +570,8 @@ then
     cd susi_linux
     git checkout $SUSI_LINUX_BRANCH
     # link the vlcplayer and hwmixer
-    ln -s ../susi_installer/hwmixer .
-    ln -s ../susi_installer/vlcplayer .
+    ln -s ../susi_installer/pythonmods/hwmixer .
+    ln -s ../susi_installer/pythonmods/vlcplayer .
     cd ..
 else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
