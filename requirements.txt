@@ -1,0 +1,3 @@
+alsaaudio
+pafy
+mutagen

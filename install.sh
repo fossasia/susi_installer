@@ -456,7 +456,7 @@ install_debian_dependencies()
 
 install_pip_dependencies()
 {
-    reqfiles="susi_python/requirements.txt susi_linux/requirements.txt"
+    reqfiles="susi_installer/requirements.txt susi_python/requirements.txt susi_linux/requirements.txt"
 
     echo "Installing Python Dependencies"
     if [ ! $targetSystem = raspi ] ; then
