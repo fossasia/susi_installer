@@ -232,12 +232,12 @@ DEBDEPS="
   vlc-plugin-video-splitter python3-cairo python3-flask flite
   default-jdk-headless pixz udisks2 python3-requests python3-service-identity
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
-  python3-watson-developer-cloud ca-certificates
+  python3-setuptools python3-watson-developer-cloud ca-certificates
 "
 
 # If snowboy cannot be installed via pip we need to build it
 SNOWBOYBUILDDEPS="
-  python3-setuptools perl libterm-readline-gnu-perl \
+  perl libterm-readline-gnu-perl \
   i2c-tools libasound2-plugins python3-dev \
   swig libpulse-dev libasound2-dev \
   libatlas-base-dev
@@ -456,7 +456,7 @@ install_debian_dependencies()
 
 install_pip_dependencies()
 {
-    reqfiles="susi_python/requirements.txt susi_linux/requirements.txt"
+    reqfiles="susi_installer/requirements.txt susi_python/requirements.txt susi_linux/requirements.txt"
 
     echo "Installing Python Dependencies"
     if [ ! $targetSystem = raspi ] ; then
