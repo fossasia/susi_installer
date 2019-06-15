@@ -24,6 +24,7 @@ def make_skill(): # pylint-enable
     music_path = list()
     artists={}
     albums={}
+    genres={}
     for audiofiles in mp3_files,ogg_files,flac_files, wav_files:
         for audiofile in audiofiles:
             music_path.append("{}".format(audiofile))
@@ -37,6 +38,10 @@ def make_skill(): # pylint-enable
                     albums.setdefault(str(mdata['album'][0]), []).append(audiofile)
                 elif 'TALB' in mdata:
                     albums.setdefault(str(mdata['TALB'][0]), []).append(audiofile)
+                if 'genre' in mdata:
+                    genres.setdefault(str(mdata['genre'][0]), []).append(audiofile)
+                elif 'TIT1' in mdata:
+                    genres.setdefault(str(mdata['TIT1'][0]), []).append(audiofile)
     # we choose ; as separation char since this seems not to be used in
     # any normal file system path naming
     song_list = ";".join( map ( lambda x: "file://" + x, music_path ) )
@@ -55,6 +60,13 @@ def make_skill(): # pylint-enable
     for album_name in albums:
         song_list = ";".join( map ( lambda x: "file://" + x, albums[album_name] ) )
         skills_artist = ['play '+ album_name +' from usb','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(song_list) +'"}',']}','eol']
+        for skill in skills_artist:
+            f.write(skill + '\n')
+        f.write("\n")
+
+    for genre in genres:
+        song_list = ";".join( map ( lambda x: "file://" + x, genres[genre] ) )
+        skills_artist = ['play '+ genre +' from usb','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(song_list) +'"}',']}','eol']
         for skill in skills_artist:
             f.write(skill + '\n')
         f.write("\n")
