@@ -2,10 +2,6 @@ from flask import Flask , render_template , request
 from flask import jsonify
 import sys
 import os
-from pathlib import Path
-parentdir = Path(os.path.dirname(os.path.abspath(__file__))).parent
-sys.path.append(str(parentdir))
-print(sys.path)
 from vlcplayer import vlcplayer
 
 app = Flask(__name__)

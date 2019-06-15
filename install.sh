@@ -570,8 +570,8 @@ then
     cd susi_linux
     git checkout $SUSI_LINUX_BRANCH
     # link the vlcplayer and hwmixer
-    ln -s ../susi_installer/hwmixer .
-    ln -s ../susi_installer/vlcplayer .
+    ln -s ../susi_installer/pythonmods/hwmixer .
+    ln -s ../susi_installer/pythonmods/vlcplayer .
     cd ..
 else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
@@ -707,7 +707,11 @@ then
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_remove_auto_skill /etc/usbmount/umount.d/
 
     echo "Installing RPi specific Systemd Rules"
-    sudo bash $INSTALLERDIR/raspi/Deploy/auto_boot.sh
+    # TODO !!! we need to make the vlcplayer available to soundserver, as of now it does not find it
+    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service /lib/systemd/system/
+    sudo systemctl enable ss-update-daemon.service
+    sudo systemctl enable ss-python-flask.service
+    sudo systemctl enable ss-soundserver.service
 fi
 
 echo "Updating Susi Linux Systemd service file"
