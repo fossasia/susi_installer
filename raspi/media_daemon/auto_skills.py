@@ -23,6 +23,7 @@ def make_skill(): # pylint-enable
     f = open( base_folder + '/susi_installer/raspi/media_daemon/custom_skill.txt', 'w')
     music_path = list()
     artists={}
+    albums={}
     for audiofiles in mp3_files,ogg_files,flac_files, wav_files:
         for audiofile in audiofiles:
             music_path.append("{}".format(audiofile))
@@ -32,6 +33,10 @@ def make_skill(): # pylint-enable
                     artists.setdefault(mdata['TPE1'][0], []).append(audiofile)
                 elif 'artist' in mdata:
                     artists.setdefault(str(mdata['artist'][0]), []).append(audiofile)
+                if 'album' in mdata:
+                    albums.setdefault(str(mdata['album'][0]), []).append(audiofile)
+                elif 'TALB' in mdata:
+                    albums.setdefault(str(mdata['TALB'][0]), []).append(audiofile)
     # we choose ; as separation char since this seems not to be used in
     # any normal file system path naming
     song_list = ";".join( map ( lambda x: "file://" + x, music_path ) )
@@ -43,6 +48,13 @@ def make_skill(): # pylint-enable
     for artist_name in artists:
         song_list = ";".join( map ( lambda x: "file://" + x, artists[artist_name] ) )
         skills_artist = ['play '+ artist_name +' from usb','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(song_list) +'"}',']}','eol']
+        for skill in skills_artist:
+            f.write(skill + '\n')
+        f.write("\n")
+
+    for album_name in albums:
+        song_list = ";".join( map ( lambda x: "file://" + x, albums[album_name] ) )
+        skills_artist = ['play '+ album_name +' from usb','!console:Playing audio from your usb device','{"actions":[','{"type":"audio_play", "identifier_type":"url", "identifier":"' + str(song_list) +'"}',']}','eol']
         for skill in skills_artist:
             f.write(skill + '\n')
         f.write("\n")
