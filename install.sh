@@ -73,6 +73,8 @@ PREFIX=""
 CLEAN=0
 SUSI_SERVER_USER=
 CORAL=0
+# default installation branch
+INSTALLBRANCH=master
 # we save arguments in case we need to re-exec the installer after git clone
 saved_args=""
 if [ ! "$vendor" = Raspbian ]
@@ -127,6 +129,11 @@ then
                 saved_args="$saved_args --with-coral"
                 shift
                 ;;
+            --development)
+                INSTALLBRANCH=development
+                saved_args="$saved_args --development"
+                shift
+                ;;
             --help)
                 cat <<'EOF'
 SUSI.AI Installer
@@ -136,6 +143,7 @@ Possible options:
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
                    defaults to $HOME/SUSI.AI
+  --development    Use the development branches instead of master branches
   --use-sudo       use sudo for installation of packages without asking
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
@@ -282,13 +290,15 @@ if [[ ( -n $TRIGGER_SOURCE ) && ( -n $TRIGGER_BRANCH ) ]] ; then
     esac
 fi
 
+# The default $INSTALLBRANCH is master, but can be switched
+# using the --development cmd line options development
 # default branches of the various components
-export SUSI_LINUX_BRANCH=${SUSI_LINUX_BRANCH:-"development"}
-export SUSI_PYTHON_BRANCH=${SUSI_PYTHON_BRANCH:-"master"}
+export SUSI_LINUX_BRANCH=${SUSI_LINUX_BRANCH:-$INSTALLBRANCH}
+export SUSI_PYTHON_BRANCH=${SUSI_PYTHON_BRANCH:-$INSTALLBRANCH}
 # if we are travis testing, then the correct branch is already
 # checked out, so no need to do anything (see below).
 # But if we git clone, we use this variable
-export SUSI_INSTALLER_BRANCH=${SUSI_INSTALLER_BRANCH:-"development"}
+export SUSI_INSTALLER_BRANCH=${SUSI_INSTALLER_BRANCH:-$INSTALLBRANCH}
 
 #
 # set up relevant paths and settings
