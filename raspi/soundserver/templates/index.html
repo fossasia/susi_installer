@@ -9,6 +9,20 @@
   </head>
 
   <body class="text-center">
-  
+    <div class="form-signin">
+      <img class="mb-4" src="{{ url_for('static', filename='SUSI.AI_Icon_2017a.svg') }}" alt="" width="256" height="256">
+      <h1 class="h4 mb-3 font-weight-normal">Control Your Smart Speaker</h1>
+      <button onclick="control()">stop</button>
+    </div>
+
+    <script>
+      function control(){
+        var http = new XMLHttpRequest();
+        var url = '/stop';
+        http.open('POST', url, true);
+        http.send();
+      }
+    </script>
+
   </body>
 </html>
