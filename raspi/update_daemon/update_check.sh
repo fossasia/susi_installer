@@ -9,6 +9,13 @@ update_repo() {
     exit 1
   fi
   cd "$1"
+  # get current branch name
+  CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
+  if [ ! "x$CURRENTBRANCH" = "xmaster" ] ; then
+    echo "Current branch of $1 is $CURRENTBRANCH, not master." >&2
+    echo "Not updating!"
+    return
+  fi
   UPSTREAM=${1:-'@{u}'}
   LOCAL=$(git rev-parse @)
   REMOTE=$(git rev-parse "$UPSTREAM")
