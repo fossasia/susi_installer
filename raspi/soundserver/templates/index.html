@@ -6,23 +6,29 @@
     <title>SUSI AI Smart Speaker Control</title>
     <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='signin.css') }}" rel="stylesheet">
+    <script type="text/javascript" src="{{ url_for('static', filename='fontawesome.min.js') }}"></script>
   </head>
 
   <body class="text-center">
     <div class="form-signin">
       <img class="mb-4" src="{{ url_for('static', filename='SUSI.AI_Icon_2017a.svg') }}" alt="" width="256" height="256">
       <h1 class="h4 mb-3 font-weight-normal">Control Your Smart Speaker</h1>
-      <button onclick="control()">stop</button>
+      <button onclick="control('stop')">stop</button><br><br>
+      <button onclick="control('pause')">pause</button><br><br>
+      <button onclick="control('resume')">resume</button><br><br>
+      <button onclick="control('restart')">restart</button><br><br>
+      <button onclick="control('shuffle')">shuffle</button><br><br>
+      <button onclick="control('next')">next</button><br><br>
+      <button onclick="control('previous')">previous</button><br><br>
     </div>
-
     <script>
-      function control(){
+      function control(action){
+        console.log(action)
         var http = new XMLHttpRequest();
-        var url = '/stop';
+        var url = '/'+action;
         http.open('POST', url, true);
         http.send();
       }
     </script>
-
   </body>
 </html>
