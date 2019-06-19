@@ -10,16 +10,45 @@
   </head>
 
   <body class="text-center">
+
     <div class="form-signin">
       <img class="mb-4" src="{{ url_for('static', filename='SUSI.AI_Icon_2017a.svg') }}" alt="" width="256" height="256">
-      <h1 class="h4 mb-3 font-weight-normal">Control Your Smart Speaker</h1>
-      <button onclick="control('stop')">stop</button><br><br>
-      <button onclick="control('pause')">pause</button><br><br>
-      <button onclick="control('resume')">resume</button><br><br>
-      <button onclick="control('restart')">restart</button><br><br>
-      <button onclick="control('shuffle')">shuffle</button><br><br>
-      <button onclick="control('next')">next</button><br><br>
-      <button onclick="control('previous')">previous</button><br><br>
+      <h1 class="h3 mb-3 font-weight-normal">Smart Speaker Control</h1>
+        <div class="form-group">
+            <fieldset class="the-fieldset">
+                <legend class="text-left w-auto">Playback Control</legend>
+            		<button onclick="control('pause')" class="btn btn-outline-primary m-2">
+            			Pause
+            			<i class="fas fa-pause"></i>
+            		</button>
+                <button onclick="control('resume')" class="btn btn-outline-primary m-2">
+            			Resume
+            			<i class="fas fa-play"></i>
+            		</button>
+                <button onclick="control('restart')" class="btn btn-outline-primary m-2">
+            			Restart
+            			<i class="fa fa-retweet"></i>
+            		</button>
+                <br><br>
+                <button onclick="control('previous')" class="btn btn-outline-primary m-2">
+            			Previous
+            			<i class="fas fa-step-backward"></i>
+            		</button>
+                <button onclick="control('next')" class="btn btn-outline-primary m-2">
+            			Next
+            			<i class="fas fa-step-forward"></i>
+            		</button>
+                <button onclick="control('shuffle')" class="btn btn-outline-primary m-2">
+            			Shuffle
+            			<i class="fa fa-random"></i>
+            		</button>
+                <br><br>
+                <button onclick="control('stop')" class="btn btn-outline-danger m-2">
+            			Stop
+            			<i class="fas fa-stop"></i>
+            		</button>
+            </fieldset>
+        </div>
     </div>
     <script>
       function control(action){
