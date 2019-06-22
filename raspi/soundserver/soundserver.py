@@ -16,6 +16,10 @@ def do_return(msg, val):
 def index():
     return render_template('index.html')
 
+@app.route('/login')
+def index():
+    return render_template('login.html')
+
 @app.route('/status', methods=['POST', 'PUT'])
 def status_route():
     return do_return('Ok', 200)
