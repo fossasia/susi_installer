@@ -6,6 +6,7 @@ from vlcplayer import vlcplayer
 
 app = Flask(__name__)
 f=open("pass.txt", "r")
+stored_token = f.readline().splitlines()[0]
 
 def do_return(msg, val):
     dm = {"status": msg}
@@ -15,8 +16,7 @@ def do_return(msg, val):
 
 @app.route('/')
 def index():
-    stored_token = str(f.read())
-    if not session.get('logged_in'):
+    if stored_token!='default' and not session.get('logged_in'):
         return render_template('login.html')
     else:
         return render_template('index.html')
