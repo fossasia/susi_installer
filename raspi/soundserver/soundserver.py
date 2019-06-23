@@ -1,10 +1,11 @@
-from flask import Flask , render_template , request
+from flask import Flask , render_template , request, flash, redirect, session, abort
 from flask import jsonify
 import sys
 import os
 from vlcplayer import vlcplayer
 
 app = Flask(__name__)
+f=open("pass.txt", "r")
 
 def do_return(msg, val):
     dm = {"status": msg}
@@ -14,10 +15,14 @@ def do_return(msg, val):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    stored_token = str(f.read())
+    if not session.get('logged_in') and stored_token=='default':
+        return render_template('login.html')
+    else:
+        return render_template('index.html')
 
 @app.route('/login')
-def index():
+def login():
     return render_template('login.html')
 
 @app.route('/status', methods=['POST', 'PUT'])
