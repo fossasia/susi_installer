@@ -1,4 +1,4 @@
-from flask import Flask , render_template , request, flash, redirect, session, abort
+from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
 from flask import jsonify
 import sys
 import os
@@ -14,16 +14,22 @@ def do_return(msg, val):
     resp.status_code = val
     return resp
 
+@app.before_request
+def before_request_callback():
+    if request.endpoint != 'login' and request.endpoint != 'login_index' and stored_token!='default' and not session.get('logged_in') and request.remote_addr != '127.0.0.1':
+        return redirect('/login_page')
+
 @app.route('/')
 def index():
-    if stored_token!='default' and not session.get('logged_in'):
-        return render_template('login.html')
-    else:
-        return render_template('index.html')
+    return render_template('index.html')
+
+@app.route('/login_page')
+def login_index():
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST', 'PUT'])
 def login():
-    if request.form['password'] == 'password':
+    if request.form['password'] == stored_token:
         session['logged_in'] = True
     else:
         flash('wrong password!')
