@@ -6,8 +6,16 @@
     <title>SUSI AI Smart Speaker Control</title>
     <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='signin.css') }}" rel="stylesheet">
-    <script type="text/javascript" src="{{ url_for('static', filename='fontawesome.min.js') }}"></script>
   </head>
+
+  <form class="form-signin" action="/login" method="POST">
+    <div class="form-group">
+      <img class="mb-4" src="{{ url_for('static', filename='SUSI.AI_Icon_2017a.svg') }}" alt="" width="256" height="256">
+      <label for="password">Password</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 
   <body class="text-center">
 

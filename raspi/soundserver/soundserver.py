@@ -16,14 +16,18 @@ def do_return(msg, val):
 @app.route('/')
 def index():
     stored_token = str(f.read())
-    if not session.get('logged_in') and stored_token=='default':
+    if not session.get('logged_in'):
         return render_template('login.html')
     else:
         return render_template('index.html')
 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'PUT'])
 def login():
-    return render_template('login.html')
+    if request.form['password'] == 'password':
+        session['logged_in'] = True
+    else:
+        flash('wrong password!')
+    return index()
 
 @app.route('/status', methods=['POST', 'PUT'])
 def status_route():
@@ -127,4 +131,5 @@ def restore_hardvolume_route():
 
 
 if __name__ == '__main__':
+    app.secret_key = os.urandom(12)
     app.run(debug=False, port=7070, host='0.0.0.0')
