@@ -5,7 +5,9 @@ import os
 from vlcplayer import vlcplayer
 
 app = Flask(__name__)
-f=open("pass.txt", "r")
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+f=open(dir_path+'/pass.txt', "r")
 stored_token = f.readline().splitlines()[0]
 
 def do_return(msg, val):
