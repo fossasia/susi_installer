@@ -73,6 +73,10 @@ mount -t sysfs none ${mount}/sys
 mount -o bind /dev ${mount}/dev
 rm ${mount}/etc/resolv.conf
 cp /etc/resolv.conf ${mount}/etc/resolv.conf
+# remove preload if necessar
+if [ -r ${mount}/etc/ld.so.preload ] ; then
+  mv ${mount}/etc/ld.so.preload ${mount}/etc/ld.so.preload.backup
+fi
 cp ".travis/qemu-arm-static" ${mount}/usr/bin/qemu-arm-static
 chmod ugo+x ${mount}/usr/bin/qemu-arm-static
 # cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
@@ -92,6 +96,10 @@ apt-get clean
 /etc/init.d/fake-hwclock stop
 hardlink -t /usr/share/doc
 EOF
+
+if [ -r ${mount}/etc/ld.so.preload.backup ] ; then
+  mv ${mount}/etc/ld.so.preload.backup ${mount}/etc/ld.so.preload
+fi
 
 rm -f "${mount}/etc/apt/apt.conf.d/51cache"
 rm -f "${mount}/usr/bin/qemu-arm-static"
