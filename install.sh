@@ -506,7 +506,8 @@ install_pip_dependencies()
     # we need to update pip, since pip 18 or so is too old and cannot work with --extra-index-url
     # properly
     $SUDOCMD $PIP install -U pip
-    $SUDOCMD $PIP install -U wheel
+    # wheel should not be necessary since we are not compiling anything?
+    # $SUDOCMD $PIP install -U wheel
     $SUDOCMD $PIP install -r susi_python/requirements.txt
     $SUDOCMD $PIP install -r susi_linux/requirements.txt
     if [ $targetSystem = raspi ] ; then
