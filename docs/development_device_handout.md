@@ -17,7 +17,7 @@ An assembly video can be found at https://youtu.be/jAEmRvQLmc0
 
 ### What else do you require to operate the device
 * A Wifi hotspot and the access credentials - or an open hot spot
-* USB (very string!) power/charger (2.5A recommended) and a USB charging cable
+* USB (very strong!) power/charger (2.5A recommended) and a USB charging cable
 
 ### Installation
 * check the source of this document and compare if the installation instructions has been enhanced: https://github.com/fossasia/susi_linux/edit/development/docs/development_device_handout.md
@@ -30,7 +30,7 @@ The device needs an internet connection to work. To configure the device to use 
 * Put in your Wifi credentials. For an open network set an empty password. If The device should connect automatically to any open network, leave SSID and password empty.
 * Click on "Reboot Smart Speaker" 
 * Wait for re-boot of the speaker, SUSI will say "SUSI has started" as soon it is ready.
-* If you want to return to the installation process (i.e. to configure another network), you can reset the device by pushing and holding the button for at least 10 seconds.
+* If you want to return to the installation process (i.e. to configure another network), you can reset the device by pushing and holding the button for at least 7 seconds (a beep sounds is played).
 
 ### Usage
 * To speak to the SUSI.AI speaker, say 'susi' and wait for the 'bing' sound

@@ -656,7 +656,7 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
       || \
       ( $targetSystem = mint ) \
       || \
-      ( $targetSystem = raspi && $targetversion = 9 ) \
+      ( $targetSystem = raspi && $targetVersion = 9 ) \
    ]]  ; then
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
