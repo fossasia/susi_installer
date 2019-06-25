@@ -238,7 +238,7 @@ DEBDEPS="
   git openssl wget python3-pip sox libsox-fmt-all flac
   libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
   vlc-plugin-video-splitter python3-cairo python3-flask flite
-  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
+  default-jdk-headless pixz udisks2 python3-requests python3-requests-futures python3-service-identity
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
   python3-setuptools python3-watson-developer-cloud ca-certificates
 "
