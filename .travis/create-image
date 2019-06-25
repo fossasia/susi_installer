@@ -41,7 +41,7 @@ else
     echo "Reusing ./raspbian-latest-lite.zip"
     unzip raspbian-latest-lite.zip
 fi
-mv ????-??-??-raspbian-stretch-lite.img raspbian.img
+mv ????-??-??-raspbian-buster-lite.img raspbian.img
 ls
 
 qemu-img resize raspbian.img 2.8G
