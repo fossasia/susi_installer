@@ -7,8 +7,6 @@ from vlcplayer import vlcplayer
 app = Flask(__name__)
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-f=open(dir_path+'/pass.txt', "r")
-stored_token = f.readline().splitlines()[0]
 
 def do_return(msg, val):
     dm = {"status": msg}
@@ -16,26 +14,43 @@ def do_return(msg, val):
     resp.status_code = val
     return resp
 
+def check_pass(passw=None):
+    f=open(dir_path+'/pass.txt', "r")
+    get_pass = f.readline().splitlines()[0]
+    if (passw==None and get_pass=='default') or (passw==get_pass):
+        return True
+    else:
+        return False
+
+def write_pass(passw=None):
+    fw=open(dir_path+"/pass.txt","w+")
+    fw.write(passw)
+    session['logged_in'] = False
+
 @app.before_request
 def before_request_callback():
-    if request.endpoint != 'login' and request.endpoint != 'login_index' and stored_token!='default' and not session.get('logged_in') and request.remote_addr != '127.0.0.1':
-        return redirect('/login_page')
+    if request.endpoint != 'login' and request.endpoint != 'static' and not\
+       check_pass() and not session.get('logged_in'):
+        return render_template('login.html')
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/login_page')
-def login_index():
-    return render_template('login.html')
-
 @app.route('/login', methods=['POST', 'PUT'])
 def login():
-    if request.form['password'] == stored_token:
+    if check_pass(request.form['password']):
         session['logged_in'] = True
     else:
         flash('wrong password!')
-    return index()
+    return redirect(url_for('index'))
+
+@app.route('/set_password', methods=['GET', 'POST'])
+def set_password():
+    if request.method == 'POST':
+        write_pass(request.form['password'])
+        return redirect(url_for('index'))
+    return render_template('password.html')
 
 @app.route('/status', methods=['POST', 'PUT'])
 def status_route():
