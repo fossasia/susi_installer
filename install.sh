@@ -694,7 +694,7 @@ then
         echo "WARNING: etherpad-lite directory already present, not cloning it!" >&2
     fi
     echo "Adding node.js repository"
-    curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
     sudo apt-get install --no-install-recommends -y nodejs
     echo "Installing node modules for etherpad"
     cd etherpad-lite
