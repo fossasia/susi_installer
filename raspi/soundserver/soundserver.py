@@ -30,7 +30,7 @@ def write_pass(passw=None):
 @app.before_request
 def before_request_callback():
     if request.endpoint != 'login' and request.endpoint != 'static' and not\
-       check_pass() and not session.get('logged_in'):
+       check_pass() and not session.get('logged_in') and request.remote_addr != '127.0.0.1':
         return render_template('login.html')
 
 @app.route('/')
