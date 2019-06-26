@@ -1,6 +1,9 @@
 #!/bin/bash -e
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+INSTALLERDIR=$(dirname $(realpath "$0"))
+
 #
 # Target layout as with the developer-setup.md layout
 #
@@ -74,7 +77,23 @@ CLEAN=0
 SUSI_SERVER_USER=
 CORAL=0
 # default installation branch
+# we use the same branch across repositories
+# so if we build from susi_installer:master, we use the master branch of
+# the other repos. And if we build from susi_installer:development, we use
+# the development branch of the others.
+# For other branches than master and development, we use the "development" branch
 INSTALLBRANCH=master
+if [ -d "$INSTALLERDIR/.git" ] ; then
+    pushd "$INSTALLERDIR"
+    CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ "$CURRENTBRANCH" = "master" ] ; then
+        INSTALLBRANCH=master
+    else
+        INSTALLBRANCH=development
+    fi
+    popd
+fi
+
 # we save arguments in case we need to re-exec the installer after git clone
 saved_args=""
 if [ ! "$vendor" = Raspbian ]
@@ -129,11 +148,6 @@ then
                 saved_args="$saved_args --with-coral"
                 shift
                 ;;
-            --development)
-                INSTALLBRANCH=development
-                saved_args="$saved_args --development"
-                shift
-                ;;
             --help)
                 cat <<'EOF'
 SUSI.AI Installer
@@ -143,7 +157,6 @@ Possible options:
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
                    defaults to $HOME/SUSI.AI
-  --development    Use the development branches instead of master branches
   --use-sudo       use sudo for installation of packages without asking
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
@@ -291,10 +304,6 @@ if [[ ( -n $TRIGGER_SOURCE ) && ( -n $TRIGGER_BRANCH ) ]] ; then
         *) echo "Unknown trigger source: $TRIGGER_SOURCE, ignoring it" ;;
     esac
 fi
-
-# The default $INSTALLBRANCH is master, but can be switched
-# using the --development cmd line options development
-# default branches of the various components
 export SUSI_LINUX_BRANCH=${SUSI_LINUX_BRANCH:-$INSTALLBRANCH}
 export SUSI_PYTHON_BRANCH=${SUSI_PYTHON_BRANCH:-$INSTALLBRANCH}
 # if we are travis testing, then the correct branch is already
@@ -355,7 +364,6 @@ fi
 
 #
 # if the installer is download somewhere else then $DESTDIR, copy it over
-INSTALLERDIR=$(dirname $(realpath "$0"))
 if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
     echo "Copying installer to destination $DESTDIR ..."
     mkdir -p "$DESTDIR"
