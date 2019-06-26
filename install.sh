@@ -238,7 +238,7 @@ DEBDEPS="
   git openssl wget python3-pip sox libsox-fmt-all flac
   libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
   vlc-plugin-video-splitter python3-cairo python3-flask flite
-  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
+  default-jdk-headless pixz udisks2 python3-requests python3-requests-futures python3-service-identity
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
   python3-setuptools python3-watson-developer-cloud ca-certificates
 "
@@ -254,6 +254,7 @@ SNOWBOYBUILDDEPS="
 # CORAL dependencies
 CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil"
 
+# install youtube-dl and python3-alsaaudio
 # python3-alsaaudio is not available on older distributions
 # only install it on:
 # - Debian buster and upwards
@@ -262,8 +263,10 @@ CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil
 if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
       || \
       ( $targetSystem = ubuntu && ! $targetVersion = 18.04 && ! $targetVersion = 18.10 && ! $targetVersion = 19.01 ) \
+      || \
+      ( $targetSystem = raspi  && ! $targetVersion = 9 ) \
    ]]  ; then
-  DEBDEPS="$DEBDEPS python3-alsaaudio"
+  DEBDEPS="$DEBDEPS python3-alsaaudio youtube-dl"
 fi
 
 # we need hostapd and dnsmask for access point mode
@@ -503,7 +506,8 @@ install_pip_dependencies()
     # we need to update pip, since pip 18 or so is too old and cannot work with --extra-index-url
     # properly
     $SUDOCMD $PIP install -U pip
-    $SUDOCMD $PIP install -U wheel
+    # wheel should not be necessary since we are not compiling anything?
+    # $SUDOCMD $PIP install -U wheel
     $SUDOCMD $PIP install -r susi_python/requirements.txt
     $SUDOCMD $PIP install -r susi_linux/requirements.txt
     if [ $targetSystem = raspi ] ; then
@@ -652,7 +656,7 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
       || \
       ( $targetSystem = mint ) \
       || \
-      ( $targetSystem = raspi ) \
+      ( $targetSystem = raspi && $targetVersion = 9 ) \
    ]]  ; then
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
@@ -690,7 +694,7 @@ then
         echo "WARNING: etherpad-lite directory already present, not cloning it!" >&2
     fi
     echo "Adding node.js repository"
-    curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
     sudo apt-get install --no-install-recommends -y nodejs
     echo "Installing node modules for etherpad"
     cd etherpad-lite
