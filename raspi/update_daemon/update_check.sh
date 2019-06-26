@@ -16,7 +16,7 @@ update_repo() {
     echo "Not updating!"
     return
   fi
-  UPSTREAM=${1:-'@{u}'}
+  UPSTREAM=${2:-'@{u}'}
   LOCAL=$(git rev-parse @)
   REMOTE=$(git rev-parse "$UPSTREAM")
   BASE=$(git merge-base @ "$UPSTREAM")
@@ -33,10 +33,9 @@ update_repo() {
     echo "Diverged"
   fi
 
-  if [$CHECK = "Need-to-pull"]
+  if [ $CHECK = "Need-to-pull" ]
   then
-    git fetch UPSTREAM
-    git merge UPSTREAM/master
+    git pull
   fi
   cd ..
 }
