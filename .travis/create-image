@@ -126,5 +126,5 @@ find "${mount}/var/log/" -type f -exec cp /dev/null {} \;
 rm -f "${mount}/root/.vnc/private.key"
 rm -f "${mount}/etc/vnc/updateid"
 
-echo 'Susibian based on Raspbian GNU/Linux 9 \n \l' > "${mount}/boot/issue.txt"
+echo 'Susibian based on Raspbian GNU/Linux 10\n \l' > "${mount}/boot/issue.txt"
 

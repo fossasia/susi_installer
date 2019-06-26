@@ -844,8 +844,7 @@ if [ $targetSystem = raspi ] ; then
 
     cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"
-    sudo rm -Rf .git
-    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python etherpad-lite
+    tar -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python etherpad-lite
     echo ""  # To add newline after tar's last checkpoint
     mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 
