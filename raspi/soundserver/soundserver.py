@@ -1,5 +1,6 @@
 from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
 from flask import jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
 from vlcplayer import vlcplayer
@@ -14,17 +15,17 @@ def do_return(msg, val):
     resp.status_code = val
     return resp
 
-def check_pass(passw=None):
+def check_pass(passw=''):
     f=open(dir_path+'/pass.txt', "r")
     get_pass = f.readline().splitlines()[0]
-    if (passw==None and get_pass=='default') or (passw==get_pass):
+    if (passw=='' and get_pass=='default') or (check_password_hash(get_pass,passw)):
         return True
     else:
         return False
 
-def write_pass(passw=None):
+def write_pass(passw):
     fw=open(dir_path+"/pass.txt","w+")
-    fw.write(passw)
+    fw.write(str(generate_password_hash(passw)))
     session['logged_in'] = False
 
 @app.before_request
