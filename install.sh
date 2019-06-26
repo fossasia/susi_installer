@@ -254,7 +254,6 @@ SNOWBOYBUILDDEPS="
 # CORAL dependencies
 CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil"
 
-# install youtube-dl and python3-alsaaudio
 # python3-alsaaudio is not available on older distributions
 # only install it on:
 # - Debian buster and upwards
@@ -266,7 +265,7 @@ if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
       || \
       ( $targetSystem = raspi  && ! $targetVersion = 9 ) \
    ]]  ; then
-  DEBDEPS="$DEBDEPS python3-alsaaudio youtube-dl"
+  DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
 
 # we need hostapd and dnsmask for access point mode
