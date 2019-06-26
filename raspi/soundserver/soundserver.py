@@ -1,10 +1,13 @@
-from flask import Flask , render_template , request
+from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
 from flask import jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
 from vlcplayer import vlcplayer
 
 app = Flask(__name__)
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 def do_return(msg, val):
     dm = {"status": msg}
@@ -12,9 +15,43 @@ def do_return(msg, val):
     resp.status_code = val
     return resp
 
+def check_pass(passw=''):
+    f=open(dir_path+'/pass.txt', "r")
+    get_pass = f.readline().splitlines()[0]
+    if (passw=='' and get_pass=='default') or (check_password_hash(get_pass,passw)):
+        return True
+    else:
+        return False
+
+def write_pass(passw):
+    fw=open(dir_path+"/pass.txt","w+")
+    fw.write(str(generate_password_hash(passw)))
+    session['logged_in'] = False
+
+@app.before_request
+def before_request_callback():
+    if request.endpoint != 'login' and request.endpoint != 'static' and not\
+       check_pass() and not session.get('logged_in') and request.remote_addr != '127.0.0.1':
+        return render_template('login.html')
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/login', methods=['POST', 'PUT'])
+def login():
+    if check_pass(request.form['password']):
+        session['logged_in'] = True
+    else:
+        flash('wrong password!')
+    return redirect(url_for('index'))
+
+@app.route('/set_password', methods=['GET', 'POST'])
+def set_password():
+    if request.method == 'POST':
+        write_pass(request.form['password'])
+        return redirect(url_for('index'))
+    return render_template('password.html')
 
 @app.route('/status', methods=['POST', 'PUT'])
 def status_route():
@@ -118,4 +155,5 @@ def restore_hardvolume_route():
 
 
 if __name__ == '__main__':
+    app.secret_key = os.urandom(12)
     app.run(debug=False, port=7070, host='0.0.0.0')
