@@ -43,6 +43,7 @@ update_repo() {
 update_repo susi_linux
 update_repo susi_python
 update_repo susi_installer
+update_repo susi_skill_data
 
 #
 # TODO we need to think about how to handle susi_server update!

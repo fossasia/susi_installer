@@ -731,6 +731,7 @@ then
     # TODO !!! we need to make the vlcplayer available to soundserver, as of now it does not find it
     sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service /lib/systemd/system/
     sudo systemctl enable ss-update-daemon.service
+    sudo systemctl enable ss-update-daemon.timer
     sudo systemctl enable ss-python-flask.service
     sudo systemctl enable ss-soundserver.service
 fi

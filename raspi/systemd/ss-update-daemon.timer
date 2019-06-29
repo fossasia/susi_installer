@@ -1,0 +1,11 @@
+[Unit]
+Description=Run SUSI Update Check weekly and on boot
+
+[Timer]
+# The service file is already installed and run on boot
+# OnBootSec=15min
+OnUnitActiveSec=1w 
+
+[Install]
+WantedBy=timers.target
+
