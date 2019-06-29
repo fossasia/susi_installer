@@ -730,6 +730,7 @@ then
     echo "Installing RPi specific Systemd Rules"
     # TODO !!! we need to make the vlcplayer available to soundserver, as of now it does not find it
     sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service /lib/systemd/system/
+    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.timer /lib/systemd/system/
     sudo systemctl enable ss-update-daemon.service
     sudo systemctl enable ss-update-daemon.timer
     sudo systemctl enable ss-python-flask.service
