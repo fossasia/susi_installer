@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>SUSI AI Smart Speaker Control</title>
-    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='signin.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/signin.css') }}" rel="stylesheet">
   </head>
 
   <form class="form-signin" action="/login" method="POST">
     <div class="form-group">
-      <img class="mb-4" src="{{ url_for('static', filename='SUSI.AI_Icon_2017a.svg') }}" alt="" width="256" height="256"> </br>
+      <img class="mb-4" src="{{ url_for('static', filename='icons/SUSI.AI_Icon_2017a.svg') }}" alt="" width="256" height="256"> </br>
       <h2>Enter Your Password To Continue</h2>
       <input type="password" class="form-control" id="password" name="password" placeholder="Password">
     </div>
