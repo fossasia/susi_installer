@@ -3,12 +3,16 @@ from flask import jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
+import subprocess
+import logging
+import os
 from vlcplayer import vlcplayer
 
 app = Flask(__name__)
 
+logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-
+song_path = "/home/pi/Music"
 def do_return(msg, val):
     dm = {"status": msg}
     resp = jsonify(dm)
@@ -153,6 +157,42 @@ def restore_hardvolume_route():
     vlcplayer.restore_hardvolume()
     return do_return('Ok', 200)
 
+@app.route('/reset_smart_speaker/<type>', methods=['POST','PUT'])
+def reset_smart_speaker(type):
+    current_folder = os.path.dirname(os.path.abspath(__file__))
+    wap_script = os.path.abspath(current_folder + '/../access_point/wap.sh')
+    factory_reset = os.path.abspath(current_folder + '/../factory_reset/factory_reset.sh')
+    if type == 'hard' :
+        print("hard FACTORY RESET")
+        logger.info("hard factory reset initiated")
+        subprocess.Popen(['sudo','bash', factory_reset, 'hard'])
+    elif type == 'soft' :
+        print("soft FACTORY RESET")
+        logger.info("soft factory reset initiated")
+        subprocess.Popen(['sudo','bash', factory_reset, 'soft'])
+    elif type == 'AP' :
+        print("switch to access point mode")
+        logger.info("switch to access mode initiated")
+        subprocess.Popen(['sudo','bash', wap_script])  
+    return do_return('Ok', 200)      
+
+
+@app.route('/getOfflineSong', methods=['GET'])
+def getOfflineSong():
+    files = os.listdir(song_path)
+    songs = []
+    for i in files:
+	    if i.endswith('.mp3') or i.endswith('.m4a') or i.endswith('.ogg') or i.endswith('.deb'):
+                file = {}
+                file['name'] = i
+                songs.append(file)
+    return do_return(songs, 200)
+
+@app.route('/playOfflineSong/<file>', methods=['PUT'])
+def playOffineSong(file):
+    vlcplayer.play(song_path+'/'+file)
+    return do_return('OK', 200)
+            
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

@@ -6,78 +6,255 @@
     <title>SUSI AI Smart Speaker Control</title>
     <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='signin.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" id="">
+    
     <script type="text/javascript" src="{{ url_for('static', filename='fontawesome.min.js') }}"></script>
   </head>
+      <body >
+        <div class="container" >
+                <div class="row ">
+    
+                 <div class="form-group col-md-12 ">
+                <div class="card person-card ">
+                    <div class="card-body">
+                        <img id="img_sex" class="person-img" src="{{ url_for('static', filename='SUSI.AI_Icon_2017a.svg') }}">
+                        <h2 id="" class="card-title">Smart Speaker Control</h2>
+                 
+                            </div>
+                            
+                    </div>
+                </div>
+                    </div>  
+                    <div class="row">
+                        <div class="col-md-12" style="padding=0.5em;">
+                            <div class="card">
+                                <div class="card-body">  
+                            <div class="row">
+                                <div class="form-group col-md-2">Volume Control</div>
+                            <div class="form-group col-md-10">
+                                         
+                                    <span class="font-weight-bold">0</span>
+                                  <i class="fas fa-volume-down"></i>
+                                  <input id="vol-control" class="slider" type="range" min="0" max="100" value="100" step="1" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)" width="100%" style="min-width: 80%;max-width: 80%;" />
+                                  <i class="fas fa-volume-up"></i>
+                                  <span class="font-weight-bold">100</span>
+                            </div>
+                        </div>   </div>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" style="padding=0.5em;">
+                            <div class="row">
+    
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2 class="card-title">Playback Control</h2>
+                                    <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-12">
+                                        <button onclick="control('pause')" class="btn btn-outline-secondary m-2" style="min-width: 100%;max-width: 100%;"> 
+                                            Pause
+                                        <i class="fas fa-pause"></i>
+                                        </button>
+                                         </div>
+                                        <div class="col-md-3 col-sm-12">
+                                         <button onclick="control('resume')" class="btn btn-outline-success m-2" style="min-width: 100%;max-width: 100%;">
+                                            Resume
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                         </div>
+                                        <div class="col-md-3 col-sm-12">
+                                         <button onclick="control('restart')" class="btn btn-outline-primary m-2" style="min-width: 100%;max-width: 100%;">
+                                            Restart
+                                            <i class="fa fa-retweet"></i>
+                                        </button>
+                                        
+                                         </div>
+                                           <div class="col-md-3 col-sm-12">
+                                         <button onclick="control('stop')" class="btn btn-outline-danger m-2" style="min-width: 100%;max-width: 100%;">
+                                            Stop
+                                            <i class="fas fa-stop"></i>
+                                      </button></div>
+                                    </div>
+                                     <div class="row">
+                                        <div class="col-md-4 col-sm-12">
+                                        <button onclick="control('previous')" class="btn btn-outline-warning m-2" style="min-width: 100%;max-width: 100%;">
+                                            Previous
+                                            <i class="fas fa-step-backward"></i>
+                                        </button>
+                                         </div>
+                                        <div class="col-md-4 col-sm-12">
+                                            <button onclick="control('shuffle')" class="btn btn-outline-primary m-2" style="min-width: 100%;max-width: 100%;">
+                                                Shuffle
+                                                <i class="fa fa-random"></i>
+                                            </button>
+                                         </div>
+                                        <div class="col-md-4 col-sm-12">
+                                        <button onclick="control('next')" class="btn btn-outline-info m-2" style="min-width: 100%;max-width: 100%;">
+                                            Next
+                                            <i class="fas fa-step-forward"></i>
+                                        </button>
+                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div></div>
+                      <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2 class="card-title">Speaker Control</h2>
+                                    <div class="col-md-12">
+                                     <div class="row">
+                                        <div class="col-md-4 col-sm-12">
+                                           <button onclick="reset('hard')" class="btn btn-outline-dark m-2" style="min-width: 100%;max-width: 100%;">
+                                                Hard Reset
+                                                <i class="fas fa-stop"></i>
+                                          </button>
+                  
+                  
+                                         </div>
+                                        <div class="col-md-4 col-sm-12">
+                                            <button onclick="reset('soft')" class="btn btn-outline-dark m-2" style="min-width: 100%;max-width: 100%;">
+                                                Soft Reset
+                                                <i class="fas fa-stop"></i>
+                                          </button>
+                                         </div>
+                                        <div class="col-md-4 col-sm-12">
+                                        <button onclick="reset('AP')" class="btn btn-outline-dark m-2" style="min-width: 100%;max-width: 100%;">
+                                            AP Reset
+                                            <i class="fas fa-stop"></i>
+                                      </button>
+                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                      <div class="card">
+                          <div class="card-body">
+                              <h2 class="card-title">Play YouTube songs</h2>
+                              <div class="form-group ">
+                                 <div class="custom-control">
+                                    <label class="form-control-label" for="link">Enter YouTube Link</label>
+                                   <input type="url" class="form-control" id="link">
+                                 </div>
+                             </div>
+                             <button onclick="playYoutube()" class="btn btn-outline-info m-2" >
+                                Play
+                                <i class="fas fa-play"></i>
+                            </button>
+                          </div>
+                          </div>
+                  </div>
+                </div>
+                         </div>   
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                            <div class="card"> 
+                                <div class="card-body">
+                                    <h2 class="card-title">Offline Song</h2>
+                                    <div class="col-md-4 col-sm-12">
+                                     <button onclick="getOfflineSong()" class="btn btn-outline-danger m-2">
+                                            Play Offline Song
+                                            <i class="fas fa-stop"></i>
+                                      </button>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="row">
+                                <div class="col-md-12">
+                            <div class="card"> 
+                                <div class="card-body" id="layout">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+    
+                    
 
-  <body class="text-center">
-
-    <div class="form-signin">
-      <img class="mb-4" src="{{ url_for('static', filename='SUSI.AI_Icon_2017a.svg') }}" alt="" width="256" height="256">
-      <h1 class="h3 mb-3 font-weight-normal">Smart Speaker Control</h1>
-        <div class="form-group">
-          <fieldset class="the-fieldset">
-              <legend class="text-left w-auto">Volume Control</legend>
-              <span class="font-weight-bold">0</span>
-              <i class="fas fa-volume-down"></i>
-              <input id="vol-control" class="slider" type="range" min="0" max="100" value="100" step="1" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"></input>
-              <i class="fas fa-volume-up"></i>
-              <span class="font-weight-bold">100</span>
-          </fieldset>
-          <fieldset class="the-fieldset">
-              <legend class="text-left w-auto">Playback Control</legend>
-          		<button onclick="control('pause')" class="btn btn-outline-primary m-2">
-          			Pause
-          			<i class="fas fa-pause"></i>
-          		</button>
-              <button onclick="control('resume')" class="btn btn-outline-primary m-2">
-          			Resume
-          			<i class="fas fa-play"></i>
-          		</button>
-              <button onclick="control('restart')" class="btn btn-outline-primary m-2">
-          			Restart
-          			<i class="fa fa-retweet"></i>
-          		</button>
-              <br><br>
-              <button onclick="control('previous')" class="btn btn-outline-primary m-2">
-          			Previous
-          			<i class="fas fa-step-backward"></i>
-          		</button>
-              <button onclick="control('next')" class="btn btn-outline-primary m-2">
-          			Next
-          			<i class="fas fa-step-forward"></i>
-          		</button>
-              <button onclick="control('shuffle')" class="btn btn-outline-primary m-2">
-          			Shuffle
-          			<i class="fa fa-random"></i>
-          		</button>
-              <br><br>
-              <button onclick="control('stop')" class="btn btn-outline-danger m-2">
-          			Stop
-          			<i class="fas fa-stop"></i>
-          		</button>
-          </fieldset>
-          <button onclick="window.location.href = '/set_password';" class="btn btn-warning m-2">
-            Set or Change Password
-            <i class="fa fa-key"></i>
-          </button>
-
-        </div>
-    </div>
+          
+      </div>
+           
     <script>
-      function control(action){
-        console.log(action)
-        var http = new XMLHttpRequest();
-        var url = '/'+action;
-        http.open('POST', url, true);
-        http.send();
-      }
-      function SetVolume(val){
-        console.log(val)
-        var http = new XMLHttpRequest();
-        var url = '/volume?val='+val;
-        http.open('POST', url, true);
-        http.send();
-      }
-    </script>
-  </body>
-</html>
+          function control(action){
+            console.log(action)
+            var http = new XMLHttpRequest();
+            var url = '/'+action;
+            http.open('POST', url, true);
+            http.send();
+          }
+          function reset(action){
+            console.log(action)
+            var http = new XMLHttpRequest();
+            var url = '/reset_smart_speaker/'+action;
+            http.open('POST', url, true);
+            http.send();
+          }
+          function SetVolume(val){
+            console.log(val)
+            var http = new XMLHttpRequest();
+            var url = '/volume?val='+val;
+            http.open('POST', url, true);
+            http.send();
+          }
+         
+          function getOfflineSong(){
+            console.log("inside getOfflineSong")
+            var url = '/getOfflineSong';
+    
+             fetch(url).then(function(response) {
+              return response.json();
+            }).then(function(data) {
+             var mod =  document.createElement("div")
+             mod.setAttribute('class',"list")
+              data.status.forEach(song => {
+                var btn = document.createElement("button");
+                var icon = document.createElement("i")
+                var name = document.createTextNode(song.name);
+                icon.className = "fa fa-music"
+                btn.value=song.name
+                btn.appendChild(icon)
+                btn.appendChild(name)
+                btn.className= "btn btn-outline-primary m-2"
+                btn.setAttribute('onClick','playOfflineSong(this)')
+                mod.appendChild(btn)
+              });
+              document.getElementById('layout').appendChild(mod)
+            }).catch(function() {
+              console.log("Error");
+              return null;
+            });
+          }
+          function playOfflineSong(e){
+            var song =  e.value
+            console.log("Song: "+song)
+            var url = '/playOfflineSong/'+song;
+            console.log("url="+url)
+            var http = new XMLHttpRequest();
+            http.open('PUT', url, true);
+            http.send();
+          //   fetch(url, {
+          //     method: 'PUT'
+          //  }).then(function(response) {
+          //   console.log(data)
+          //     return response.json();
+          //   }).catch(function() {
+          //     console.log("Error");
+          //   });
+          }
+        </script>
+      </body>
+    </html>
+    
