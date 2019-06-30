@@ -36,7 +36,7 @@ sudo git checkout $CURRENT_BRANCH
 # Here we check whether the current detached head is actually the head of master
 # and if yes, switch to master branch
 cd /home/pi/SUSI.AI/susi_installer
-if [ $(git rev-parse refs/heads/master) = $(git rev-parse HEAD) ] ; then
+if [ $(git rev-parse origin/master) = $(git rev-parse HEAD) ] ; then
   sudo git checkout master
 fi
 
