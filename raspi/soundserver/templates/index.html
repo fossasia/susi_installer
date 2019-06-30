@@ -7,6 +7,8 @@
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/signin.css') }}" rel="stylesheet">
     <script type="text/javascript" src="{{ url_for('static', filename='js/fontawesome.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/action-control.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/set-volume.js') }}"></script>
   </head>
 
   <body class="text-center">
@@ -63,21 +65,6 @@
 
         </div>
     </div>
-    <script>
-      function control(action){
-        console.log(action)
-        var http = new XMLHttpRequest();
-        var url = '/'+action;
-        http.open('POST', url, true);
-        http.send();
-      }
-      function SetVolume(val){
-        console.log(val)
-        var http = new XMLHttpRequest();
-        var url = '/volume?val='+val;
-        http.open('POST', url, true);
-        http.send();
-      }
-    </script>
+  
   </body>
 </html>
