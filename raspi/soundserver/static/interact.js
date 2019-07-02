@@ -64,6 +64,7 @@ function control(action){
     http.send();
   }
 
+  
   function refershDeviceList(){
       
     var url = '/getdevice'
@@ -79,6 +80,24 @@ function control(action){
               opt.innerText = folder.name
               list.appendChild(opt)              
           });
+      }).catch(function() {
+        console.log("Error");
+        return null;
+      });
+  }
+
+  function playYoutube(e){
+    var link = document.getElementById('ytb-link').value
+    console.log('link='+link)
+    var url = '/playyoutube'
+     fetch(url,{
+        method: 'PATCH', // or 'PUT'
+        body: JSON.stringify({'link':link}), // data can be `string` or {object}!
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      }).then(function(response) {
+        return response.json();
       }).catch(function() {
         console.log("Error");
         return null;

@@ -203,6 +203,12 @@ def playOffineSong(folder,file):
     vlcplayer.play(mountPath+'/'+folder+'/'+file)
     return do_return('OK', 200)
             
+@app.route('/playyoutube', methods=['PATCH'])
+def playFromYoutubeLink():
+    data = request.json
+    print(data)
+    vlcplayer.playytbLink(data['link'])
+    return do_return('OK', 200)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

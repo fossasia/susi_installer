@@ -40,7 +40,10 @@ class VlcPlayer():
 
     def playytb(self, vid):
         self.play(vid2youtubeMRL(vid))
-
+    
+    def playytbLink(self, link):
+        self.play(link2youtubeMRL(link))
+    
     def play(self, mrl_string):
         self.mrl = mrl_string.split(";")
         media_list = self.instance.media_list_new(self.mrl)
@@ -158,6 +161,11 @@ class VlcPlayer():
 
 def vid2youtubeMRL(vid):
     url = 'https://www.youtube.com/watch?v=' + vid
+    video = pafy.new(url)
+    best = video.getbestaudio()
+    return best.url
+
+def link2youtubeMRL(url):
     video = pafy.new(url)
     best = video.getbestaudio()
     return best.url
