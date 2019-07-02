@@ -734,6 +734,7 @@ then
     sudo systemctl enable ss-update-daemon.service
     sudo systemctl enable ss-update-daemon.timer
     sudo systemctl enable ss-python-flask.service
+    sudo systemctl enable ss-factory-daemon.service
     sudo systemctl enable ss-soundserver.service
 fi
 

@@ -41,7 +41,6 @@ def config():
     subprocess.call(['sudo', 'systemctl', 'daemon-reload']) #nosec #pylint-disable type: ignore
     subprocess.call(['sudo', 'systemctl', 'disable', 'ss-python-flask.service']) #nosec #pylint-disable type: ignore
     subprocess.call(['sudo', 'systemctl', 'enable', 'ss-susi-linux@pi.service']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'enable', 'ss-factory-daemon.service']) #nosec #pylint-disable type: ignore
     display_message = {"configuration":"successful", "stt": stt, "tts": tts, "hotword": hotword, "wake":wake}
     resp = jsonify(display_message)
     resp.status_code = 200
@@ -113,7 +112,6 @@ def reboot():
     subprocess.call(['sudo', 'systemctl', 'daemon-reload']) #nosec #pylint-disable type: ignore
     subprocess.call(['sudo', 'systemctl', 'disable', 'ss-python-flask.service']) #nosec #pylint-disable type: ignore
     subprocess.call(['sudo', 'systemctl', 'enable', 'ss-susi-linux@pi.service']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'enable', 'ss-factory-daemon.service']) #nosec #pylint-disable type: ignore
     subprocess.Popen(['sudo','bash',os.path.join(wifi_search_folder,'rwap.sh')])
     display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "wake":wake, "message":"SUSI is rebooting"}
     resp = jsonify(display_message)
