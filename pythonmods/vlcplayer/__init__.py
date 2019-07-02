@@ -43,22 +43,16 @@ class VlcPlayer():
     def playytb(self, vid):
         self.play(vid2youtubeMRL(vid))
 
-    def playLocalFiles(self,url):
-        # Method to play local mp3 files
-        media_list = self.instance.media_list_new(url)
-        self.list_player.set_media_list(media_list)
-        self.list_player.play()
-        self.softvolume(100, self.player)
-
-    def playscloud(self, url):
+    def playscloud(self, identifier):
         #Url of the format: https://soundcloud.com/aries_ix/sayonara
+        url = "https://souncloud.com" + identifier
         track = self.sc_api.resolve(url)
         assert type(track) is Track
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)),"download.mp3")
         with open(filename, "wb+") as fp:
             track.write_mp3_to(fp)
         # subprocess.call(["play","download.mp3"])
-        self.playLocalFiles(filename)
+        self.play(filename)
 
     def play(self, mrl_string):
         self.mrl = mrl_string.split(";")
