@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-song_path = "/home/pi/Music"
+mountPath = "/media/pi/"
 def do_return(msg, val):
     dm = {"status": msg}
     resp = jsonify(dm)
@@ -176,10 +176,20 @@ def reset_smart_speaker(type):
         subprocess.Popen(['sudo','bash', wap_script])  
     return do_return('Ok', 200)      
 
+@app.route('/getdevice', methods=['GET'])
+def getMountedDevice():
+    folders = os.listdir(mountPath)
+    devices = []
+    for d in folders:
+            device = {}
+            device['name'] = d
+            devices.append(device)
+                
+    return do_return(devices, 200)
 
-@app.route('/getOfflineSong', methods=['GET'])
-def getOfflineSong():
-    files = os.listdir(song_path)
+@app.route('/getOfflineSong/<folder>', methods=['GET'])
+def getOfflineSong(folder):
+    files = os.listdir(mountPath+folder)
     songs = []
     for i in files:
 	    if i.endswith('.mp3') or i.endswith('.m4a') or i.endswith('.ogg') or i.endswith('.deb'):
@@ -188,9 +198,9 @@ def getOfflineSong():
                 songs.append(file)
     return do_return(songs, 200)
 
-@app.route('/playOfflineSong/<file>', methods=['PUT'])
-def playOffineSong(file):
-    vlcplayer.play(song_path+'/'+file)
+@app.route('/playOfflineSong/<folder>/<file>', methods=['PUT'])
+def playOffineSong(folder,file):
+    vlcplayer.play(mountPath+'/'+folder+'/'+file)
     return do_return('OK', 200)
             
 
