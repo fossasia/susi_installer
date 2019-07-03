@@ -77,10 +77,10 @@ def play_route():
 # /volume?val=up
 # /volume?val=down
 # /volume?val=NN  0 <= NN <= 100
-@app.route('/volume', methods=['POST', 'PUT'])
-def volume_route():
+@app.route('/volume/<val>', methods=['POST', 'PUT'])
+def volume_route(val):
     try:
-        vlcplayer.volume(request.args.get('val'))
+        vlcplayer.volume(val)
         return do_return('Ok', 200)
     except Exception as e:
         logger.error(e)
@@ -163,21 +163,21 @@ def reset_smart_speaker(type):
     wap_script = os.path.abspath(current_folder + '/../access_point/wap.sh')
     factory_reset = os.path.abspath(current_folder + '/../factory_reset/factory_reset.sh')
     if type == 'hard' :
-        print("hard FACTORY RESET")
+        logger.info("hard FACTORY RESET")
         logger.info("hard factory reset initiated")
         subprocess.Popen(['sudo','bash', factory_reset, 'hard'])
     elif type == 'soft' :
-        print("soft FACTORY RESET")
+        logger.info("soft FACTORY RESET")
         logger.info("soft factory reset initiated")
         subprocess.Popen(['sudo','bash', factory_reset, 'soft'])
     elif type == 'AP' :
-        print("switch to access point mode")
+        logger.info("switch to access point mode")
         logger.info("switch to access mode initiated")
         subprocess.Popen(['sudo','bash', wap_script])  
     return do_return('Ok', 200)      
 
 @app.route('/getdevice', methods=['GET'])
-def getMountedDevice():
+def get_mounted_device():
     folders = os.listdir(mountPath)
     devices = []
     for d in folders:
@@ -188,7 +188,7 @@ def getMountedDevice():
     return do_return(devices, 200)
 
 @app.route('/getOfflineSong/<folder>', methods=['GET'])
-def getOfflineSong(folder):
+def get_offline_song(folder):
     files = os.listdir(mountPath+folder)
     songs = []
     for i in files:
@@ -199,12 +199,12 @@ def getOfflineSong(folder):
     return do_return(songs, 200)
 
 @app.route('/playOfflineSong/<folder>/<file>', methods=['PUT'])
-def playOffineSong(folder,file):
+def play_offine_song(folder,file):
     vlcplayer.play(mountPath+'/'+folder+'/'+file)
     return do_return('OK', 200)
             
 @app.route('/playyoutube', methods=['PATCH'])
-def playFromYoutubeLink():
+def play_from_youtubeLink():
     data = request.json
     print(data)
     vlcplayer.playytbLink(data['link'])
