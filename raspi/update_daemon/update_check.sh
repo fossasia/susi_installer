@@ -14,6 +14,7 @@ update_repo() {
   if [ ! "x$CURRENTBRANCH" = "xmaster" ] ; then
     echo "Current branch of $1 is $CURRENTBRANCH, not master." >&2
     echo "Not updating!"
+    cd ..
     return
   fi
   UPSTREAM=${2:-'@{u}'}
