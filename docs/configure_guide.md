@@ -38,3 +38,33 @@ This guide is for setting up the smart speaker according to your environment. Th
 * Your Device is configured successfully. Wait for the process to finish up. You'll hear `SUSI has started` and the three lights on the ReSpeaker hat will light up.
 
   <img src="images/Android6.jpg" height="500px"><br>
+
+## Configuring the smart speaker using the web page
+
+* This method can be used to set up the smart speaker without the need of installing the SUSI Android app. The Smart Speaker creates its own WIFI access point with the SSID - `SUSI.AI`. The Device is by default in access point mode if it has not been set up before.
+
+* Open the wifi menu and connect to your Smart Speaker's access point named "SUSI.AI".
+
+  <img src="images/wifi1.jpg" height="500px"><br>
+
+* Then enter the password -  `password`
+
+  <img src="images/wifi2.jpg" height="500px"><br>
+
+* Now you should be connected to the WIFI network created by the Smart Speaker.
+
+  <img src="images/wifi3.jpg" height="500px"><br>
+
+* Open up a web browser and enter the URL - http://10.0.0.1:5000. You'll see the following page-
+
+  <img src="images/wifi4.jpg" height="500px"><br>
+
+* Enter the WIFI SSID you want your smart speaker to be connected to.
+Then Enter the password to your WIFI.  
+
+  <img src="images/wifi5.jpg" height="500px"><br>
+
+* Select the Hotword engine and Select if you want to enable button support(included on the Respeaker PiHat).\
+Select Reboot Smart Speaker.
+
+#### The speaker should now reboot. If everything is set-up correctly, you'll hear "SUSI has started" sound and the three LED lights on the Respeaker Pi-Hat will light up.
