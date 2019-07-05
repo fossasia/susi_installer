@@ -14,11 +14,7 @@ import json_config
 
 access_point_folder = os.path.dirname(os.path.abspath(__file__))
 wifi_search_folder = os.path.join(access_point_folder, '..')
-base_folder = os.path.join(access_point_folder, '../../../..') # we are in ./raspi/access_point/server/
-susi_linux_folder = os.path.join(base_folder, 'susi_linux')
-config_json_file  = os.path.join(base_folder, 'config.json')
-configuration_script =  '/home/pi/SUSI.AI/bin/susi-linux-config-generator'
-authentication_script = '/home/pi/SUSI.AI/bin/susi-linux-authentication'
+susiconfig = '/home/pi/SUSI.AI/bin/susi-config'
 
 app = Flask(__name__, static_folder="static")
 
@@ -36,8 +32,7 @@ def config():
     tts = request.args.get('tts')
     hotword = request.args.get('hotword')
     wake = request.args.get('wake')
-    os.chdir(base_folder)
-    subprocess.Popen(['sudo', configuration_script, stt, tts, hotword, wake])  #nosec #pylint-disable type: ignore
+    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword, "wakebutton="+wake])  #nosec #pylint-disable type: ignore
     # TODO we should check the actual return code of susi-linux-config-generator
     display_message = {"configuration":"successful", "stt": stt, "tts": tts, "hotword": hotword, "wake":wake}
     resp = jsonify(display_message)
@@ -50,8 +45,7 @@ def login():
     auth = request.args.get('auth')
     email = request.args.get('email')
     password = request.args.get('password')
-    os.chdir(base_folder)
-    subprocess.call(['sudo', authentication_script, auth, email, password]) #nosec #pylint-disable type: ignore
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password]) #nosec #pylint-disable type: ignore
     display_message = {"authentication":"successful", "auth": auth, "email": email, "password": password}
     resp = jsonify(display_message)
     resp.status_code = 200
@@ -61,7 +55,6 @@ def login():
 def wifi_config():
     wifi_ssid = request.args.get('wifissid')
     wifi_password = request.args.get('wifipassd')
-    os.chdir(base_folder)
     subprocess.call(['sudo', 'bash', wifi_search_folder + '/wifi_search.sh', wifi_ssid, wifi_password])  #nosec #pylint-disable type: ignore
     display_message = {"wifi":"configured", "wifi_ssid":wifi_ssid, "wifi_password": wifi_password}
     resp = jsonify(display_message)
@@ -71,8 +64,7 @@ def wifi_config():
 @app.route('/speaker_config', methods=['GET'])
 def speaker_config():
     room_name = request.args.get('room_name')
-    config = json_config.connect(config_json_file)
-    config['room_name'] = room_name
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "roomname="+room_name) #nosec #pylint-disable type: ignore
     display_message = {"room_name":room_name}
     resp = jsonify(display_message)
     resp.status_code = 200
@@ -84,16 +76,13 @@ def speaker_config():
 
 @app.route('/reboot', methods=['POST'])
 def reboot():
-    config = json_config.connect(config_json_file)
-
     # speaker_config
     room_name = request.form['room_name'] 
-    config['room_name'] = room_name
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "roomname="+room_name) #nosec #pylint-disable type: ignore
 
     # wifi_credentials
     wifi_ssid = request.form['wifissid']
     wifi_password = request.form['wifipassd']
-    os.chdir(base_folder)
     subprocess.call(['sudo', 'bash', wifi_search_folder + '/wifi_search.sh', wifi_ssid, wifi_password])  #nosec #pylint-disable type: ignore
 
     # auth
@@ -106,7 +95,7 @@ def reboot():
     tts = request.form['tts']
     hotword = request.form['hotword']
     wake = request.form['wake']
-    subprocess.Popen(['sudo', configuration_script, stt, tts, hotword, wake])  #nosec #pylint-disable type: ignore
+    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword, "wakebutton="+wake])  #nosec #pylint-disable type: ignore
     display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "wake":wake, "message":"SUSI is rebooting"}
     resp = jsonify(display_message)
     resp.status_code = 200
