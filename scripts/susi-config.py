@@ -36,10 +36,6 @@ def login():
     susi.sign_in(config['login_credentials']['email'], config['login_credentials']['password'], room_name=config['room_name'])
 
 
-def roomname(rn = ''):
-    config['room_name'] = rn
-
-
 def is_valid(email, password):
     """ Method to Validate SUSI Login Details
     :param email: SUSI Sign-in email
@@ -194,4 +190,100 @@ def generate_config():
 
     print("Setup Wake Button\n")
     setup_wake_button()
+
+
+#
+# susi-config set key=value ...
+# susi-config get key ...
+#
+# key value(s)
+# stt google|watson|bing|pocketsphinx
+# tts google|watson|flite
+# watson.stt.user <value>
+# watson.stt.pass <value>
+# watson.tts.user <value>
+# watson.tts.pass <value>
+# bing.api <value>
+# wakebutton enable|disable
+# susi.user <value>
+# susi.pass <value>
+# susi.mode authenticated|anonymous
+# roomname <value>
+
+keys_conf = {
+        'stt': 'stt',
+        'tts': 'tts',
+        'watson.stt.user': 'watson_stt_config.username',
+        'watson.stt.pass': 'watson_stt_config.password',
+        'watson.tts.user': 'watson_tts_config.username', 
+        'watson.tts.pass': 'watson_tts_config.password', 
+        'susi.user': 'login_credentials.email',
+        'susi.pass': 'login_credentials.password',
+        'susi.mode': 'usage_mode',
+        'roomname', 'room_name',
+        'bing.api': 'bing_speech_api_key',
+        'wakebutton': 'WakeButton'
+    }
+
+try:
+    if sys.argv[1] == 'set':
+        for kv in sys.argv[2:]:
+            k,v = kv.split('=', 2)
+            if k in possible_keys:
+                pass
+            else:
+                raise ValueError('unknown key', k)
+
+            if k == "stt":
+                if v == 'google' or v == 'watson' or v == 'bing' or v == 'pocketsphinx':
+                    config['stt'] = v
+                else:
+                    raise ValueError(k,v)
+            elif k == 'tts':
+                if v == 'google' or v == 'watson' or v == 'flite':
+                    config['tts'] = v
+                else:
+                    raise ValueError(k, v)
+            elif k == 'watson.stt.user':
+                config['watson_stt_config']['username'] = v
+            elif k == 'watson.stt.pass':
+                config['watson_stt_config']['password'] = v
+            elif k == 'watson.tts.user':
+                config['watson_tts_config']['username'] = v
+            elif k == 'watson.tts.pass':
+                config['watson_tts_config']['password'] = v
+            elif k == 'susi.user':
+                config['login_credentials']['email'] = v
+            elif k == 'susi.pass':
+                config['login_credentials']['password'] = password
+            elif k == 'roomname':
+                config['room_name'] = v
+            elif k == 'bing.api':
+                config['bing_speech_api_key'] = v
+            elif k == 'wakebutton':
+                if v == 'enable' or v == 'disable':
+                    setup_wake_button(v == 'enable')
+                else:
+                    raise ValueError(k, v)
+            elif k == 'susi.mode':
+                if v == 'authenticated' or v == 'anonymous':
+                    config['usage_mode'] = v
+                else:
+                    raise ValueError(k, v)
+            else:
+                raise ValueError(k, v)
+
+    elif sys.argv[1] == 'get':
+        ret = []
+        for k in sys.argv[2:]:
+            if k in possible_keys:
+                ret.append(k + '=' 
+
+            pass
+    else:
+        raise ValueError
+
+except ValueError as ex:
+    print('Invalid input', ex)
+
 
