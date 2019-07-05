@@ -17,9 +17,9 @@ cp /etc/network/interfaces.d/wlan.client /etc/network/interfaces.d/wlan-client
 # these are dual to wap.sh
 systemctl disable hostapd
 systemctl disable dnsmasq
-sudo systemctl enable ss-susi-linux@pi.service
-sudo systemctl enable ss-susi-login.service
-sudo systemctl disable ss-python-flask.service
+systemctl enable ss-susi-linux@pi.service
+systemctl enable ss-susi-login.service
+systemctl disable ss-python-flask.service
 
 echo "Please reboot"
 sleep 10;

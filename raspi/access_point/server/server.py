@@ -17,8 +17,8 @@ wifi_search_folder = os.path.join(access_point_folder, '..')
 base_folder = os.path.join(access_point_folder, '../../../..') # we are in ./raspi/access_point/server/
 susi_linux_folder = os.path.join(base_folder, 'susi_linux')
 config_json_file  = os.path.join(base_folder, 'config.json')
-configuration_script =  os.path.join(susi_linux_folder, 'config_generator.py')
-authentication_script =  os.path.join(susi_linux_folder, 'authentication.py')
+configuration_script =  '/home/pi/SUSI.AI/bin/susi-linux-config-generator'
+authentication_script = '/home/pi/SUSI.AI/bin/susi-linux-authentication'
 
 app = Flask(__name__, static_folder="static")
 
@@ -37,15 +37,12 @@ def config():
     hotword = request.args.get('hotword')
     wake = request.args.get('wake')
     os.chdir(base_folder)
-    subprocess.Popen(['sudo', 'python3', configuration_script, stt, tts, hotword, wake])  #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'daemon-reload']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'disable', 'ss-python-flask.service']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'enable', 'ss-susi-linux@pi.service']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'enable', 'ss-factory-daemon.service']) #nosec #pylint-disable type: ignore
+    subprocess.Popen(['sudo', configuration_script, stt, tts, hotword, wake])  #nosec #pylint-disable type: ignore
+    # TODO we should check the actual return code of susi-linux-config-generator
     display_message = {"configuration":"successful", "stt": stt, "tts": tts, "hotword": hotword, "wake":wake}
     resp = jsonify(display_message)
     resp.status_code = 200
-    subprocess.Popen(['sudo','bash',os.path.join(wifi_search_folder,'rwap.sh')])
+    subprocess.Popen(['sudo','bash', os.path.join(wifi_search_folder,'rwap.sh')])
     return resp # pylint-enable
 
 @app.route('/auth', methods=['GET'])
@@ -54,7 +51,7 @@ def login():
     email = request.args.get('email')
     password = request.args.get('password')
     os.chdir(base_folder)
-    subprocess.call(['sudo', 'python3', authentication_script, auth, email, password]) #nosec #pylint-disable type: ignore
+    subprocess.call(['sudo', authentication_script, auth, email, password]) #nosec #pylint-disable type: ignore
     display_message = {"authentication":"successful", "auth": auth, "email": email, "password": password}
     resp = jsonify(display_message)
     resp.status_code = 200
@@ -109,15 +106,11 @@ def reboot():
     tts = request.form['tts']
     hotword = request.form['hotword']
     wake = request.form['wake']
-    subprocess.Popen(['sudo', 'python3', configuration_script, stt, tts, hotword, wake])  #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'daemon-reload']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'disable', 'ss-python-flask.service']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'enable', 'ss-susi-linux@pi.service']) #nosec #pylint-disable type: ignore
-    subprocess.call(['sudo', 'systemctl', 'enable', 'ss-factory-daemon.service']) #nosec #pylint-disable type: ignore
-    subprocess.Popen(['sudo','bash',os.path.join(wifi_search_folder,'rwap.sh')])
+    subprocess.Popen(['sudo', configuration_script, stt, tts, hotword, wake])  #nosec #pylint-disable type: ignore
     display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "wake":wake, "message":"SUSI is rebooting"}
     resp = jsonify(display_message)
     resp.status_code = 200
+    subprocess.Popen(['sudo','bash', os.path.join(wifi_search_folder,'rwap.sh')])
     return resp  # pylint-enable
 
 if __name__ == '__main__':
