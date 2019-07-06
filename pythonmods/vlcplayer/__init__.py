@@ -1,12 +1,16 @@
 """ VLC Player module """
 
-import vlc
-import pafy
+import os
+import logging
 import time
 import random
-from hwmixer import mixer
+
 from sclib import SoundcloudAPI, Track
-import os
+import pafy
+import vlc
+
+from hwmixer import mixer
+
 #
 # we have two mixers available
 # - software mixer via python-vlc
@@ -27,6 +31,7 @@ import os
 # - all values send to volume adjustments of vlc player are
 #   fraction between [0, current_master_volume]
 
+logger = logging.getLogger(__name__)
 
 class VlcPlayer():
 
@@ -47,11 +52,14 @@ class VlcPlayer():
         #Url of the format: https://soundcloud.com/aries_ix/sayonara
         url = "https://souncloud.com" + identifier
         track = self.sc_api.resolve(url)
-        assert type(track) is Track
+        try:
+            assert type(track) is Track
+        except AssertionError as error:
+            logger.debug(error)
+        
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)),"download.mp3")
         with open(filename, "wb+") as fp:
             track.write_mp3_to(fp)
-        # subprocess.call(["play","download.mp3"])
         self.play(filename)
 
     def play(self, mrl_string):
