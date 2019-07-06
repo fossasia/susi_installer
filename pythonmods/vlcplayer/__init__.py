@@ -5,6 +5,9 @@ import pafy
 import time
 import random
 from hwmixer import mixer
+import urllib.parse
+import requests
+import xml
 
 #
 # we have two mixers available
@@ -47,6 +50,20 @@ class VlcPlayer():
         self.list_player.set_media_list(media_list)
         self.list_player.play()
         self.softvolume(100, self.player)
+
+    def playtunein(self, query_name):
+        base_url = "http://opml.radiotime.com/Search.ashx?query=" + \
+            urllib.parse.urlencode(query_name)
+        resp = requests.get(base_url)
+        resp_list = xml.dom.minidom.parse(resp)
+        resp_list = resp_list.getElementsByTagName("outline")
+        if not resp_list:
+            return
+        
+        playing_mrl = resp_list[0].getAttribute("URL")
+        self.play(playing_mrl)
+        # playing_mrl = requests.get(playing_url)
+
 
     def next(self):
         if self.is_playing():
