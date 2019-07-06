@@ -723,7 +723,7 @@ then
     sudo mkdir /etc/systemd/system/systemd-udevd.service.d/
     echo -e "[Service]\nMountFlags=shared" | sudo tee /etc/systemd/system/systemd-udevd.service.d/mountFlagOverride.conf
     # readonly mount for external USB drives
-    sudo sed '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
+    sudo sed -i -e '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_create_skill /etc/usbmount/mount.d/
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_remove_auto_skill /etc/usbmount/umount.d/
 
