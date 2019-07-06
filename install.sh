@@ -1,6 +1,9 @@
 #!/bin/bash -e
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+INSTALLERDIR=$(dirname $(realpath "$0"))
+
 #
 # Target layout as with the developer-setup.md layout
 #
@@ -74,7 +77,23 @@ CLEAN=0
 SUSI_SERVER_USER=
 CORAL=0
 # default installation branch
+# we use the same branch across repositories
+# so if we build from susi_installer:master, we use the master branch of
+# the other repos. And if we build from susi_installer:development, we use
+# the development branch of the others.
+# For other branches than master and development, we use the "development" branch
 INSTALLBRANCH=master
+if [ -d "$INSTALLERDIR/.git" ] ; then
+    pushd "$INSTALLERDIR"
+    CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ "$CURRENTBRANCH" = "master" ] ; then
+        INSTALLBRANCH=master
+    else
+        INSTALLBRANCH=development
+    fi
+    popd
+fi
+
 # we save arguments in case we need to re-exec the installer after git clone
 saved_args=""
 if [ ! "$vendor" = Raspbian ]
@@ -129,11 +148,6 @@ then
                 saved_args="$saved_args --with-coral"
                 shift
                 ;;
-            --development)
-                INSTALLBRANCH=development
-                saved_args="$saved_args --development"
-                shift
-                ;;
             --help)
                 cat <<'EOF'
 SUSI.AI Installer
@@ -143,7 +157,6 @@ Possible options:
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
                    defaults to $HOME/SUSI.AI
-  --development    Use the development branches instead of master branches
   --use-sudo       use sudo for installation of packages without asking
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
@@ -238,7 +251,7 @@ DEBDEPS="
   git openssl wget python3-pip sox libsox-fmt-all flac
   libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
   vlc-plugin-video-splitter python3-cairo python3-flask flite
-  default-jdk-headless pixz udisks2 python3-requests python3-service-identity
+  default-jdk-headless pixz udisks2 python3-requests python3-requests-futures python3-service-identity
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
   python3-setuptools python3-watson-developer-cloud ca-certificates
 "
@@ -262,6 +275,8 @@ CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil
 if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
       || \
       ( $targetSystem = ubuntu && ! $targetVersion = 18.04 && ! $targetVersion = 18.10 && ! $targetVersion = 19.01 ) \
+      || \
+      ( $targetSystem = raspi  && ! $targetVersion = 9 ) \
    ]]  ; then
   DEBDEPS="$DEBDEPS python3-alsaaudio"
 fi
@@ -289,10 +304,6 @@ if [[ ( -n $TRIGGER_SOURCE ) && ( -n $TRIGGER_BRANCH ) ]] ; then
         *) echo "Unknown trigger source: $TRIGGER_SOURCE, ignoring it" ;;
     esac
 fi
-
-# The default $INSTALLBRANCH is master, but can be switched
-# using the --development cmd line options development
-# default branches of the various components
 export SUSI_LINUX_BRANCH=${SUSI_LINUX_BRANCH:-$INSTALLBRANCH}
 export SUSI_PYTHON_BRANCH=${SUSI_PYTHON_BRANCH:-$INSTALLBRANCH}
 # if we are travis testing, then the correct branch is already
@@ -353,7 +364,6 @@ fi
 
 #
 # if the installer is download somewhere else then $DESTDIR, copy it over
-INSTALLERDIR=$(dirname $(realpath "$0"))
 if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
     echo "Copying installer to destination $DESTDIR ..."
     mkdir -p "$DESTDIR"
@@ -503,7 +513,8 @@ install_pip_dependencies()
     # we need to update pip, since pip 18 or so is too old and cannot work with --extra-index-url
     # properly
     $SUDOCMD $PIP install -U pip
-    $SUDOCMD $PIP install -U wheel
+    # wheel should not be necessary since we are not compiling anything?
+    # $SUDOCMD $PIP install -U wheel
     $SUDOCMD $PIP install -r susi_python/requirements.txt
     $SUDOCMD $PIP install -r susi_linux/requirements.txt
     if [ $targetSystem = raspi ] ; then
@@ -652,7 +663,7 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
       || \
       ( $targetSystem = mint ) \
       || \
-      ( $targetSystem = raspi ) \
+      ( $targetSystem = raspi && $targetVersion = 9 ) \
    ]]  ; then
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
@@ -690,7 +701,7 @@ then
         echo "WARNING: etherpad-lite directory already present, not cloning it!" >&2
     fi
     echo "Adding node.js repository"
-    curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
     sudo apt-get install --no-install-recommends -y nodejs
     echo "Installing node modules for etherpad"
     cd etherpad-lite
@@ -712,15 +723,18 @@ then
     sudo mkdir /etc/systemd/system/systemd-udevd.service.d/
     echo -e "[Service]\nMountFlags=shared" | sudo tee /etc/systemd/system/systemd-udevd.service.d/mountFlagOverride.conf
     # readonly mount for external USB drives
-    sudo sed '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
+    sudo sed -i -e '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_create_skill /etc/usbmount/mount.d/
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_remove_auto_skill /etc/usbmount/umount.d/
 
     echo "Installing RPi specific Systemd Rules"
     # TODO !!! we need to make the vlcplayer available to soundserver, as of now it does not find it
     sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service /lib/systemd/system/
+    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.timer /lib/systemd/system/
     sudo systemctl enable ss-update-daemon.service
+    sudo systemctl enable ss-update-daemon.timer
     sudo systemctl enable ss-python-flask.service
+    sudo systemctl enable ss-factory-daemon.service
     sudo systemctl enable ss-soundserver.service
 fi
 
@@ -833,8 +847,7 @@ if [ $targetSystem = raspi ] ; then
 
     cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"
-    sudo rm -Rf .git
-    tar --exclude-vcs -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python etherpad-lite
+    tar -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 susi_linux susi_installer susi_server susi_skill_data susi_python etherpad-lite
     echo ""  # To add newline after tar's last checkpoint
     mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 

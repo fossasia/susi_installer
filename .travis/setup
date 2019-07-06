@@ -21,10 +21,38 @@ apt-get upgrade -y --no-install-recommends
 apt-get install -y --no-install-recommends git
 
 sudo -u pi mkdir /home/pi/SUSI.AI
-cd /home/pi/SUSI.AI && sudo -u pi git clone https://github.com/fossasia/susi_installer.git
+cd /home/pi/SUSI.AI
+sudo -u pi git clone https://github.com/fossasia/susi_installer.git
 
 # Run SUSI Linux's install script
-cd /home/pi/SUSI.AI/susi_installer && git checkout $CURRENT_BRANCH && sudo -Hu pi ./install.sh --clean
+cd /home/pi/SUSI.AI/susi_installer
+# if $CURRENT_BRANCH is repo/branch name, we add a new origin and 
+# checkout the respective branch from it
+DN=$(dirname $CURRENT_BRANCH)
+BN=$(basename $CURRENT_BRANCH)
+if [ $DN != "." ] ; then
+  sudo -u pi git remote add $DN https://github.com/$DN/susi_installer.git
+  sudo -u pi git fetch $DN
+  sudo -u pi git checkout -b $CURRENT_BRANCH --track $DN/$BN
+else
+  sudo -u pi git checkout $CURRENT_BRANCH 
+fi
+
+# Tagged builds are running on a detached head from
+#   git checkout <TAGNAME>
+# That means that the images build on travis-ci will be development images
+# in the sense that the git heads point to development (since we didn't start
+# from the master branch!)
+# Here we check whether the current detached head is actually the head of master
+# and if yes, switch to master branch
+cd /home/pi/SUSI.AI/susi_installer
+if [ $(git rev-parse origin/master) = $(git rev-parse HEAD) ] ; then
+  sudo -u pi git checkout master
+fi
+
+# Run the installer
+# we need to keep environment otherwise the TRIGGER_* variables are lost
+sudo -EHu pi ./install.sh --clean
 
 # After ./install.sh, the /dev is occupied by some processes and cannot be released by build script.
 # We stop those processes to let the build script continue.

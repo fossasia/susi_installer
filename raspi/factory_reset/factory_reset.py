@@ -22,8 +22,21 @@ try:
             while GPIO.input(17) == 0 :
                 time.sleep(0.1)
                 duration = round(time.time()-start,1)
-                if(duration == 7.0 or duration == 15.0 or duration == 25.0):
+                if duration == 1.0 :
+                    subprocess.Popen(['play', current_folder + '/hold_for_wifi_reset.wav'])
+                if duration == 7.0 :
                     subprocess.Popen(['play', current_folder + '/beep.wav'])
+                    subprocess.Popen(['play', current_folder + '/wifi_reset.wav'])
+                    time.sleep(0.5)
+                    subprocess.Popen(['play', current_folder + '/hold_for_soft_factory_reset.wav'])
+                if duration == 15.0 :
+                    subprocess.Popen(['play', current_folder + '/beep.wav'])
+                    subprocess.Popen(['play', current_folder + '/soft_factory_reset.wav'])
+                    time.sleep(0.5)
+                    subprocess.Popen(['play', current_folder + '/hold_for_hard_factory_reset.wav'])
+                if duration == 25.0 :
+                    subprocess.Popen(['play', current_folder + '/beep.wav'])
+                    subprocess.Popen(['play', current_folder + '/hard_factory_reset.wav'])
             end = time.time()
             total = end - start
             if total >= 25 :

@@ -10,3 +10,5 @@ main/hotword_engine/snowboy/snowboydetect.py
 /extras/output.wav
 /snowboy/
 seeed-voicecard/
+raspi/soundserver/hwmixer
+raspi/soundserver/vlcplayer
