@@ -1,3 +1,4 @@
 alsaaudio
 pafy
 mutagen
+soundcloud-lib
