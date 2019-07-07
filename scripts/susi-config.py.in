@@ -165,8 +165,8 @@ def get_set(k, v = None):
         return config[keys_conf[k]]
     elif k == 'wakebutton':
         if not (v is None):
-            if v == 'enable' or v == 'disable':
-                setup_wake_button(v == 'enable')
+            if v == 'y' or v == 'n' or v == 'enable' or v == 'disable':
+                setup_wake_button( v == 'y' or v == 'enable')
             else:
                 raise ValueError(k, v)
         return config[keys_conf[k]]
@@ -179,8 +179,8 @@ def get_set(k, v = None):
         return config[keys_conf[k]]
     elif k == 'hotword':
         if not (v is None):
-            if v == 'Snowboy' or v == 'PocketSphinx':
-                request_hotword_choice( v == 'Snowboy' )
+            if v == 'y' or v == 'n' or v == 'Snowboy' or v == 'PocketSphinx':
+                request_hotword_choice( v == 'y' or v == 'Snowboy' )
             else:
                 raise ValueError(k, v)
         return config[keys_conf[k]]
