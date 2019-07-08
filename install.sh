@@ -663,12 +663,7 @@ fi
 echo "Downloading: Susi server"
 if [ ! -d susi_server ]
 then
-    # we don't use /tmp here since this allows for link attacks
-    rm -f susi_server_binary_latest.tar.gz
-    wget http://download.susi.ai/susi_server/susi_server_binary_latest.tar.gz
-    tar -xzf susi_server_binary_latest.tar.gz
-    mv susi_server_binary_latest susi_server
-    rm susi_server_binary_latest.tar.gz
+    git clone -b stable-dist --single-branch https://github.com/fossasia/susi_server.git
 else
     echo "WARNING: susi_server directory already present, not cloning it!" >&2
 fi
