@@ -16,7 +16,7 @@ export TRIGGER_SOURCE TRIGGER_BRANCH
 export LANG=C
 export LC_ALL=C
 
-apt-get update
+apt-get --allow-releaseinfo-change update
 apt-get upgrade -y --no-install-recommends
 apt-get install -y --no-install-recommends git
 
