@@ -64,7 +64,7 @@ def wifi_config():
 @app.route('/speaker_config', methods=['GET'])
 def speaker_config():
     room_name = request.args.get('room_name')
-    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "roomname=\""+room_name+"\""]) #nosec #pylint-disable type: ignore
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', 'roomname="'+room_name+'"']) #nosec #pylint-disable type: ignore
     display_message = {"room_name":room_name}
     resp = jsonify(display_message)
     resp.status_code = 200
@@ -78,7 +78,7 @@ def speaker_config():
 def reboot():
     # speaker_config
     room_name = request.form['room_name'] 
-    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "roomname=\""+room_name+"\""]) #nosec #pylint-disable type: ignore
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', 'roomname="'+room_name+'"']) #nosec #pylint-disable type: ignore
 
     # wifi_credentials
     wifi_ssid = request.form['wifissid']
