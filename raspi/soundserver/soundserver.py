@@ -43,7 +43,7 @@ def before_request_callback():
        check_pass() and not session.get('logged_in') and request.remote_addr != '127.0.0.1':
         return render_template('login.html')
 
-@app.route('/')
+@app.route('/control')
 def index():
     return render_template('index.html')
 
