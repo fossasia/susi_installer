@@ -12,4 +12,8 @@ main/hotword_engine/snowboy/snowboydetect.py
 seeed-voicecard/
 raspi/soundserver/hwmixer
 raspi/soundserver/vlcplayer
+raspi/soundserver/static/css
+raspi/soundserver/static/js
+raspi/soundserver/static/media
+raspi/soundserver/templates/index.html
 susi_installer/raspi/susi.ai

@@ -671,13 +671,14 @@ else
 fi
 
 echo "Downloading: Susi.AI webclient"
-if [ ! -d "susi_python" ]
+if [ ! -d "susi.ai" ]
 then
-    cd susi_installer/raspi
     git clone https://github.com/fossasia/susi.ai.git
     cd susi.ai
-    git checkout gh-pages
-    cd ../../..
+    git checkout local-pages
+    cd ..
+    ln -s $PWD/susi.ai/static/* $PWD/susi_installer/raspi/soundserver/static/
+    ln -s $PWD/susi.ai/index.html $PWD/susi_installer/raspi/soundserver/templates/
 else
     echo "WARNING: susi.ai directory already present, not cloning it!" >&2
 fi
