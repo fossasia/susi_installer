@@ -157,24 +157,24 @@ def restore_hardvolume_route():
     vlcplayer.restore_hardvolume()
     return do_return('Ok', 200)
 
-@app.route('/reset_smart_speaker/<type>', methods=['POST','PUT'])
-def reset_smart_speaker(type):
-    current_folder = os.path.dirname(os.path.abspath(__file__))
-    wap_script = os.path.abspath(current_folder + '/../access_point/wap.sh')
-    factory_reset = os.path.abspath(current_folder + '/../factory_reset/factory_reset.sh')
-    if type == 'hard' :
-        logger.info("hard FACTORY RESET")
-        logger.info("hard factory reset initiated")
-        subprocess.Popen(['sudo','bash', factory_reset, 'hard'])
-    elif type == 'soft' :
-        logger.info("soft FACTORY RESET")
-        logger.info("soft factory reset initiated")
-        subprocess.Popen(['sudo','bash', factory_reset, 'soft'])
-    elif type == 'AP' :
-        logger.info("switch to access point mode")
-        logger.info("switch to access mode initiated")
-        subprocess.Popen(['sudo','bash', wap_script])  
-    return do_return('Ok', 200)      
+# @app.route('/reset_smart_speaker/<type>', methods=['POST','PUT'])
+# def reset_smart_speaker(type):
+#     current_folder = os.path.dirname(os.path.abspath(__file__))
+#     wap_script = os.path.abspath(current_folder + '/../access_point/wap.sh')
+#     factory_reset = os.path.abspath(current_folder + '/../factory_reset/factory_reset.sh')
+#     if type == 'hard' :
+#         logger.info("hard FACTORY RESET")
+#         logger.info("hard factory reset initiated")
+#         subprocess.Popen(['sudo','bash', factory_reset, 'hard'])
+#     elif type == 'soft' :
+#         logger.info("soft FACTORY RESET")
+#         logger.info("soft factory reset initiated")
+#         subprocess.Popen(['sudo','bash', factory_reset, 'soft'])
+#     elif type == 'AP' :
+#         logger.info("switch to access point mode")
+#         logger.info("switch to access mode initiated")
+#         subprocess.Popen(['sudo','bash', wap_script])  
+#     return do_return('Ok', 200)      
 
 @app.route('/getdevice', methods=['GET'])
 def get_mounted_device():
