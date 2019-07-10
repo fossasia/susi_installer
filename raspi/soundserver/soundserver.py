@@ -1,18 +1,20 @@
-from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
-from flask import jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
 import subprocess
 import logging
-import os
+
+from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
+from flask import jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 from vlcplayer import vlcplayer
 
 app = Flask(__name__)
 
 logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-mountPath = "/media/pi/"
+mountPath = os.path.join('/media',os.getlogin())
+
+
 def do_return(msg, val):
     dm = {"status": msg}
     resp = jsonify(dm)
@@ -94,6 +96,8 @@ def say_route():
         return do_return('Ok', 200)
     else:
         return do_return('Missing mrl argument', 400)
+
+
 @app.route('/beep', methods=['POST', 'PUT'])
 def beep_route():
     if 'mrl' in request.args:
@@ -110,10 +114,12 @@ def beep_route():
 def pause_route():
     vlcplayer.pause()
     return do_return('Ok', 200)
+    
 @app.route('/resume', methods=['POST', 'PUT'])
 def resume_route():
     vlcplayer.resume()
     return do_return('Ok', 200)
+
 @app.route('/stop', methods=['POST', 'PUT'])
 def stop_route():
     vlcplayer.stop()
@@ -143,6 +149,7 @@ def shuffle_route():
 def save_softvolume_route():
     vlcplayer.save_softvolume()
     return do_return('Ok', 200)
+
 @app.route('/restore_softvolume', methods=['POST', 'PUT'])
 def restore_softvolume_route():
     vlcplayer.restore_softvolume()
@@ -152,6 +159,7 @@ def restore_softvolume_route():
 def save_hardvolume_route():
     vlcplayer.save_hardvolume()
     return do_return('Ok', 200)
+
 @app.route('/restore_hardvolume', methods=['POST', 'PUT'])
 def restore_hardvolume_route():
     vlcplayer.restore_hardvolume()
@@ -179,34 +187,25 @@ def restore_hardvolume_route():
 @app.route('/getdevice', methods=['GET'])
 def get_mounted_device():
     folders = os.listdir(mountPath)
-    devices = []
-    for d in folders:
-            device = {}
-            device['name'] = d
-            devices.append(device)
+    devices = [{'name': d} for d in folders]
                 
     return do_return(devices, 200)
 
 @app.route('/getOfflineSong/<folder>', methods=['GET'])
 def get_offline_song(folder):
-    files = os.listdir(mountPath+folder)
-    songs = []
-    for i in files:
-	    if i.endswith('.mp3') or i.endswith('.m4a') or i.endswith('.ogg') or i.endswith('.deb'):
-                file = {}
-                file['name'] = i
-                songs.append(file)
+    files = os.listdir(os.path.join(mountPath,folder))
+    songs = [{'name': i} for i in files if i.endswith('.mp3') or i.endswith('.m4a') or i.endswith('.ogg') ]
     return do_return(songs, 200)
 
 @app.route('/playOfflineSong/<folder>/<file>', methods=['PUT'])
-def play_offine_song(folder,file):
-    vlcplayer.play(mountPath+'/'+folder+'/'+file)
+def play_offine_song(folder, file):
+    vlcplayer.stop()
+    vlcplayer.play(os.path.join(mountPath, folder, file))
     return do_return('OK', 200)
             
 @app.route('/playyoutube', methods=['PATCH'])
 def play_from_youtubeLink():
     data = request.json
-    print(data)
     vlcplayer.playytbLink(data['link'])
     return do_return('OK', 200)
 
