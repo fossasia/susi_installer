@@ -584,6 +584,35 @@ function install_seeed_voicecard_driver()
 
 ####  Main  ####
 cd "$DESTDIR"
+mkdir -p $BINDIR
+cp susi_installer/scripts/susi-config.py.in $BINDIR/susi-config
+sed -i -e "s!@SUSI_WORKING_DIR@!$WORKDIR!g"  $BINDIR/susi-config
+chmod +x $BINDIR/susi-config
+# generate initial config.json
+CFG="$WORKDIR/config.json"
+if [ ! -r "$CFG" ] ; then
+  cat >"$CFG" <<EOF
+{
+  "Device": "Desktop Computer",
+  "WakeButton": "not available",
+  "default_stt": "google",
+  "default_tts": "google",
+  "data_base_dir": "$DESTDIR/susi_linux",
+  "detection_bell_sound": "extras/detection-bell.wav",
+  "problem_sound": "extras/problem.wav",
+  "recognition_error_sound": "extras/recognition-error.wav",
+  "flite_speech_file_path": "extras/cmu_us_slt.flitevox",
+  "hotword_engine": "Snowboy",
+  "usage_mode": "anonymous",
+  "room_name": "office",
+  "watson_tts_config": {
+      "username": "", "password": ""
+  }
+}
+EOF
+fi
+
+
 echo "Downloading: Susi Linux"
 if [ ! -d "susi_linux" ]
 then
@@ -599,7 +628,6 @@ else
 fi
 echo "Setting up wrapper scripts for susi_linux"
 cd susi_linux/wrapper
-mkdir -p $BINDIR
 for i in *.in ; do
     wr=`basename $i .in`
     cp $i $BINDIR/$wr
@@ -635,12 +663,7 @@ fi
 echo "Downloading: Susi server"
 if [ ! -d susi_server ]
 then
-    # we don't use /tmp here since this allows for link attacks
-    rm -f susi_server_binary_latest.tar.gz
-    wget http://download.susi.ai/susi_server/susi_server_binary_latest.tar.gz
-    tar -xzf susi_server_binary_latest.tar.gz
-    mv susi_server_binary_latest susi_server
-    rm susi_server_binary_latest.tar.gz
+    git clone -b stable-dist --single-branch https://github.com/fossasia/susi_server.git
 else
     echo "WARNING: susi_server directory already present, not cloning it!" >&2
 fi
@@ -723,7 +746,7 @@ then
     sudo mkdir /etc/systemd/system/systemd-udevd.service.d/
     echo -e "[Service]\nMountFlags=shared" | sudo tee /etc/systemd/system/systemd-udevd.service.d/mountFlagOverride.conf
     # readonly mount for external USB drives
-    sudo sed '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
+    sudo sed -i -e '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_create_skill /etc/usbmount/mount.d/
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_remove_auto_skill /etc/usbmount/umount.d/
 
@@ -734,6 +757,7 @@ then
     sudo systemctl enable ss-update-daemon.service
     sudo systemctl enable ss-update-daemon.timer
     sudo systemctl enable ss-python-flask.service
+    sudo systemctl enable ss-factory-daemon.service
     sudo systemctl enable ss-soundserver.service
 fi
 

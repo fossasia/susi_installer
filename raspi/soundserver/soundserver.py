@@ -1,14 +1,17 @@
 import sys
 import os
 import subprocess
+
 import logging
 
 from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
 from flask import jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from vlcplayer import vlcplayer
 
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))

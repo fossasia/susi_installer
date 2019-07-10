@@ -4,7 +4,9 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3  /home/pi/SUSI.AI/susi_installer/raspi/soundserver/soundserver.py
+WorkingDirectory=/home/pi/SUSI.AI
+Environment=PYTHONPATH=/home/pi/SUSI.AI/susi_installer/pythonmods
+ExecStart=/usr/bin/python3 /home/pi/SUSI.AI/susi_installer/raspi/soundserver/soundserver.py
 
 [Install]
 WantedBy=multi-user.target
