@@ -19,36 +19,34 @@ update_repo() {
   git fetch --all
   # get current branch name
   CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
+  RET=0
   if [ ! "x$CURRENTBRANCH" = "x$master" ] ; then
     echo "Current branch of $1 is $CURRENTBRANCH, not $master." >&2
     echo "Not updating!"
-    cd ..
-    return 0
-  fi
-  UPSTREAM=${2:-'@{u}'}
-  LOCAL=$(git rev-parse @)
-  REMOTE=$(git rev-parse "$UPSTREAM")
-  BASE=$(git merge-base @ "$UPSTREAM")
-  CHECK=''
-  if [ $LOCAL = $REMOTE ]
-  then
-    echo "Up-to-date"
-    CHECK='up-to-date'
-  elif [ $LOCAL = $BASE ] 
-  then
-    echo "Need to pull"
-    CHECK='Need-to-pull'
+    RET=0
   else
-    echo "Diverged"
-  fi
-
-  if [ $CHECK = "Need-to-pull" ] ; then
-    git pull
-    # return 1, which is false, so we will run the reboot sequence
-    return 1
+    UPSTREAM=${2:-'@{u}'}
+    LOCAL=$(git rev-parse @)
+    REMOTE=$(git rev-parse "$UPSTREAM")
+    BASE=$(git merge-base @ "$UPSTREAM")
+    CHECK=''
+    if [ "$LOCAL" = "$REMOTE" ] ; then
+      echo "Up-to-date"
+    elif [ "$LOCAL" = "$BASE" ] ; then
+      echo "Need to pull"
+      git pull
+      RET=1
+    elif [ "$BASE" = "" ] ; then
+      # the susi server case with a detached branch for the release
+      echo "Need to reset to remote"
+      git reset --hard origin/$CURRENTBRANCH
+      RET=1
+    else
+      echo "Diverged"
+    fi
   fi
   cd ..
-  return 0
+  return $RET
 }
 
 do_reboot=0
