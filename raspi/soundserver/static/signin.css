@@ -24,7 +24,11 @@ body {
     border: 1px solid #A9A9A9;
     padding: 10px;
 }
-
+.list {
+  border: 1px solid #A9A9A9;
+  overflow-y: scroll;
+  height:400px;
+}
 .slidecontainer {
   width: 100%;
 }

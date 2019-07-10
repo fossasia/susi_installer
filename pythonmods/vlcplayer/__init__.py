@@ -47,6 +47,9 @@ class VlcPlayer():
 
     def playytb(self, vid):
         self.play(vid2youtubeMRL(vid))
+    
+    def playytbLink(self, link):
+        self.play(link2youtubeMRL(link))
 
     def playscloud(self, identifier):
         #Url of the format: https://soundcloud.com/aries_ix/sayonara
@@ -175,6 +178,7 @@ class VlcPlayer():
             mixer.volume(self.saved_hardvolume)
         return self.saved_hardvolume
 
+    
 
 def vid2youtubeMRL(vid):
     url = 'https://www.youtube.com/watch?v=' + vid
@@ -182,6 +186,10 @@ def vid2youtubeMRL(vid):
     best = video.getbestaudio()
     return best.url
 
+def link2youtubeMRL(url):
+    video = pafy.new(url)
+    best = video.getbestaudio()
+    return best.url
 
 
 vlcplayer = VlcPlayer()

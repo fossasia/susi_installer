@@ -1,5 +1,7 @@
 import sys
 import os
+import subprocess
+
 import logging
 
 from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
@@ -11,7 +13,10 @@ from vlcplayer import vlcplayer
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
+mountPath = os.path.join('/media',os.getlogin())
+
 
 def do_return(msg, val):
     dm = {"status": msg}
@@ -77,10 +82,10 @@ def play_route():
 # /volume?val=up
 # /volume?val=down
 # /volume?val=NN  0 <= NN <= 100
-@app.route('/volume', methods=['POST', 'PUT'])
-def volume_route():
+@app.route('/volume/<val>', methods=['POST', 'PUT'])
+def volume_route(val):
     try:
-        vlcplayer.volume(request.args.get('val'))
+        vlcplayer.volume(val)
         return do_return('Ok', 200)
     except Exception as e:
         logger.error(e)
@@ -94,6 +99,8 @@ def say_route():
         return do_return('Ok', 200)
     else:
         return do_return('Missing mrl argument', 400)
+
+
 @app.route('/beep', methods=['POST', 'PUT'])
 def beep_route():
     if 'mrl' in request.args:
@@ -110,10 +117,12 @@ def beep_route():
 def pause_route():
     vlcplayer.pause()
     return do_return('Ok', 200)
+    
 @app.route('/resume', methods=['POST', 'PUT'])
 def resume_route():
     vlcplayer.resume()
     return do_return('Ok', 200)
+
 @app.route('/stop', methods=['POST', 'PUT'])
 def stop_route():
     vlcplayer.stop()
@@ -143,6 +152,7 @@ def shuffle_route():
 def save_softvolume_route():
     vlcplayer.save_softvolume()
     return do_return('Ok', 200)
+
 @app.route('/restore_softvolume', methods=['POST', 'PUT'])
 def restore_softvolume_route():
     vlcplayer.restore_softvolume()
@@ -152,11 +162,55 @@ def restore_softvolume_route():
 def save_hardvolume_route():
     vlcplayer.save_hardvolume()
     return do_return('Ok', 200)
+
 @app.route('/restore_hardvolume', methods=['POST', 'PUT'])
 def restore_hardvolume_route():
     vlcplayer.restore_hardvolume()
     return do_return('Ok', 200)
 
+# @app.route('/reset_smart_speaker/<type>', methods=['POST','PUT'])
+# def reset_smart_speaker(type):
+#     current_folder = os.path.dirname(os.path.abspath(__file__))
+#     wap_script = os.path.abspath(current_folder + '/../access_point/wap.sh')
+#     factory_reset = os.path.abspath(current_folder + '/../factory_reset/factory_reset.sh')
+#     if type == 'hard' :
+#         logger.info("hard FACTORY RESET")
+#         logger.info("hard factory reset initiated")
+#         subprocess.Popen(['sudo','bash', factory_reset, 'hard'])
+#     elif type == 'soft' :
+#         logger.info("soft FACTORY RESET")
+#         logger.info("soft factory reset initiated")
+#         subprocess.Popen(['sudo','bash', factory_reset, 'soft'])
+#     elif type == 'AP' :
+#         logger.info("switch to access point mode")
+#         logger.info("switch to access mode initiated")
+#         subprocess.Popen(['sudo','bash', wap_script])  
+#     return do_return('Ok', 200)      
+
+@app.route('/getdevice', methods=['GET'])
+def get_mounted_device():
+    folders = os.listdir(mountPath)
+    devices = [{'name': d} for d in folders]
+                
+    return do_return(devices, 200)
+
+@app.route('/getOfflineSong/<folder>', methods=['GET'])
+def get_offline_song(folder):
+    files = os.listdir(os.path.join(mountPath,folder))
+    songs = [{'name': i} for i in files if i.endswith('.mp3') or i.endswith('.m4a') or i.endswith('.ogg') ]
+    return do_return(songs, 200)
+
+@app.route('/playOfflineSong/<folder>/<file>', methods=['PUT'])
+def play_offine_song(folder, file):
+    vlcplayer.stop()
+    vlcplayer.play(os.path.join(mountPath, folder, file))
+    return do_return('OK', 200)
+            
+@app.route('/playyoutube', methods=['PATCH'])
+def play_from_youtubeLink():
+    data = request.json
+    vlcplayer.playytbLink(data['link'])
+    return do_return('OK', 200)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
