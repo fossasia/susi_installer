@@ -213,41 +213,53 @@ def get_set(k, v = None):
         raise ValueError(k, v)
 
 
-try:
-    if sys.argv[1] == 'set':
-        for kv in sys.argv[2:]:
-            k,v = kv.split('=', 2)
-            if k in keys_conf:
-                pass
-            else:
-                raise ValueError('unknown key', k)
-            get_set(k,v)
+def main():
+    if len(sys.argv) == 1:
+        print("""
+Usage: 
+  susi-config get [ key key ... ]
+  susi-config set key=value [ key=value ... ]
+  susi-config login
+""")
+        sys.exit(1)
 
-    elif sys.argv[1] == 'get':
-        if len(sys.argv) == 2:
-            args = list(keys_conf.keys())
+    try:
+        if sys.argv[1] == 'set':
+            for kv in sys.argv[2:]:
+                k,v = kv.split('=', 2)
+                if k in keys_conf:
+                    pass
+                else:
+                    raise ValueError('unknown key', k)
+                get_set(k,v)
+
+        elif sys.argv[1] == 'get':
+            if len(sys.argv) == 2:
+                args = list(keys_conf.keys())
+            else:
+                args = sys.argv[2:]
+            ret = []
+            for k in args:
+                v = get_set(k)
+                if type(v) != type('str'):
+                    ret.append(k + " = (unset)")
+                else:
+                    ret.append(k + " = " + str(v))
+            for i in ret:
+                print(i)
+
+        elif sys.argv[1] == 'login':
+            import susi_python as susi
+            susi.sign_in(config['login_credentials']['email'],
+                         config['login_credentials']['password'],
+                         room_name=config['room_name'])
+
         else:
-            args = sys.argv[2:]
-        ret = []
-        for k in args:
-            v = get_set(k)
-            if type(v) != type('str'):
-                ret.append(k + " = (unset)")
-            else:
-                ret.append(k + " = " + str(v))
-        for i in ret:
-            print(i)
+            raise ValueError
 
-    elif sys.argv[1] == 'login':
-        import susi_python as susi
-        susi.sign_in(config['login_credentials']['email'],
-                     config['login_credentials']['password'],
-                     room_name=config['room_name'])
+    except ValueError as ex:
+        print('Invalid input', ex)
 
-    else:
-        raise ValueError
-
-except ValueError as ex:
-    print('Invalid input', ex)
-
+if __name__ == '__main__':
+    main()
 
