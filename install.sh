@@ -254,6 +254,9 @@ DEBDEPS="
   default-jdk-headless pixz udisks2 python3-requests python3-requests-futures python3-service-identity
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
   python3-setuptools python3-watson-developer-cloud ca-certificates
+  # soundcloud deps
+  python3-aiohttp python3-bs4 python3-mutagen python3-multidict python3-async-timeout
+  python3-yarl python3-soupsieve
 "
 
 # If snowboy cannot be installed via pip we need to build it
