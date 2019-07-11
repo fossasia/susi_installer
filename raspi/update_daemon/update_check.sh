@@ -16,7 +16,7 @@ update_repo() {
     # default branch is master
     master=master
   fi
-  git fetch --all
+  sudo -u pi git fetch --all
   # get current branch name
   CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
   RET=0
@@ -34,12 +34,12 @@ update_repo() {
       echo "Up-to-date"
     elif [ "$LOCAL" = "$BASE" ] ; then
       echo "Need to pull"
-      git pull
+      sudo -u pi git pull
       RET=1
     elif [ "$BASE" = "" ] ; then
       # the susi server case with a detached branch for the release
       echo "Need to reset to remote"
-      git reset --hard origin/$CURRENTBRANCH
+      sudo -u pi git reset --hard origin/$CURRENTBRANCH
       RET=1
     else
       echo "Diverged"
