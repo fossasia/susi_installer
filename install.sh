@@ -673,10 +673,7 @@ fi
 echo "Downloading: Susi.AI webclient"
 if [ ! -d "susi.ai" ]
 then
-    git clone https://github.com/fossasia/susi.ai.git
-    cd susi.ai
-    git checkout local-pages
-    cd ..
+    git clone --depth 1 -b gh-pages https://github.com/fossasia/susi.ai.git
     ln -s $PWD/susi.ai/static/* $PWD/susi_installer/raspi/soundserver/static/
     ln -s $PWD/susi.ai/index.html $PWD/susi_installer/raspi/soundserver/templates/
 else
