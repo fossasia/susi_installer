@@ -670,6 +670,16 @@ else
     echo "WARNING: susi_server directory already present, not cloning it!" >&2
 fi
 
+echo "Downloading: Susi.AI webclient"
+if [ ! -d "susi.ai" ]
+then
+    git clone --depth 1 -b gh-pages https://github.com/fossasia/susi.ai.git
+    ln -s $PWD/susi.ai/static/* $PWD/susi_installer/raspi/soundserver/static/
+    ln -s $PWD/susi.ai/index.html $PWD/susi_installer/raspi/soundserver/templates/
+else
+    echo "WARNING: susi.ai directory already present, not cloning it!" >&2
+fi
+
 echo "Installing required dependencies"
 install_debian_dependencies $DEBDEPS
 install_pip_dependencies

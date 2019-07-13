@@ -47,19 +47,23 @@ def before_request_callback():
 def index():
     return render_template('index.html')
 
+@app.route('/control')
+def control():
+    return render_template('control.html')
+
 @app.route('/login', methods=['POST', 'PUT'])
 def login():
     if check_pass(request.form['password']):
         session['logged_in'] = True
     else:
         flash('wrong password!')
-    return redirect(url_for('index'))
+    return redirect(url_for('control'))
 
 @app.route('/set_password', methods=['GET', 'POST'])
 def set_password():
     if request.method == 'POST':
         write_pass(request.form['password'])
-        return redirect(url_for('index'))
+        return redirect(url_for('control'))
     return render_template('password.html')
 
 @app.route('/status', methods=['POST', 'PUT'])
