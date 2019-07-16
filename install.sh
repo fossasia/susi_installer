@@ -756,7 +756,7 @@ then
     echo "Preparing USB automount"
     # systemd-udevd creates its own filesystem namespace, so mount is done, but it is not visible in the principal namespace.
     sudo mkdir /etc/systemd/system/systemd-udevd.service.d/
-    echo -e "[Service]\nMountFlags=shared" | sudo tee /etc/systemd/system/systemd-udevd.service.d/mountFlagOverride.conf
+    echo -e "[Service]\nPrivateMounts=no" | sudo tee /etc/systemd/system/systemd-udevd.service.d/udev-service-override.conf
     # readonly mount for external USB drives
     sudo sed -i -e '/^MOUNTOPTIONS/ s/sync/ro/' /etc/usbmount/usbmount.conf
     sudo cp $INSTALLERDIR/raspi/media_daemon/01_create_skill /etc/usbmount/mount.d/
