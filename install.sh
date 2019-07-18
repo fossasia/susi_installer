@@ -478,7 +478,8 @@ install_debian_dependencies()
 
 install_pip_dependencies()
 {
-    reqfiles="susi_installer/requirements.txt susi_python/requirements.txt susi_linux/requirements.txt"
+    reqfiles=$(ls susi_*/requirements.txt)
+    reqpifiles=$(ls susi_*/requirements-rpi.txt)
 
     echo "Installing Python Dependencies"
     if [ ! $targetSystem = raspi ] ; then
@@ -517,10 +518,13 @@ install_pip_dependencies()
     $SUDOCMD $PIP install -U pip
     # wheel should not be necessary since we are not compiling anything?
     # $SUDOCMD $PIP install -U wheel
-    $SUDOCMD $PIP install -r susi_python/requirements.txt
-    $SUDOCMD $PIP install -r susi_linux/requirements.txt
+    for i in $reqfiles ; do
+        $SUDOCMD $PIP install -r $i
+    done
     if [ $targetSystem = raspi ] ; then
-        $SUDOCMD $PIP install -r susi_linux/requirements-rpi.txt
+        for i in $reqpifiles ; do
+            $SUDOCMD $PIP install -r $i
+        done
     fi
 }
 
