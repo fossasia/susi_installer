@@ -2,6 +2,8 @@
 
 import sys
 import time
+import re
+import uuid
 
 import requests
 import json_config
@@ -18,12 +20,13 @@ def get_token(login,password):
 
 def device_register(access_token):
     g = geocoder.ip('me')
+    mac=':'.join(re.findall('..', '%012x' % uuid.getnode()))
     url='https://api.susi.ai/aaa/addNewDevice.json?&name=SmartSpeaker'
     PARAMS = {
         'room':'home',
         'latitude':str(g.lat),
         'longitude':str(g.lng),
-        'macid':'21:12:23:34:12:23',
+        'macid':mac,
         'access_token':access_token
     }
     print(PARAMS)
