@@ -108,7 +108,9 @@ class VlcPlayer():
         self.list_player.stop()
 
     def wait_till_end(self, pl):
-        playing = set([vlc.State.Playing, vlc.State.Buffering])
+        playing = set([vlc.State.Playing, vlc.State.Buffering, vlc.State.Opening])
+        # wait some time to give vlc a chance to start up
+        time.sleep(0.3)
         time_left = True
         while time_left == True:
             pstate = pl.get_state()
