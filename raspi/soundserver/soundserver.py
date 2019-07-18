@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-mountPath = os.path.join('/media',os.getlogin())
+mountPath = '/media/pi'
 
 
 def do_return(msg, val):
