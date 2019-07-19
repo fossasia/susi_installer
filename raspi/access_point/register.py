@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
+import syslog
 import time
 import re
 import uuid
+import os
 
 import requests
 import json_config
@@ -23,7 +25,7 @@ def device_register(access_token):
     mac=':'.join(re.findall('..', '%012x' % uuid.getnode()))
     url='https://api.susi.ai/aaa/addNewDevice.json?&name=SmartSpeaker'
     PARAMS = {
-        'room':'home',
+        'room':room,
         'latitude':str(g.lat),
         'longitude':str(g.lng),
         'macid':mac,
@@ -36,11 +38,15 @@ def device_register(access_token):
 config = json_config.connect('/home/pi/SUSI.AI/config.json')
 user = config['login_credentials']['email']
 password = config['login_credentials']['password']
+room=config['roomname']
 
 try:
     access_token=get_token(user,password)
-    print(device_register(access_token))
+    out=device_register(access_token,room)
+    syslog.syslog(str(out))
     print(access_token)
 except:
     time.sleep(5)
     print("retrying")
+
+os.system('crontab -r')
