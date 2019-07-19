@@ -47,6 +47,7 @@ def login():
     password = request.args.get('password')
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password]) #nosec #pylint-disable type: ignore
     display_message = {"authentication":"successful", "auth": auth, "email": email, "password": password}
+    os.system('echo "@reboot python3 /home/pi/SUSI.AI/susi_installer/raspi/access_point/register.py" | crontab -')
     resp = jsonify(display_message)
     resp.status_code = 200
     return resp # pylint-enable
@@ -77,7 +78,7 @@ def speaker_config():
 @app.route('/reboot', methods=['POST'])
 def reboot():
     # speaker_config
-    room_name = request.form['room_name'] 
+    room_name = request.form['room_name']
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', 'roomname="'+room_name+'"']) #nosec #pylint-disable type: ignore
 
     # wifi_credentials
