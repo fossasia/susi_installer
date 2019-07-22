@@ -94,8 +94,8 @@ keys_conf = {
         'tts': 'default_tts',
         'watson.stt.user': 'watson_stt_config.username',
         'watson.stt.pass': 'watson_stt_config.password',
-        'watson.tts.user': 'watson_tts_config.username', 
-        'watson.tts.pass': 'watson_tts_config.password', 
+        'watson.tts.user': 'watson_tts_config.username',
+        'watson.tts.pass': 'watson_tts_config.password',
         'susi.user': 'login_credentials.email',
         'susi.pass': 'login_credentials.password',
         'susi.mode': 'usage_mode',
@@ -153,7 +153,7 @@ def get_set(k, v = None):
         return config['login_credentials']['email']
     elif k == 'susi.pass':
         if not (v is None):
-            config['login_credentials']['password'] = password
+            config['login_credentials']['password'] = v
         return config['login_credentials']['password']
     elif k == 'roomname':
         if not (v is None):
@@ -216,7 +216,7 @@ def get_set(k, v = None):
 def main():
     if len(sys.argv) == 1:
         print("""
-Usage: 
+Usage:
   susi-config get [ key key ... ]
   susi-config set key=value [ key=value ... ]
   susi-config login
@@ -262,4 +262,3 @@ Usage:
 
 if __name__ == '__main__':
     main()
-

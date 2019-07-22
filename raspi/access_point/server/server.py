@@ -47,6 +47,8 @@ def login():
     password = request.args.get('password')
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password]) #nosec #pylint-disable type: ignore
     display_message = {"authentication":"successful", "auth": auth, "email": email, "password": password}
+    if auth == 'authenticated' and email != "":
+        os.system('sudo systemctl enable ss-susi-register.service')
     resp = jsonify(display_message)
     resp.status_code = 200
     return resp # pylint-enable
@@ -77,7 +79,7 @@ def speaker_config():
 @app.route('/reboot', methods=['POST'])
 def reboot():
     # speaker_config
-    room_name = request.form['room_name'] 
+    room_name = request.form['room_name']
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', 'roomname="'+room_name+'"']) #nosec #pylint-disable type: ignore
 
     # wifi_credentials
@@ -89,6 +91,10 @@ def reboot():
     auth = request.form['auth']
     email = request.form['email']
     password = request.form['password']
+
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password])
+    if auth == 'authenticated' and email != "":
+        os.system('sudo systemctl enable ss-susi-register.service')
 
     # config
     stt = request.form['stt']
