@@ -48,7 +48,7 @@ def login():
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password]) #nosec #pylint-disable type: ignore
     display_message = {"authentication":"successful", "auth": auth, "email": email, "password": password}
     if auth == 'authenticated' and email != "":
-        os.system('echo "@reboot python3 /home/pi/SUSI.AI/susi_installer/raspi/access_point/register.py" | crontab -')
+        os.system('sudo systemctl enable ss-susi-register.service')
     resp = jsonify(display_message)
     resp.status_code = 200
     return resp # pylint-enable
@@ -94,7 +94,7 @@ def reboot():
 
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password])
     if auth == 'authenticated' and email != "":
-        os.system('echo "@reboot python3 /home/pi/SUSI.AI/susi_installer/raspi/access_point/register.py" | crontab -')
+        os.system('sudo systemctl enable ss-susi-register.service')
 
     # config
     stt = request.form['stt']

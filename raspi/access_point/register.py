@@ -14,7 +14,7 @@ import geocoder
 
 current_folder = os.path.dirname(os.path.abspath(__file__))
 
-logging.basicConfig(filename=current_folder+'/../../../debug.log', filemode='a', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 config = json_config.connect('/home/pi/SUSI.AI/config.json')
@@ -60,5 +60,5 @@ for i in range(3):
             config['usage_mode']="anonymous"
             config['login_credentials']['email']=""
             config['login_credentials']['password']=""
-            subprocess.Popen(['sudo','bash', 'wap.sh'])
-os.system('crontab -r')
+            subprocess.Popen(['sudo','bash', 'susi_installer/raspi/access_point/wap.sh'])
+os.system('sudo systemctl disable ss-susi-register.service')
