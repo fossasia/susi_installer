@@ -15,9 +15,7 @@ env:
     TRIGGER_BRANCH=""
     TRIGGER_SOURCE=""
   matrix:
-    - TARGET=debian VERSION=stretch
     - TARGET=debian VERSION=buster
-    - TARGET=ubuntu VERSION=18.04
     - TARGET=ubuntu VERSION=18.10
     - TARGET=ubuntu VERSION=19.04
 
@@ -32,7 +30,7 @@ jobs:
     - os: linux
       env:
         - TARGET=raspi
-        - VERSION=stretch
+        - VERSION=buster
       before_install: sudo apt-get update ; sudo apt-get install qemu qemu-user-static binfmt-support parted wget dosfstools zip pixz
       script:
         - sudo -E bash ./.travis/create-image
