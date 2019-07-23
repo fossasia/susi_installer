@@ -139,7 +139,11 @@ asked.
 
 #### Configure and Run SUSI Linux
 
-- Run the configuration generator script. This will allow you to customize the
+Several executables are installed into `~/SUSI.AI/bin`, in particular
+`susi-config` (configuration utility), `start-susi-linux` (headless start),
+and `susi-linux-app` (GUI app).
+
+- Run the SUSI configuration script. This will allow you to customize the
 setup according to your needs. It can be used to modify:
     - TTS service
     - Speech Recognition service
@@ -153,16 +157,16 @@ $ pip3 install service_identity
 ```    
 Run the script using:
 ```
-$ python3 config_generator.py <stt> <tts> <hotword_detection> <wake_button>
-$ python3 authentication.py <choice> <email> <password>
+$ susi-config set stt=<stt> tts=<tts> hotword=<hotword> wakebutton=<enable|disable>
+$ susi-config set susi.mode=<choice> susi.user=<email> susi.pass=<pass>
 ```
 - Once configured, you may run SUSI User Interface by executing the following command
 ```
-$ python3 app.py
+$ susi-linux-app
 ```
 - Alternatively ,you can run SUSI without User Interface by executing the following command
 ```
-$ python3 -m main
+$ start-susi-linux
 ```
 In both case SUSI will start in always listening Hotword Detection Mode. To ask SUSI a question, say "Susi". If detection of
 hotword is successful, you will hear a small bell sound. Ask your query after the bell sound. Your query will be

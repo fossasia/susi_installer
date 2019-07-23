@@ -54,17 +54,17 @@ If still there is error, see if devices are selected correctly in Ubuntu sound s
 
 - Run the configuration generator script and optimize the setup according to your needs.
 ```bash
-$ python3 config_generator.py
+$ ~/SUSI.AI/bin/susi-config set key=value ...
 ```
--Note: Enclose every input(y/n, email, password) queried after running the above command with ''(single quotes).
-
+- Note: Enclose every input(y/n, email, password) queried after running the above command with ''(single quotes).
+- See the output of ```susi-config --help``` for details
 - One config.json is generated, you may run SUSI User Interface by executing the following command
 ```bash
-$ python3 app.py
+$ ~/SUSI.AI/bin/susi-linux-app
 ```
 - Alternatively ,you can run SUSI without User Interface by executing the following command
 ```
-$ python3 -m main
+$ ~/SUSI.AI/bin/start-susi-linux
 ```
 
 In both case SUSI will start in always listening Hotword Detection Mode. To ask SUSI a question, say "Susi". If detection of
