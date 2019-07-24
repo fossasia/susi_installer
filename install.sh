@@ -191,7 +191,7 @@ case "$vendor" in
             targetVersion=10
         fi
         case "$targetVersion" in
-            9|10|11) ;;
+            9|10|11|unstable) ;;
             *) echo "Unsupported Debian version: $targetVersion" >&2 ; exit 1 ;;
         esac
         ;;
