@@ -1,12 +1,12 @@
 [Unit]
-Description=Sound Server for SUSI Linux
+Description=Control Server for SUSI Linux
 After=multi-user.target
 
 [Service]
 Type=simple
 WorkingDirectory=/home/pi/SUSI.AI
 Environment=PYTHONPATH=/home/pi/SUSI.AI/susi_installer/pythonmods
-ExecStart=/usr/bin/python3 /home/pi/SUSI.AI/susi_installer/raspi/soundserver/soundserver.py
+ExecStart=/usr/bin/python3 /home/pi/SUSI.AI/susi_installer/raspi/controlserver/controlserver.py
 
 [Install]
 WantedBy=multi-user.target
