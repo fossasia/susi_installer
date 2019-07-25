@@ -121,7 +121,7 @@ def beep_route():
 def pause_route():
     vlcplayer.pause()
     return do_return('Ok', 200)
-    
+
 @app.route('/resume', methods=['POST', 'PUT'])
 def resume_route():
     vlcplayer.resume()
@@ -188,14 +188,14 @@ def restore_hardvolume_route():
 #     elif type == 'AP' :
 #         logger.info("switch to access point mode")
 #         logger.info("switch to access mode initiated")
-#         subprocess.Popen(['sudo','bash', wap_script])  
-#     return do_return('Ok', 200)      
+#         subprocess.Popen(['sudo','bash', wap_script])
+#     return do_return('Ok', 200)
 
 @app.route('/getdevice', methods=['GET'])
 def get_mounted_device():
     folders = os.listdir(mountPath)
     devices = [{'name': d} for d in folders]
-                
+
     return do_return(devices, 200)
 
 @app.route('/getOfflineSong/<folder>', methods=['GET'])
@@ -209,12 +209,98 @@ def play_offine_song(folder, file):
     vlcplayer.stop()
     vlcplayer.play(os.path.join(mountPath, folder, file))
     return do_return('OK', 200)
-            
+
 @app.route('/playyoutube', methods=['PATCH'])
 def play_from_youtubeLink():
     data = request.json
     vlcplayer.playytbLink(data['link'])
     return do_return('OK', 200)
+
+@app.route('/install')
+def install():
+    return 'starting the installation script'
+
+@app.route('/config', methods=['GET'])
+def config():
+    stt = request.args.get('stt')
+    tts = request.args.get('tts')
+    hotword = request.args.get('hotword')
+    wake = request.args.get('wake')
+    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword, "wakebutton="+wake])  #nosec #pylint-disable type: ignore
+    # TODO we should check the actual return code of susi-linux-config-generator
+    display_message = {"configuration":"successful", "stt": stt, "tts": tts, "hotword": hotword, "wake":wake}
+    resp = jsonify(display_message)
+    resp.status_code = 200
+    subprocess.Popen(['sudo','bash', os.path.join(wifi_search_folder,'rwap.sh')])
+    return resp # pylint-enable
+
+@app.route('/auth', methods=['GET'])
+def login():
+    auth = request.args.get('auth')
+    email = request.args.get('email')
+    password = request.args.get('password')
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password]) #nosec #pylint-disable type: ignore
+    display_message = {"authentication":"successful", "auth": auth, "email": email, "password": password}
+    if auth == 'authenticated' and email != "":
+        os.system('sudo systemctl enable ss-susi-register.service')
+    resp = jsonify(display_message)
+    resp.status_code = 200
+    return resp # pylint-enable
+
+@app.route('/wifi_credentials', methods=['GET'])
+def wifi_config():
+    wifi_ssid = request.args.get('wifissid')
+    wifi_password = request.args.get('wifipassd')
+    subprocess.call(['sudo', 'bash', wifi_search_folder + '/wifi_search.sh', wifi_ssid, wifi_password])  #nosec #pylint-disable type: ignore
+    display_message = {"wifi":"configured", "wifi_ssid":wifi_ssid, "wifi_password": wifi_password}
+    resp = jsonify(display_message)
+    resp.status_code = 200
+    return resp  # pylint-enable
+
+@app.route('/speaker_config', methods=['GET'])
+def speaker_config():
+    room_name = request.args.get('room_name')
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', 'roomname="'+room_name+'"']) #nosec #pylint-disable type: ignore
+    display_message = {"room_name":room_name}
+    resp = jsonify(display_message)
+    resp.status_code = 200
+    return resp
+
+# the reboot service combines all other services in one call
+# the current version allows anonymous operation mode
+# todo: the front-end should provide an option for this
+
+@app.route('/reboot', methods=['POST'])
+def reboot():
+    # speaker_config
+    room_name = request.form['room_name']
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', 'roomname="'+room_name+'"']) #nosec #pylint-disable type: ignore
+
+    # wifi_credentials
+    wifi_ssid = request.form['wifissid']
+    wifi_password = request.form['wifipassd']
+    subprocess.call(['sudo', 'bash', wifi_search_folder + '/wifi_search.sh', wifi_ssid, wifi_password])  #nosec #pylint-disable type: ignore
+
+    # auth
+    auth = request.form['auth']
+    email = request.form['email']
+    password = request.form['password']
+
+    subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password])
+    if auth == 'authenticated' and email != "":
+        os.system('sudo systemctl enable ss-susi-register.service')
+
+    # config
+    stt = request.form['stt']
+    tts = request.form['tts']
+    hotword = request.form['hotword']
+    wake = request.form['wake']
+    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword, "wakebutton="+wake])  #nosec #pylint-disable type: ignore
+    display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "wake":wake, "message":"SUSI is rebooting"}
+    resp = jsonify(display_message)
+    resp.status_code = 200
+    subprocess.Popen(['sudo','bash', os.path.join(wifi_search_folder,'rwap.sh')])
+    return resp  # pylint-enable
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
