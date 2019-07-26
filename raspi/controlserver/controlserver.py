@@ -3,6 +3,7 @@ import os
 import subprocess
 
 import logging
+import json_config
 
 from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
 from flask import jsonify
@@ -16,6 +17,10 @@ logger = logging.getLogger(__name__)
 logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
 mountPath = '/media/pi'
+
+access_point_folder = os.path.dirname(os.path.abspath(__file__))
+wifi_search_folder = os.path.join(access_point_folder, '..')
+susiconfig = '/home/pi/SUSI.AI/bin/susi-config'
 
 
 def do_return(msg, val):
@@ -51,8 +56,12 @@ def index():
 def control():
     return render_template('control.html')
 
+@app.route('/setup')
+def setup():
+    return render_template('setup.html')
+
 @app.route('/login', methods=['POST', 'PUT'])
-def login():
+def setlogin():
     if check_pass(request.form['password']):
         session['logged_in'] = True
     else:
