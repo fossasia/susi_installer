@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
 mountPath = '/media'
 
-access_point_folder = os.path.dirname(os.path.abspath(__file__))
-wifi_search_folder = os.path.join(access_point_folder, '..')
+wifi_search_folder = os.path.join(dir_path, '../access_point')
 susiconfig = '/home/pi/SUSI.AI/bin/susi-config'
 
 
