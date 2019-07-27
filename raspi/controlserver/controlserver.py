@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-mountPath = '/media/pi'
+mountPath = '/media'
 
 access_point_folder = os.path.dirname(os.path.abspath(__file__))
 wifi_search_folder = os.path.join(access_point_folder, '..')
