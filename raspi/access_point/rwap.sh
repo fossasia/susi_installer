@@ -19,7 +19,6 @@ systemctl disable hostapd
 systemctl disable dnsmasq
 systemctl enable ss-susi-linux@pi.service
 systemctl enable ss-susi-login.service
-systemctl disable ss-python-flask.service
 
 echo "Please reboot"
 sleep 10;

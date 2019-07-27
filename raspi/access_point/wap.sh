@@ -42,7 +42,6 @@ systemctl enable hostapd
 systemctl enable dnsmasq
 systemctl disable ss-susi-linux@pi.service
 systemctl disable ss-susi-login.service
-systemctl enable ss-python-flask.service
 
 # add server in the auto-boot up list
 echo "All done! Rebooting"
