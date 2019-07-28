@@ -41,8 +41,18 @@ def write_pass(passw):
     fw.write(str(generate_password_hash(passw)))
     session['logged_in'] = False
 
+def access_mode():
+    stat = os.system('service hostapd status')
+    if not stat:
+        return True
+    return False
+
 @app.before_request
 def before_request_callback():
+    if (request.endpoint == 'setup' or request.endpoint == 'config'\
+     or request.endpoint == 'auth' or request.endpoint == 'wifi_credentials' \
+     or request.endpoint == 'speaker_config' or request.endpoint == 'reboot') and not access_mode():
+        return redirect(url_for('control'))
     if request.endpoint != 'login' and request.endpoint != 'static' and not\
        check_pass() and not session.get('logged_in') and request.remote_addr != '127.0.0.1':
         return render_template('login.html')
@@ -57,6 +67,7 @@ def control():
 
 @app.route('/setup')
 def setup():
+    access_mode()
     return render_template('setup.html')
 
 @app.route('/login', methods=['POST', 'PUT'])
