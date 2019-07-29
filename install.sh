@@ -930,15 +930,15 @@ if [ ! $targetSystem = raspi ] ; then
     echo ""
     echo "Enjoy."
 else
-    echo -e "\033[0;92mSUSI is installed successfully!\033[0m"
+    echo -e "SUSI is installed successfully!"
     echo -e "Please add $BINDIR to your PATH, then"
-    echo -e "Run configuration script by 'susi-config set stt=\033[0;32m<stt engine> tts=\033[0;33m<tts engine> hotword=\033[0;34m<snowboy or pocketsphinx> wakebutton=\033[0;35m<wake button?>' \033[0m"
+    echo -e "Run configuration script by 'susi-config set stt=<stt engine> tts=<tts engine> hotword=<snowboy> or pocketsphinx> wakebutton=<wake button>'"
     echo "For example, to configure SUSI as following: "
-    echo -e "\t \033[0;32m-Google for speech-to-text"
-    echo -e "\t \033[0;33m-Google for text-to-speech"
-    echo -e "\t \033[0;34m-Use snowboy for hot-word detection"
-    echo -e "\t \033[0;35m-Do not use GPIO for wake button\033[0m"
-    echo -e "susi-config set stt=\033[0;32mgoogle tts=\033[0;33mgoogle hotword=\033[0;34mSnowBoy wakebutton=\033[0;35mdisable \033[0m"
+    echo -e "\t - Google for speech-to-text"
+    echo -e "\t - Google for text-to-speech"
+    echo -e "\t - Use snowboy for hot-word detection"
+    echo -e "\t - Do not use GPIO for wake button"
+    echo -e "susi-config set stt=google tts=google hotword=SnowBoy wakebutton=disable"
 fi
 
 # vim: set expandtab shiftwidth=4 softtabstop=4 smarttab:
