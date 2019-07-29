@@ -15,4 +15,5 @@ raspi/controlserver/vlcplayer
 raspi/controlserver/static/css
 raspi/controlserver/static/js
 raspi/controlserver/static/media
+raspi/controlserver/templates/index.html
 susi_installer/raspi/susi.ai
