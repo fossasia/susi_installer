@@ -70,6 +70,16 @@ def setup():
     access_mode()
     return render_template('setup.html')
 
+#End-point to check whether the device is in access point mode
+@app.route('/check_ap')
+def check_ap_mode():
+    if access_mode():
+        dm = {"status": "True"}
+    else:
+        dm = {"status": "False"}
+    resp = jsonify(dm)
+    return resp
+
 @app.route('/login', methods=['POST', 'PUT'])
 def setlogin():
     if check_pass(request.form['password']):
