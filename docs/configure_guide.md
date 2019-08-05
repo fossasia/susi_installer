@@ -39,7 +39,7 @@ This guide is for setting up the smart speaker according to your environment. Th
 
   <img src="images/Android6.jpg" height="500px"><br>
 
-## Configuring the smart speaker using the web page
+## Configuring the smart speaker using the web client.
 
 * This method can be used to set up the smart speaker without the need of installing the SUSI Android app. The Smart Speaker creates its own WIFI access point with the SSID - `SUSI.AI`. The Device is by default in access point mode if it has not been set up before.
 
@@ -55,14 +55,14 @@ This guide is for setting up the smart speaker according to your environment. Th
 
   <img src="images/wifi3.jpg" height="500px"><br>
 
-* Open up a web browser and enter the URL - http://10.0.0.1:5000. You'll see the following page-
+* Open up a web browser and enter the URL - http://10.0.0.1:7070. You'll see the following page-
 
-  <img src="images/wifi4.jpg" height="500px"><br>
+  <img src="images/wifi4.png" height="500px"><br>
 
 * Enter the WIFI SSID you want your smart speaker to be connected to.
 Then Enter the password to your WIFI.  
 
-  <img src="images/wifi5.jpg" height="500px"><br>
+  <img src="images/wifi5.png" height="500px"><br>
 
 * Select the Hotword engine and Select if you want to enable button support(included on the Respeaker PiHat).\
 Select Reboot Smart Speaker.
