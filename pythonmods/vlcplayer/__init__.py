@@ -133,7 +133,7 @@ class VlcPlayer():
             pstate = pl.get_state()
             if pstate not in playing:
                 time_left = False
-            print("Sleeping for audio output")
+            # print("Sleeping for audio output")
             time.sleep(0.1)
 
     def is_playing(self):
