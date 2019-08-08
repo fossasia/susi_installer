@@ -74,9 +74,9 @@ def setup():
 @app.route('/check_ap')
 def check_ap_mode():
     if access_mode():
-        dm = {"status": "True"}
+        dm = {"status": "true"}
     else:
-        dm = {"status": "False"}
+        dm = {"status": "false"}
     resp = jsonify(dm)
     return resp
 
