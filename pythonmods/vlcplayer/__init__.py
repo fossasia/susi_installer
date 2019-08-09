@@ -9,7 +9,8 @@ from sclib import SoundcloudAPI, Track
 import pafy
 import vlc
 
-from hwmixer import mixer
+# disable hwmixer and hope that crashes disappear
+#from hwmixer import mixer
 import urllib.parse
 import requests
 import xml
@@ -40,7 +41,8 @@ class VlcPlayer():
 
     def __init__(self):
         self.saved_softvolume = -1
-        self.saved_hardvolume = -1
+        # self.saved_hardvolume = -1
+        self.saved_hardvolume = 100
         self.instance = vlc.Instance("--no-video")
         self.player = self.instance.media_player_new()
         self.sayplayer = self.instance.media_player_new()
@@ -162,17 +164,20 @@ class VlcPlayer():
             self.restore_softvolume()
 
     def volume(self, val):
-        return mixer.volume(val)
+        # return mixer.volume(val)
+        return (self.saved_hardvolume)
 
     def softvolume(self, val, pl):
         if (val is None):
-            absvol = mixer.volume(None)
+            # absvol = mixer.volume(None)
+            absvol = self.saved_hardvolume
             sf = pl.audio_get_volume()
             # sometimes the softvolume is bigger than 100 while hw volume is 100, catch that
             return min( 100, int(sf * 100 / absvol) )
         elif ((isinstance(val, int) or val.isdigit()) and (int(val) <= 100) and (int(val) >= 0)):
             p = int(val)
-            absvol = mixer.volume(None)
+            # absvol = mixer.volume(None)
+            absvol = self.saved_hardvolume
             softvol = min(absvol, round(absvol * p / 100))
             pl.audio_set_volume(softvol)
             return(softvol)
@@ -189,12 +194,12 @@ class VlcPlayer():
         return self.saved_softvolume
 
     def save_hardvolume(self):
-        self.saved_hardvolume = mixer.volume(None)
+        # self.saved_hardvolume = mixer.volume(None)
         return self.saved_hardvolume
 
     def restore_hardvolume(self):
-        if (self.saved_hardvolume >= 0):
-            mixer.volume(self.saved_hardvolume)
+        #if (self.saved_hardvolume >= 0):
+        #    mixer.volume(self.saved_hardvolume)
         return self.saved_hardvolume
 
     
