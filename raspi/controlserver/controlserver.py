@@ -286,6 +286,16 @@ def wifi_config():
     resp.status_code = 200
     return resp  # pylint-enable
 
+@app.route('/add_wifi', methods=['GET'])
+def add_wifi():
+    wifi_ssid = request.args.get('wifissid')
+    wifi_password = request.args.get('wifipassd')
+    subprocess.call(['sudo', 'bash', wifi_search_folder + '/add_wifi.sh', wifi_ssid, wifi_password])  #nosec #pylint-disable type: ignore
+    display_message = {"wifi":"configured", "wifi_ssid":wifi_ssid, "wifi_password": wifi_password}
+    resp = jsonify(display_message)
+    resp.status_code = 200
+    return resp  # pylint-enable
+
 @app.route('/speaker_config', methods=['GET'])
 def speaker_config():
     room_name = request.args.get('room_name')
