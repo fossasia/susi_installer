@@ -480,6 +480,7 @@ install_pip_dependencies()
 {
     reqfiles=$(ls susi_*/requirements.txt)
     reqpifiles=$(ls susi_*/requirements-rpi.txt)
+    reqoptionalfiles=$(ls susi_*/requirements-optional.txt)
 
     echo "Installing Python Dependencies"
     if [ ! $targetSystem = raspi ] ; then
@@ -520,6 +521,9 @@ install_pip_dependencies()
     # $SUDOCMD $PIP install -U wheel
     for i in $reqfiles ; do
         $SUDOCMD $PIP install -r $i
+    done
+    for i in $reqoptionalfiles ; do
+        $SUDOCMD $PIP install -r $i || true
     done
     if [ $targetSystem = raspi ] ; then
         for i in $reqpifiles ; do

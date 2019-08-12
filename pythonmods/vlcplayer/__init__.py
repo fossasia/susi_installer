@@ -5,7 +5,6 @@ import logging
 import time
 import random
 
-from sclib import SoundcloudAPI, Track
 import pafy
 import vlc
 
@@ -36,6 +35,13 @@ import xml
 
 logger = logging.getLogger(__name__)
 
+try:
+    from sclib import SoundcloudAPI, Track
+    sclib_available = True
+except ImportError:
+    logger.warning("vlcplayer: SoundCloudAPI not available")
+    sclib_available = False
+
 class VlcPlayer():
 
     def __init__(self):
@@ -46,7 +52,8 @@ class VlcPlayer():
         self.sayplayer = self.instance.media_player_new()
         self.list_player =  self.instance.media_list_player_new()
         self.list_player.set_media_player(self.player)
-        self.sc_api = SoundcloudAPI()
+        if sclib_available:
+            self.sc_api = SoundcloudAPI()
 
     def playytb(self, vid):
         self.play(vid2youtubeMRL(vid))
@@ -55,6 +62,8 @@ class VlcPlayer():
         self.play(link2youtubeMRL(link))
 
     def playscloud(self, identifier):
+        if not sclib_available:
+            return(False)
         #Url of the format: https://soundcloud.com/aries_ix/sayonara
         url = "https://souncloud.com" + identifier
         track = self.sc_api.resolve(url)

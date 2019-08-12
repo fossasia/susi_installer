@@ -1,4 +1,3 @@
 pyalsaaudio
 pafy
 mutagen
-soundcloud-lib
