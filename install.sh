@@ -889,9 +889,9 @@ if [ $targetSystem = raspi ] ; then
 
     cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"
-    tar -I 'pixz -p 2' -cf reset_folder.tar.xz --checkpoint=.1000 --exclude susi_server_data --exclude etherpad.db --exclude config.json .
+    tar -I 'pixz -p 2' -cf ../reset_folder.tar.xz --checkpoint=.1000 --exclude susi_server_data --exclude etherpad.db --exclude config.json .
     echo ""  # To add newline after tar's last checkpoint
-    mv reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
+    mv ../reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 
     # Avahi has bug with IPv6, and make it fail to propage mDNS domain.
     sudo sed -i 's/use-ipv6=yes/use-ipv6=no/g' /etc/avahi/avahi-daemon.conf || true
