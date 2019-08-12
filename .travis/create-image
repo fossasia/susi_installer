@@ -5,6 +5,17 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 export LANG=C
 export LC_ALL=C
 
+if [ "$1" = "--stretch" ] ; then
+    DOSTRETCH=1
+    URL=https://downloads.raspberrypi.org/raspbian/images/raspbian-2019-04-09/2019-04-08-raspbian-stretch.zip
+    ZIPNAME=raspbian-latest-lite-stretch.zip
+    shift
+else
+    DOSTRETCH=0
+    URL=https://downloads.raspberrypi.org/raspbian_lite_latest
+    ZIPNAME=raspbian-latest-lite.zip
+fi
+
 TRAVIS_BRANCH=${TRAVIS_BRANCH:-""}
 TRIGGER_SOURCE=${TRIGGER_SOURCE:-""}
 TRIGGER_BRANCH=${TRIGGER_BRANCH:-""}
@@ -28,20 +39,20 @@ cleanup() {
 }
 trap cleanup EXIT
 
-if [ ! -r raspbian-latest-lite.zip ] ; then
-    if [ ! -r ../raspbian-latest-lite.zip ] ; then
-        echo "Downloading latest raspbian lite image"
-        wget -O raspbian-latest-lite.zip https://downloads.raspberrypi.org/raspbian_lite_latest
-	unzip raspbian-latest-lite.zip
+if [ ! -r $ZIPNAME ] ; then
+    if [ ! -r ../$ZIPNAME ] ; then
+        echo "Downloading raspbian lite image from $URL"
+        wget -O $ZIPNAME $URL
+	unzip $ZIPNAME
     else
-	echo "Reusing ../raspbian-latest-lite.zip"
-	unzip ../raspbian-latest-lite.zip
+	echo "Reusing ../$ZIPNAME"
+	unzip ../$ZIPNAME
     fi
 else
-    echo "Reusing ./raspbian-latest-lite.zip"
-    unzip raspbian-latest-lite.zip
+    echo "Reusing ./$ZIPNAME"
+    unzip $ZIPNAME
 fi
-mv ????-??-??-raspbian-buster-lite.img raspbian.img
+mv ????-??-??-raspbian-*-lite.img raspbian.img
 ls
 
 qemu-img resize raspbian.img 3.5G

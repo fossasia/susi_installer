@@ -16,7 +16,14 @@ export TRIGGER_SOURCE TRIGGER_BRANCH
 export LANG=C
 export LC_ALL=C
 
-apt-get --allow-releaseinfo-change update
+version=`lsb_release -r -s 2>/dev/null`
+targetVersion=${version%.*}
+
+if [ $targetVersion = 9 ] ; then
+    apt-get update
+else
+    apt-get --allow-releaseinfo-change update
+fi
 apt-get upgrade -y --no-install-recommends
 apt-get install -y --no-install-recommends git
 
