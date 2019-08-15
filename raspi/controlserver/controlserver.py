@@ -333,9 +333,8 @@ def reboot():
     stt = request.form['stt']
     tts = request.form['tts']
     hotword = request.form['hotword']
-    wake = request.form['wake']
-    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword, "wakebutton="+wake])  #nosec #pylint-disable type: ignore
-    display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "wake":wake, "message":"SUSI is rebooting"}
+    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword])  #nosec #pylint-disable type: ignore
+    display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "message":"SUSI is rebooting"}
     resp = jsonify(display_message)
     resp.status_code = 200
     subprocess.Popen(['sudo','bash', os.path.join(wifi_search_folder,'rwap.sh')])
