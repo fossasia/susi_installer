@@ -604,7 +604,7 @@ if [ ! -r "$CFG" ] ; then
   cat >"$CFG" <<EOF
 {
   "Device": "Desktop Computer",
-  "WakeButton": "not available",
+  "WakeButton": "enabled",
   "default_stt": "google",
   "default_tts": "google",
   "data_base_dir": "$DESTDIR/susi_linux",
