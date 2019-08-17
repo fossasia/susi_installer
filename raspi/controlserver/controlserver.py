@@ -1,6 +1,8 @@
 import sys
 import os
 import subprocess
+import re
+import uuid
 
 import logging
 import json_config
@@ -14,7 +16,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
-logger = logging.getLogger(__name__)
 dir_path = os.path.dirname(os.path.realpath(__file__))
 mountPath = '/media'
 
@@ -46,6 +47,9 @@ def access_mode():
     if not stat:
         return True
     return False
+
+def return_mac():
+    return ':'.join(re.findall('..', '%012x' % uuid.getnode()))
 
 @app.before_request
 def before_request_callback():
@@ -98,6 +102,13 @@ def set_password():
 @app.route('/status', methods=['POST', 'PUT'])
 def status_route():
     return do_return('Ok', 200)
+
+@app.route('/mac', methods=['POST', 'PUT', 'GET'])
+def mac_id():
+    mac_id_device = str(return_mac())
+    dm = {"macid": mac_id_device}
+    resp = jsonify(dm)
+    return resp
 
 # /play?ytb=???
 # /play?mrl=???
