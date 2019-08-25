@@ -595,7 +595,7 @@ function install_seeed_voicecard_driver()
 ####  Main  ####
 cd "$DESTDIR"
 mkdir -p $BINDIR
-cp susi_installer/scripts/susi-config.py.in $BINDIR/susi-config
+cp susi_installer/scripts/susi-config.in $BINDIR/susi-config
 sed -i -e "s!@SUSI_WORKING_DIR@!$WORKDIR!g"  $BINDIR/susi-config
 chmod +x $BINDIR/susi-config
 # generate initial config.json
