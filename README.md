@@ -47,7 +47,7 @@ How to assembly a smart speaker: [Video](https://www.youtube.com/watch?v=jAEmRvQ
 * If you want to return to the installation process (i.e. to configure another network), you can reset the device by pushing and holding the button for at least 10 seconds.
 
 ### Configuring the Smart Speaker through the Android App
-* Download the SUSI.AI android app: [Download Here](https://github.com/fossasia/susi_android/blob/apk/app-playStore-debug.apk)
+* Download the SUSI.AI android app: [Download Here](https://github.com/fossasia/susi_android/blob/apk/susiai-master-playStore-release.apk?raw=true)
 * After Running the installation script , you'll have a RasPi in access point mode. With a Flask Server running at port 5000.
 * You can use the mobile clients to configure the device automatically.<br>
 <img src="docs/images/ios_app.gif" height="400px">
