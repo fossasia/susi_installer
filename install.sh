@@ -674,6 +674,19 @@ echo "Downloading: Susi server"
 if [ ! -d susi_server ]
 then
     git clone -b stable-dist --single-branch https://github.com/fossasia/susi_server.git
+    # creating a local anonymous user with credentials:
+    # Username: anonymous@susi.ai and password: password
+    mkdir -p ./susi_server/data/settings/
+    cat > ./susi_server/data/settings/authentication.json <<EOL
+{
+  "passwd_login:anonymous@susi.ai": {
+    "salt": "i0Q9jnWLfRf4sRJN3svg",
+    "id": "email:anonymous@susi.ai",
+    "passwordHash": "+UarmkoElJhC6+RQdp7Cz1eYJ0Y0ebCCq8un4jYLpQ0=",
+    "activated": true
+  }
+}
+EOL
 else
     echo "WARNING: susi_server directory already present, not cloning it!" >&2
 fi
