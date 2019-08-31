@@ -6,6 +6,8 @@ import uuid
 
 import logging
 import json_config
+import requests
+import susi_config
 
 from flask import Flask , render_template , request, flash, redirect, session, abort, g, url_for
 from flask import jsonify
@@ -21,7 +23,17 @@ mountPath = '/media'
 
 wifi_search_folder = os.path.join(dir_path, '../access_point')
 susiconfig = '/home/pi/SUSI.AI/bin/susi-config'
+cfg = susi_config.SusiConfig(dir_path + "/../../..")
 
+def get_token():
+    url = 'http://api.susi.ai/aaa/login.json'
+    PARAMS = {
+        'login': cfg.get_set('susi.user'),
+        'password': cfg.get_set('susi.pass'),
+        'type': 'access-token'
+    }
+    r1 = requests.get(url, params=PARAMS).json()
+    return r1['access_token']
 
 def do_return(msg, val):
     dm = {"status": msg}
@@ -108,6 +120,19 @@ def mac_id():
     mac_id_device = str(return_mac())
     dm = {"macid": mac_id_device}
     resp = jsonify(dm)
+    return resp
+
+@app.route('/unlink_device', methods=['GET', 'POST'])
+def unlink_device():
+    mac = return_mac()
+    access_token = get_token()
+    PARAMS = {
+        'macid': mac,
+        'access_token': access_token
+    }
+    url = 'https://api.susi.ai/aaa/removeUserDevices.json'
+    result = requests.get(url, params=PARAMS).json()
+    resp = jsonify(result)
     return resp
 
 # /play?ytb=???
