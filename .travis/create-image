@@ -5,7 +5,8 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 export LANG=C
 export LC_ALL=C
 
-if [ "$1" = "--stretch" ] ; then
+firstarg=
+if [ "${1-}" = "--stretch" ] ; then
     DOSTRETCH=1
     URL=https://downloads.raspberrypi.org/raspbian/images/raspbian-2019-04-09/2019-04-08-raspbian-stretch.zip
     ZIPNAME=raspbian-latest-lite-stretch.zip
