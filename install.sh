@@ -568,8 +568,6 @@ function install_snowboy()
 
 function install_seeed_voicecard_driver()
 {
-    # TODO: Modify this driver install script, so that it won't pull libasound-plugins,
-    # which in turn, pull lot of video-related stuff.
     if arecord -l | grep -q voicecard
     then
         echo "ReSpeaker Mic Array driver was already installed."
@@ -579,8 +577,16 @@ function install_seeed_voicecard_driver()
     cd "$DESTDIR"
     git clone https://github.com/respeaker/seeed-voicecard.git
     cd seeed-voicecard
+    # remove libasound2-plugins from list of installed packages, it pulls in loads
+    # and is not necessary
+    sed -i -e 's/apt-get -y install \(.*\) libasound2-plugins/apt-get -y install \1/g' install.sh
     # This happens *ONLY* on the RPi, so we can do sudo!
     sudo ./install.sh
+    # TODO Fix for crashes in pasound module that tear down susi-linux
+    # src/hostapi/alsa/pa_linux_alsa.c:3641: PaAlsaStreamComponent_BeginPolling: Assertion `ret == self->nfds' failed
+    # https://github.com/alexa/avs-device-sdk/issues/532
+    # suggests that it has something to do with dsnoop
+    # But that doesn't help a lot, just thinking about solutions.
     cd ..
     tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
     rm -rf seeed-voicecard
