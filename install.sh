@@ -600,10 +600,14 @@ sed -i -e "s!@SUSI_WORKING_DIR@!$WORKDIR!g"  $BINDIR/susi-config
 chmod +x $BINDIR/susi-config
 # generate initial config.json
 CFG="$WORKDIR/config.json"
+DEVICENAME="Desktop Computer"
+if [ $targetSystem = raspi ] ; then
+    DEVICENAME="RaspberryPi"
+fi
 if [ ! -r "$CFG" ] ; then
   cat >"$CFG" <<EOF
 {
-  "Device": "Desktop Computer",
+  "Device": "$DEVICENAME",
   "WakeButton": "enabled",
   "default_stt": "google",
   "default_tts": "google",
