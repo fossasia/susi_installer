@@ -928,9 +928,9 @@ if [ $targetSystem = raspi ] ; then
     sudo bash $INSTALLERDIR/raspi/access_point/wap.sh
 fi
 
-read -p "Do you want to download languages for offline recognition?[Y/N] " -n 1 -r
-echo    # (optional) move to a new line
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+read -p "Do you want to download languages for offline recognition?[y/n] " lang
+echo 
+if [[ $lang = y ]] ; then
     SR_LIB=$(python3 -c "import speech_recognition as sr, os.path as p; print(p.dirname(sr.__file__))")
     sudo mkdir "$SR_LIB/it-IT"
     sudo mkdir "$SR_LIB/temp"
