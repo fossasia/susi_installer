@@ -248,7 +248,7 @@ fi
 # Dependencies of the packages or building
 # we try to move as many pip packages to Debian packages
 DEBDEPS="
-  git openssl wget python3-pip sox libsox-fmt-all flac
+  git openssl wget python3-pip sox libsox-fmt-all flac libasound2-plugins
   libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
   vlc-plugin-video-splitter python3-cairo python3-flask flite
   default-jdk-headless pixz udisks2 python3-requests python3-requests-futures python3-service-identity
@@ -261,7 +261,7 @@ DEBDEPS="
 # If snowboy cannot be installed via pip we need to build it
 SNOWBOYBUILDDEPS="
   perl libterm-readline-gnu-perl \
-  i2c-tools libasound2-plugins python3-dev \
+  i2c-tools python3-dev \
   swig libpulse-dev libasound2-dev \
   libatlas-base-dev
 "
