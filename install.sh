@@ -871,7 +871,7 @@ if [ $targetSystem = raspi ] ; then
     sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
 
     # update hostname to "susi" (and not raspberrypi)
-    sudo echo "susi" > /etc/hostname
+    echo "susi" | sudo tee /etc/hostname
 
     # enable the server service unconditionally
     sudo systemctl enable ss-susi-server
