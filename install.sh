@@ -870,6 +870,9 @@ if [ $targetSystem = raspi ] ; then
     # make sure that the susi_server does not open the browser on startup
     sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
 
+    # update hostname to "susi" (and not raspberrypi)
+    sudo echo "susi" > /etc/hostname
+
     # enable the server service unconditionally
     sudo systemctl enable ss-susi-server
     sudo systemctl enable ss-etherpad-lite
