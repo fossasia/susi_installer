@@ -13,7 +13,7 @@ from flask import Flask , render_template , request, flash, redirect, session, a
 from flask import jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# from vlcplayer import vlcplayer
+from vlcplayer import vlcplayer
 
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
@@ -137,7 +137,7 @@ def unlink_device():
 
 # /play?ytb=???
 # /play?mrl=???
-# @app.route('/play', methods=['POST', 'PUT'])
+@app.route('/play', methods=['POST', 'PUT'])
 def play_route():
     if 'ytb' in request.args:
         vlcplayer.playytb(request.args.get('ytb'))
@@ -151,7 +151,7 @@ def play_route():
 # /volume?val=up
 # /volume?val=down
 # /volume?val=NN  0 <= NN <= 100
-# @app.route('/volume/<val>', methods=['POST', 'PUT'])
+@app.route('/volume/<val>', methods=['POST', 'PUT'])
 def volume_route(val):
     try:
         vlcplayer.volume(val)
@@ -161,7 +161,7 @@ def volume_route(val):
         return do_return('Volume adjustment error' + e, 400)
 
 # /say?mrl=???
-# @app.route('/say', methods=['POST', 'PUT'])
+@app.route('/say', methods=['POST', 'PUT'])
 def say_route():
     if 'mrl' in request.args:
         vlcplayer.say(request.args.get('mrl'))
@@ -170,7 +170,7 @@ def say_route():
         return do_return('Missing mrl argument', 400)
 
 
-# @app.route('/beep', methods=['POST', 'PUT'])
+@app.route('/beep', methods=['POST', 'PUT'])
 def beep_route():
     if 'mrl' in request.args:
         vlcplayer.beep(request.args.get('mrl'))
@@ -182,57 +182,57 @@ def beep_route():
 # /pause
 # /resume
 # /stop
-# @app.route('/pause', methods=['POST', 'PUT'])
+@app.route('/pause', methods=['POST', 'PUT'])
 def pause_route():
     vlcplayer.pause()
     return do_return('Ok', 200)
 
-# @app.route('/resume', methods=['POST', 'PUT'])
+@app.route('/resume', methods=['POST', 'PUT'])
 def resume_route():
     vlcplayer.resume()
     return do_return('Ok', 200)
 
-# @app.route('/stop', methods=['POST', 'PUT'])
+@app.route('/stop', methods=['POST', 'PUT'])
 def stop_route():
     vlcplayer.stop()
     return do_return('Ok', 200)
 
-# @app.route('/next', methods=['POST', 'PUT'])
+@app.route('/next', methods=['POST', 'PUT'])
 def next_route():
     vlcplayer.next()
     return do_return('Ok', 200)
 
-# @app.route('/previous', methods=['POST', 'PUT'])
+@app.route('/previous', methods=['POST', 'PUT'])
 def previous_route():
     vlcplayer.previous()
     return do_return('Ok', 200)
 
-# @app.route('/restart', methods=['POST', 'PUT'])
+@app.route('/restart', methods=['POST', 'PUT'])
 def restart_route():
     vlcplayer.restart()
     return do_return('Ok', 200)
 
-# @app.route('/shuffle', methods=['POST', 'PUT'])
+@app.route('/shuffle', methods=['POST', 'PUT'])
 def shuffle_route():
     vlcplayer.shuffle()
     return do_return('Ok', 200)
 
-# @app.route('/save_softvolume', methods=['POST', 'PUT'])
+@app.route('/save_softvolume', methods=['POST', 'PUT'])
 def save_softvolume_route():
     vlcplayer.save_softvolume()
     return do_return('Ok', 200)
 
-# @app.route('/restore_softvolume', methods=['POST', 'PUT'])
+@app.route('/restore_softvolume', methods=['POST', 'PUT'])
 def restore_softvolume_route():
     vlcplayer.restore_softvolume()
     return do_return('Ok', 200)
 
-# @app.route('/save_hardvolume', methods=['POST', 'PUT'])
+@app.route('/save_hardvolume', methods=['POST', 'PUT'])
 def save_hardvolume_route():
     vlcplayer.save_hardvolume()
     return do_return('Ok', 200)
 
-# @app.route('/restore_hardvolume', methods=['POST', 'PUT'])
+@app.route('/restore_hardvolume', methods=['POST', 'PUT'])
 def restore_hardvolume_route():
     vlcplayer.restore_hardvolume()
     return do_return('Ok', 200)
@@ -269,13 +269,13 @@ def get_offline_song(folder):
     songs = [{'name': i} for i in files if i.endswith('.mp3') or i.endswith('.m4a') or i.endswith('.ogg') ]
     return do_return(songs, 200)
 
-# @app.route('/playOfflineSong/<folder>/<file>', methods=['PUT'])
+@app.route('/playOfflineSong/<folder>/<file>', methods=['PUT'])
 def play_offine_song(folder, file):
     vlcplayer.stop()
     vlcplayer.play(os.path.join(mountPath, folder, file))
     return do_return('OK', 200)
 
-# @app.route('/playyoutube', methods=['PATCH'])
+@app.route('/playyoutube', methods=['PATCH'])
 def play_from_youtubeLink():
     data = request.json
     vlcplayer.playytbLink(data['link'])
