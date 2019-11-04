@@ -2,17 +2,6 @@ body {
     background-color: #e9ebee;
 }
 
-#overlay{
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color:#000;
-    opacity: .75;
-    z-index: 9999999;
-}
-
 .card {
     margin-top: 1em;
 }
