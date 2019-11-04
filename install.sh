@@ -929,6 +929,9 @@ if [ $targetSystem = raspi ] ; then
 
     echo "Converting RasPi into an Access Point"
     sudo bash $INSTALLERDIR/raspi/access_point/wap.sh
+
+    # install our home compiled package of libportaudio2
+    sudo dpkg -i $INSTALLERDIR/raspi/debs/libportaudio2_19.6.0-1.1_armhf.deb
 fi
 
 
