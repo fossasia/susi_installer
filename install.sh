@@ -893,7 +893,7 @@ if [ $targetSystem = raspi ] ; then
     # this is a recent change from udev somewhen in 2018?
     echo "Working around broken udev and ro file systems"
     sudo mkdir -p /etc/systemd/system
-    sudo cp $INSTALLERDIR/raspi/media_daemon/udev-restart-after-boot.service /etc/systemd/system/udev-restart-after-boot.service
+    sudo cp $INSTALLERDIR/raspi/media_daemon/udev-restart-after-boot.service /lib/systemd/system/
     sudo systemctl enable udev-restart-after-boot
 
     echo "Disable dhcpcd"
