@@ -39,7 +39,7 @@ How to assembly a smart speaker: [Video](https://www.youtube.com/watch?v=jAEmRvQ
 ### Configuring Smart Speaker
 * Power on the device
 * Connect your computer or mobile phone to the SUSI.AI hotspot using the password "password".
-* Open http://10.0.0.1:5000 which will show you the set-up page as visible below:
+* Open http://10.0.0.1:7070 which will show you the set-up page as visible below:
 ![SUSI.AI Wifi Setup](docs/images/SUSI.AI-Wifi-Setup.png "SUSI.AI Wifi Setup")
 * Put in your Wifi credentials. For an open network set an empty password. If The device should connect automatically to any open network, leave SSID and password empty.
 * Click on "Reboot Smart Speaker"
