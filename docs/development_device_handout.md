@@ -48,3 +48,14 @@ To get the device running anyway, you can do the following:
 * cd into the application folder: `cd SUSI.AI/susi_linux/`
 * you can manually start the Susi linux client now with (i.e.) `nohup python3 -m main &`
 * if you want to redefine the wifi hotspot, run `cd access_point` and `sudo ./wifi_search.sh <ssid> <pw>`. This writes the information about the wifi access point into `/etc/wpa_supplicant/wpa_supplicant.conf`
+
+
+## Local Hacks
+
+You can access a local version of the susi.ai home page at http://susi.local:7070
+There is also a chat window, so you can use a local susi at home without going to the susi.ai home page.
+
+You can also use a local susi dream; for this open http://susi.local:9001 and edit the etherpad "susi". The whole path is then http://susi.local:9001/p/susi
+
+
+
