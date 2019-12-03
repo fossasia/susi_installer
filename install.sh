@@ -76,6 +76,8 @@ PREFIX=""
 CLEAN=0
 SUSI_SERVER_USER=
 CORAL=0
+# should dependencies installed via apt-get or pip
+NODEPS=0
 # default installation branch
 # we use the same branch across repositories
 # so if we build from susi_installer:master, we use the master branch of
@@ -148,6 +150,11 @@ then
                 saved_args="$saved_args --with-coral"
                 shift
                 ;;
+            --no-dependency-installation)
+                NODEPS=1
+                saved_args="$saved_args --no-dependency-installation"
+                shift
+                ;;
             --help)
                 cat <<'EOF'
 SUSI.AI Installer
@@ -169,6 +176,9 @@ Possible options:
                    combinations:
                    - Debian: 9, 10, 11
                    - Ubuntu and LinuxMint: 18*, 19*, 20*
+  --no-dependency-installation
+                   Do not attempt to install dependencies via apt-get or pip.
+                   You are responsible to install all required packages.
 
 EOF
                 exit 0
@@ -711,14 +721,19 @@ else
     echo "WARNING: susi.ai directory already present, not cloning it!" >&2
 fi
 
-echo "Installing required dependencies"
-install_debian_dependencies $DEBDEPS
-install_pip_dependencies
-# in case that snowboy installation failed, build it from source
-# also, make sure that we don't exit in case of not present snowboy
-ret=`pip3 show snowboy || true`
-if [ -z "$ret" ] ; then
-    install_snowboy
+if [ $NODEPS = 0 ]
+then
+    echo "Installing required dependencies"
+    install_debian_dependencies $DEBDEPS
+    install_pip_dependencies
+    # in case that snowboy installation failed, build it from source
+    # also, make sure that we don't exit in case of not present snowboy
+    ret=`pip3 show snowboy || true`
+    if [ -z "$ret" ] ; then
+        install_snowboy
+    fi
+else
+    echo "Not installing dependencies, be sure to have everything available!"
 fi
 
 # function to update the latest vlc drivers which will allow it to play MRL of latest videos
