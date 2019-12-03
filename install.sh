@@ -797,6 +797,28 @@ then
     wget "http://www.festvox.org/flite/packed/flite-2.0/voices/cmu_us_slt.flitevox" -P susi_linux/extras
 fi
 
+#
+# Use pkg-config to get correct systemd install path
+#   system units: pkg-config systemd --variable=systemdsystemunitdir
+#                 on Debian: /lib/systemd/system
+#   user units:   pkg-config systemd --variable=systemduserunitdir
+#                 on Debian: /usr/lib/systemd/user
+# but install path into $HOME are fixed I guess
+if [ -x "$(command -v pkg-config)" ]
+then
+    systemdsystem=$(pkg-config systemd --variable=systemdsystemunitdir 2>/dev/null)
+    systemduser=$(pkg-config systemd --variable=systemduserunitdir 2>/dev/null)
+fi
+if [ -z "$systemdsystem" ] ; then
+    systemdsystem=/lib/systemd/system
+fi
+if [ -z "$systemduser" ] ; then
+    systemduser=/usr/lib/systemd/user
+fi
+systemdhomeuser=$HOME/.config/systemd/user
+
+PKGCONFIG=$(command -v pkg-config)
+
 if [ $targetSystem = raspi ]
 then
     echo "Preparing USB automount"
@@ -810,8 +832,8 @@ then
 
     echo "Installing RPi specific Systemd Rules"
     # TODO !!! we need to make the vlcplayer available to controlserver, as of now it does not find it
-    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service /lib/systemd/system/
-    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.timer /lib/systemd/system/
+    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service $systemdsystem
+    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.timer $systemdsystem
     sudo systemctl enable ss-update-daemon.service
     sudo systemctl enable ss-update-daemon.timer
     sudo systemctl enable ss-factory-daemon.service
@@ -827,15 +849,15 @@ sed -i -e "s!@BINDIR@!$BINDIR!" 'ss-susi-linux@.service'
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     # on RasPi, we install the system units into the system directories
     if [ $targetSystem = raspi ] ; then
-        sudo cp 'ss-susi-linux@.service' /lib/systemd/system/
+        sudo cp 'ss-susi-linux@.service' $systemdsystem
     else
         # Desktop in user mode
-        mkdir -p $HOME/.config/systemd/user
-        cp ss-susi-linux.service $HOME/.config/systemd/user/
+        mkdir -p $systemdhomeuser
+        cp ss-susi-linux.service $systemdhomeuser
     fi
 else
-    $SUDOCMD cp 'ss-susi-linux@.service' /lib/systemd/system/
-    $SUDOCMD cp ss-susi-linux.service /usr/lib/systemd/user/
+    $SUDOCMD cp 'ss-susi-linux@.service' $systemdsystem
+    $SUDOCMD cp ss-susi-linux.service $systemduser
 fi
 rm 'ss-susi-linux@.service'
 rm ss-susi-linux.service
@@ -848,19 +870,19 @@ sed -i -e "s!@SUSI_SERVER_USER@!$SUSI_SERVER_USER!" ss-susi-server.service
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     # on RasPi, we install the system units into the system directories
     if [ $targetSystem = raspi ] ; then
-        sudo cp 'ss-susi-server.service' /lib/systemd/system/
+        sudo cp 'ss-susi-server.service' $systemdsystem
         sudo systemctl daemon-reload || true
     else
         # Desktop in user mode
-        mkdir -p $HOME/.config/systemd/user
+        mkdir -p $systemdhomeuser
         # we need to filter out the User= line from user units!
-        grep -v '^User=' ss-susi-server.service > $HOME/.config/systemd/user/ss-susi-server.service
+        grep -v '^User=' ss-susi-server.service > $systemdhomeuser/ss-susi-server.service
         systemctl --user daemon-reload || true
     fi
 else
     # susi-server does not support multi-user functionality by now
     # since data/log dirs are shared
-    # $SUDOCMD cp ss-susi-server.service /usr/lib/systemd/user/
+    # $SUDOCMD cp ss-susi-server.service $systemduser
     #
     # add a new user for susi-server
     $SUDOCMD adduser --system \
@@ -874,7 +896,7 @@ else
     $SUDOCMD mkdir -p /var/lib/susi-server/data
     $SUDOCMD chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
     $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
-    $SUDOCMD cp ss-susi-server.service /lib/systemd/system/
+    $SUDOCMD cp ss-susi-server.service $systemdsystem
     $SUDOCMD systemctl daemon-reload || true
 fi
 rm ss-susi-server.service
