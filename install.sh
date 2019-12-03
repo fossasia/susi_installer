@@ -804,6 +804,8 @@ fi
 #   user units:   pkg-config systemd --variable=systemduserunitdir
 #                 on Debian: /usr/lib/systemd/user
 # but install path into $HOME are fixed I guess
+systemdsystem=""
+systemduser=""
 if [ -x "$(command -v pkg-config)" ]
 then
     systemdsystem=$(pkg-config systemd --variable=systemdsystemunitdir 2>/dev/null)
