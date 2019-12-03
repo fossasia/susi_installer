@@ -819,7 +819,6 @@ if [ -z "$systemduser" ] ; then
 fi
 systemdhomeuser=$HOME/.config/systemd/user
 
-PKGCONFIG=$(command -v pkg-config)
 
 if [ $targetSystem = raspi ]
 then
