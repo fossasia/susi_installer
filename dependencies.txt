@@ -1,4 +1,4 @@
-PIP			DEBIAN (sid)				FEDORA
+PIP			DEBIAN/BUSTER				FEDORA
 
 pyalsaaudio		python3-alsaaudio
 pafy			python3-pafy
@@ -9,7 +9,7 @@ python-Levenshtein	python3-levenshtein
 python-vlc		python3-vlc
 requests_futures	python3-requests-futures
 service_identity	python3-service-identity
-watson-developer-cloud	python3-ibm-watson
+watson-developer-cloud	python3-watson-developer-cloud (broken in sid due to switch to python3-ibm-watson)
 youtube-dl>=2019.6.21	youtube-dl
 requests>=2.13.0	python3-requests
 flask			python3-flask
