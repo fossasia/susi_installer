@@ -1,2 +1,11 @@
 - install youtube_dl on buster and above?
 
+- desktop file for menu item to start susi_linux
+- make susi-server systemd socket activated so that
+  starting susi_linux starts susi-server automatically
+- ApplicationIcon for susi-linux
+  example code maybe https://github.com/bluppfisk/coinprice-indicator/blob/master/coin/indicator.py
+- write desktop installation guide
+
+- current master branch is broken, susi server answers rubbish!
+
