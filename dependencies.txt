@@ -48,9 +48,6 @@ Completely unclear why these are necessary
 ------------------------------------------
 python3-cairo
 python3-psutil
-python3-multidict
-python3-async-timeout
-python3-yarl
 
 
 
