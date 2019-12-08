@@ -1,0 +1,64 @@
+PIP			DEBIAN (sid)				FEDORA
+
+pyalsaaudio		python3-alsaaudio
+pafy			python3-pafy
+mutagen			python3-mutagen
+colorlog		python3-colorlog
+pyaudio			python3-pyaudio
+python-Levenshtein	python3-levenshtein
+python-vlc		python3-vlc
+requests_futures	python3-requests-futures
+service_identity	python3-service-identity
+watson-developer-cloud	python3-ibm-watson
+youtube-dl>=2019.6.21	youtube-dl
+requests>=2.13.0	python3-requests
+flask			python3-flask
+
+pocketsphinx==0.1.15	(version wrong)
+google_speech		xxx
+json_config		xxx
+rx>=3.0.0a0		xxx
+snowboy==1.3.0		xxx			(from repo.fury)
+speechRecognition==3.8.1 xxx
+websocket-server	xxx
+async_promises		xxx
+geocoder		xxx
+soundcloud-lib		xxx
+
+
+Indirect deps for one of the above pip install necessary
+---------------------------------------------------------
+click			python3-click		(geocoder)
+future			python3-future		(geocoder)
+six			python3-six		(geocoder)
+decorator		python3-decorator	(geocoder)
+ratelim			xxx			(geocoder)
+bs4			xxx			(soundcloud-lib)
+aiohttp			python3-aiohttp		(soundcloud-lib)
+beautifulsoup4		python3-bs4		(soundcloud-lib)
+typing			xxx			(async_promises)
+web-cache		xxx			(google_speech)
+
+For installation of wheel packages
+---------------------------------
+python3-setuptools
+
+
+Completely unclear why these are necessary
+------------------------------------------
+python3-cairo
+python3-psutil
+python3-multidict
+python3-async-timeout
+python3-yarl
+
+
+
+RPi only
+--------
+spidev
+RPi.GPIO
+
+
+# Repo for wheel packages, pre-compiled for ARM
+--extra-index-url https://repo.fury.io/fossasia/
