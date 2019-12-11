@@ -62,14 +62,14 @@ RASPIDEPS="
   git openssl wget python3-pip sox libsox-fmt-all flac libasound2-plugins
   libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
   vlc-plugin-video-splitter flite default-jdk-headless pixz udisks2 ca-certificates
-  hostapd dnsmasq usbmount
+  hostapd dnsmasq usbmount python3-setuptools python3-pyaudio
 "
 
 RASPIPYTHONDEPS="
   python3-cairo python3-flask
   python3-requests python3-requests-futures python3-service-identity
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
-  python3-setuptools python3-watson-developer-cloud
+  python3-watson-developer-cloud
   python3-aiohttp python3-bs4 python3-mutagen python3-alsaaudio
 "
 
@@ -117,11 +117,11 @@ if [ $TRUSTPIP = 0 ] ; then
     if [ $UNKNOWN = 1 ] ; then
         echo "Cannot determine pip version number. Got \`$pipversion\' from \`pip3 --version\'" >&2
         echo "Please use \`--trust-pip\' to disable these checks if you are sure that pip is" >&2
-        echo "at least at version 18!" >&2
+        echo "at least at version 19!" >&2
         exit 1
     fi
-    if [ "$pipversion" -lt 18 ] ; then
-        echo "pip3 version \`$pipversion\' is less than the required version number 18" >&2
+    if [ "$pipversion" -lt 19 ] ; then
+        echo "pip3 version \`$pipversion\' is less than the required version number 19" >&2
         echo "Will update pip3 using itself."
         UPDATEPIP=1
     fi
