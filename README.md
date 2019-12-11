@@ -3,6 +3,43 @@
 This repository provides installation script for SUSI.AI for Linux Desktops
 as well as for our development SUSI.AI Smart Speaker based on Raspberry Pi.
 
+## Quickstart
+
+If you want to get SUSI.AI Personal Assistant installed quickly without reading
+all the small print, here is a quickstart.
+
+### Preferred method: user install with `sudo`
+
+The preferred method is installing SUSI.AI into your home directory, but using
+`sudo` to install the required Python modules. If this is an option for you,
+first do
+```
+  ./install-dependencies.sh
+```
+followed by
+```
+  ./install-susi.sh
+```
+(this will change to `install.sh` after testing).
+
+This will install SUSI.AI into `~/SUSI.AI`. After that you can start it
+according to the output of the installer at the end.
+
+### Another method: user install without `sudo`
+
+This method is much less tested, because the required Python modules will
+be installed into your home directory (`~/.local/lib`). On the other hand,
+no `sudo` permissions are needed, and everything can be done as local user:
+```
+   ./install-dependencies.sh --sudo-cmd ""
+   ./install-susi.sh
+```
+
+### The rest
+
+All other methods require root permissions and we recommend reading the
+full document before trying them.
+
 ## Prerequisites
 
 The installation script expects certain programs and libraries being installed
