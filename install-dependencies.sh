@@ -16,6 +16,7 @@ CLEAN=1
 BRANCH=development
 RASPI=0
 SUDOCMD=sudo
+DISTPKGS=0
 while [[ $# -gt 0 ]]
 do
     key="$1"
@@ -26,6 +27,8 @@ do
             CLEAN=0 ; shift ;;
         --raspi)
             RASPI=1 ; shift ;;
+        --use-dist-packages)
+            DISTPKGS=1 ; shift ;;
         --sudo-cmd)
             SUDOCMD="$2" ; shift ; shift ;;
         --branch)
@@ -40,6 +43,7 @@ Possible options:
   --raspi          Do additional installation tasks for the SUSI.AI Smart Speaker
   --sudo-cmd CMD   Use CMD instead of the default sudo
   --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
+  --use-dist-packages (only with --raspi) Try to use distribution packages (apt-get on Debian etc)
 
 EOF
             exit 0
@@ -51,7 +55,31 @@ EOF
 done
 
 
+#
+# On Raspberry susibian, install what is necessary
+#
+RASPIDEPS="
+  git openssl wget python3-pip sox libsox-fmt-all flac libasound2-plugins
+  libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
+  vlc-plugin-video-splitter flite default-jdk-headless pixz udisks2 ca-certificates
+  hostapd dnsmasq usbmount
+"
 
+RASPIPYTHONDEPS="
+  python3-cairo python3-flask
+  python3-requests python3-requests-futures python3-service-identity
+  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
+  python3-setuptools python3-watson-developer-cloud
+  python3-aiohttp python3-bs4 python3-mutagen python3-alsaaudio
+"
+
+if [ $RASPI = 1 ] ; then
+    $SUDOCMD apt-get update
+    $SUDOCMD apt-get install --no-install-recommends -y $RASPIDEPS
+    if [ $DISTPKGS = 1 ] ; then
+        $SUDOCMD apt-get install --no-install-recommends -y $RASPIPYTHONDEPS
+    fi
+fi
 
 #
 # Check necessary programs are available
