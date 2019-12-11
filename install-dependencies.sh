@@ -79,6 +79,9 @@ if [ $RASPI = 1 ] ; then
     if [ $DISTPKGS = 1 ] ; then
         $SUDOCMD apt-get install --no-install-recommends -y $RASPIPYTHONDEPS
     fi
+    if [ $CLEAN = 1 ] ; then
+        apt-get clean
+    fi
 fi
 
 #
@@ -127,7 +130,7 @@ if [ $TRUSTPIP = 0 ] ; then
     fi
 fi
 
-PIP=pip3
+PIP="pip3 -q"
 if [ $CLEAN = 1 ] ; then
     PIP="pip3 --no-cache-dir -q"
 fi
