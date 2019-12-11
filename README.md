@@ -63,7 +63,7 @@ try to provide updated lists for other distributions, too.
 Indirect dependencies when installing some of the above
 
 | PIP | Debian/Buster | Fedora | Requested by |
-| --- | --- | --- |
+| --- | --- | --- | -- |
 | click			| python3-click		| | geocoder |
 | future		| python3-future	| | geocoder |
 | six			| python3-six		| | geocoder |
@@ -78,6 +78,7 @@ Indirect dependencies when installing some of the above
 
 Packages that are only required for installation on the Raspbian based
 SUSI.AI smart speaker:
+
 | PIP | Debian/Buster | Fedora | 
 | --- | --- | --- |
 | spidev   | | |
