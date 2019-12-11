@@ -2,6 +2,10 @@
 # SUSI.AI Smart Assistant dependency installer script
 # Copyright 2019 Norbert Preining
 # 
+# TODO
+# - maybe add an option --try-system-install and then use apt-get etc as far as possible?
+#   but how to deal with non-Debian systems
+#
 set -euo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
@@ -74,7 +78,10 @@ fi
 #
 UPDATEPIP=0
 if [ $TRUSTPIP = 0 ] ; then
-    pipversion=$(pip3 --version | sed -e 's/^pip //' -e 's/\..*$//' -e 's/ .*$//')
+    pipversion=$(pip3 --version)
+    pipversion=${pipversion#pip }
+    pipversion=${pipversion%%.*}
+    pipversion=${pipversion%% *}
     UNKNOWN=0
     case "$pipversion" in
         ''|*[!0-9]*) UNKNOWN=1 ;;
