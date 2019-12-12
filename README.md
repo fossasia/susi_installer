@@ -78,6 +78,8 @@ at least at version 18 to ensure we can specify additional repositories
 in the requirement files. The `install-dependencies` script will update
 `pip3` if this requirement is not fulfilled.
 
+For Fedora 31 it seems that the packages `python3-devel`, `python3-wheel`,
+and `python3-setuptools` are necessary, too.
 
 ### List of Python packages
 
