@@ -89,7 +89,7 @@ can decide to either use the distribution (Debian, Fedora,...) provided
 packages or those directly available from the PyPy distribution.
 
 To ensure that additional repositories can be used, `pip3` needs to be
-at least at version 18 to ensure we can specify additional repositories
+at least at version 19 to ensure we can specify additional repositories
 in the requirement files. The `install-dependencies` script will update
 `pip3` if this requirement is not fulfilled.
 
