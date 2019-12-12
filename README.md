@@ -14,7 +14,7 @@ The preferred method is installing SUSI.AI into your home directory, but using
 `sudo` to install the required Python modules. If this is an option for you,
 first do
 ```
-  ./install-dependencies.sh
+  ./install-dependencies.sh --system-install
 ```
 followed by
 ```
@@ -22,7 +22,8 @@ followed by
 ```
 (this will change to `install.sh` after testing).
 
-This will install SUSI.AI into `~/SUSI.AI`. After that you can start it
+This will install all necessary system packages and Python libraries, and
+SUSI.AI into `~/SUSI.AI`. After that you can start it
 according to the output of the installer at the end.
 
 ### Another method: user install without `sudo`
