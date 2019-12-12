@@ -76,22 +76,33 @@ targetSystem="unknown"
 sysInstaller="unknown"
 if [ -x "$(command -v lsb_release)" ]; then
     vendor=`lsb_release -i -s 2>/dev/null`
-    version=`lsb_release -r -s 2>/dev/null`
-    targetVersion=""
     case "$vendor" in
-        Debian) targetSystem=debian ; sysInstaller="apt" ;;
-        Raspbian) targetSystem=raspi ; sysInstaller="apt" ;;
-        Ubuntu) targetSystem=ubuntu ; sysInstaller="apt" ;;
-        LinuxMint) targetSystem=mint ; sysInstaller="apt" ;;
-        *) targetSystem=unknown ; sysInstaller="unknown" ;;
+        Debian)    targetSystem=debian  ;;
+        Raspbian)  targetSystem=raspi   ;;
+        Ubuntu)    targetSystem=ubuntu  ;;
+        LinuxMint) targetSystem=mint    ;;
+        *)         targetSystem=unknown ;;
     esac
 else
     # TODO
     # how to check ubuntu/mint/fedora/raspi ... ?????
-    if [ -r /etc/debian_version ] ; then
-        sysInstaller="apt"
+    # what are the ID names there, maybe leave out lsb_release completely?
+    if [ -r /etc/os-release ] ; then
+        source /etc/os-release
+        if [ -n "$ID" ] ; then
+            targetSystem="$ID"
+        fi
+    elif [ -r /etc/debian_version ] ; then
+        targetSystem="debian"
     fi
 fi
+
+sysInstaller=unknown
+case $targetSystem in
+    debian|ubuntu|raspi|mint) sysInstaller=apt ;;
+    fedora)                   sysInstaller=dnf ;;
+esac
+
 
 if [ $SYSTEMINSTALL = 1 ] ; then
     if [ -n "$SYSINSTALLER" ] ; then
