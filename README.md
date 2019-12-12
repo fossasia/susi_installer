@@ -45,9 +45,27 @@ full document before trying them.
 The installation script expects certain programs and libraries being installed
 on the system, in particular the following programs need to be available
 (not necessarily for the installation, but also for operation of SUSI.AI
-programs afterwards):
+programs afterwards). The following table lists the required programs and
+the respective packages in Debian/Buster and Fedora 31:
 
-	git wget sox java vlc flac python3 pip3
+| Program | Debian/Buster        | Fedora 31 |
+| ------- | -------------------- | --- |
+| git     | git                  | git |
+| wget    | wget                 | wget |
+| sox     | sox                  | sox |
+| java    | default-jre-headless | java-1.8.0-openjdk-headless |
+| vlc     | vlc-bin              | vlc (1) |
+| flac    | flac                 | flac |
+| python3 | python3              | python3 |
+| pip3    | python3-pip          | python3-pip |
+
+(1) It is important to note that on Fedora, VLC is not available by
+default and the RPMFusion repository needs to be enabled. The procedure
+is described [here](https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/)
+and basically means:
+```
+  sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+```
 
 Furthermore, a considerable list of Python libraries are required for full
 operation. The script `install-dependencies` will install them using `pip3`
@@ -70,56 +88,56 @@ files in the repositories of `susi_installer`, `susi_python`, and `susi_linux`.
 We provide PIP package names and Debian package names if available, and will
 try to provide updated lists for other distributions, too.
 
-| PIP | Debian/Buster | Fedora |
+| PIP | Debian/Buster | Fedora 31 |
 | --- | --- | --- |
-| setuptools            | python3-setuptools                    | |
-| pyalsaaudio		| python3-alsaaudio			| |
-| pafy			| python3-pafy				| |
-| mutagen		| python3-mutagen			| |
-| colorlog		| python3-colorlog			| |
-| pyaudio		| python3-pyaudio			| |
-| python-Levenshtein	| python3-levenshtein			| |
-| python-vlc		| python3-vlc				| |
-| requests_futures	| python3-requests-futures		| |
-| service_identity	| python3-service-identity		| |
-| watson-developer-cloud | python3-watson-developer-cloud	| |
-| youtube-dl>=2019.6.21	| youtube-dl				| |
-| requests>=2.13.0	| python3-requests			| |
-| flask			| python3-flask				| |
-| pocketsphinx==0.1.15	| - (version wrong)			| |
-| google_speech		| -					| |
-| json_config		| -					| |
-| rx>=3.0.0a0		| -					| |
-| snowboy==1.3.0	| -					| |
-| speechRecognition==3.8.1 | -					| |
-| websocket-server	| -					| |
-| async_promises	| -					| |
-| geocoder		| -					| |
-| soundcloud-lib	| -					| |
+| setuptools            | python3-setuptools                | python3-setuptools |
+| pyalsaaudio		| python3-alsaaudio		    | python3-alsaaudio |
+| pafy			| python3-pafy			    | - |
+| mutagen		| python3-mutagen		    | python3-mutagen |
+| colorlog		| python3-colorlog		    | python3-colorlog |
+| pyaudio		| python3-pyaudio		    | python3-pyaudio |
+| python-Levenshtein	| python3-levenshtein		    | python3-Levenshtein |
+| python-vlc		| python3-vlc			    | python3-vlc |
+| requests_futures	| python3-requests-futures	    | ? |
+| service_identity	| python3-service-identity	    | python3-service-identity |
+| watson-developer-cloud | python3-watson-developer-cloud   | - |
+| youtube-dl>=2019.6.21	| youtube-dl			    | youtube-dl |
+| requests>=2.13.0	| python3-requests		    | python3-requests |
+| flask			| python3-flask			    | python3-flask |
+| pocketsphinx==0.1.15	| - (version wrong)		    | - |
+| google_speech		| -				    | - |
+| json_config		| -				    | - |
+| rx>=3.0.0a0		| -				    | - |
+| snowboy==1.3.0	| -				    | - |
+| speechRecognition==3.8.1 | -				    | - |
+| websocket-server	| -				    | - |
+| async_promises	| -				    | - |
+| geocoder		| -				    | - |
+| soundcloud-lib	| -				    | - |
 
 Indirect dependencies when installing some of the above
 
 | PIP | Debian/Buster | Fedora | Requested by |
 | --- | --- | --- | -- |
-| click			| python3-click		| | geocoder |
-| future		| python3-future	| | geocoder |
-| six			| python3-six		| | geocoder |
-| decorator		| python3-decorator	| | geocoder |
-| ratelim		| -			| | geocoder |
-| bs4			| -			| | soundcloud-lib |
-| aiohttp		| python3-aiohttp	| | soundcloud-lib |
-| beautifulsoup4	| python3-bs4		| | soundcloud-lib |
-| typing		| -			| | async_promises |
-| web-cache		| -			| | google_speech  |
+| click			| python3-click		| python3-click | geocoder |
+| future		| python3-future	| python3-future | geocoder |
+| six			| python3-six		| python3-six | geocoder |
+| decorator		| python3-decorator	| python3-decorator | geocoder |
+| ratelim		| -			| - | geocoder |
+| bs4			| -			| - | soundcloud-lib |
+| aiohttp		| python3-aiohttp	| python3-aiohttp | soundcloud-lib |
+| beautifulsoup4	| python3-bs4		| python3-beautifulsoup4 | soundcloud-lib |
+| typing		| -			| - | async_promises |
+| web-cache		| -			| - | google_speech  |
 
 
 Packages that are only required for installation on the Raspbian based
 SUSI.AI smart speaker:
 
-| PIP | Debian/Buster | Fedora | 
-| --- | --- | --- |
-| spidev   | | |
-| RPi.GPIO | | |
+| PIP      | Debian/Buster | Fedora | 
+| -------- | --- | --- |
+| spidev   | -   | python3-spidev |
+| RPi.GPIO | -   | - |
 
 
 Installation of some of these packages requires adding an extra repository
