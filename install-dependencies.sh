@@ -114,6 +114,14 @@ if [ -n "$MISSINGPROGS" ] ; then
     echo "$MISSINGPROGS" >&2
     exit 1
 fi
+# check whether setuptools is installed
+{
+    ret=`pip3 show setuptools || true`
+    if [ -z "$ret" ] ; then
+        echo "Missing dependency: python3-setuptools, please install that first!" >&2
+        exit 1
+    fi
+}
 
 #
 # check that pip3 is at least at version 18
