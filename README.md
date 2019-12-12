@@ -58,6 +58,7 @@ the respective packages in Debian/Buster and Fedora 31:
 | flac    | flac                 | flac |
 | python3 | python3              | python3 |
 | pip3    | python3-pip          | python3-pip |
+| - (2)   | python3-setuptools   | python3-setuptools |
 
 (1) It is important to note that on Fedora, VLC is not available by
 default and the RPMFusion repository needs to be enabled. The procedure
@@ -66,6 +67,20 @@ and basically means:
 ```
   sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 ```
+
+(2) `python3-setuptools` doesn't provide a binary, but it is required to be
+installed, otherwise installations of other packages using `pip3` will
+not work.
+
+The above packages can be installed on Debian using
+```
+sudo apt-get install git wget sox default-jre-headless vlc-bin flac python3 python3-pip python3-setuptools
+```
+and on Fedora using
+```
+sudo dnf install git wget sox java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools
+```
+(but read the note (1) above!).
 
 Furthermore, a considerable list of Python libraries are required for full
 operation. The script `install-dependencies` will install them using `pip3`
@@ -77,9 +92,6 @@ To ensure that additional repositories can be used, `pip3` needs to be
 at least at version 18 to ensure we can specify additional repositories
 in the requirement files. The `install-dependencies` script will update
 `pip3` if this requirement is not fulfilled.
-
-For Fedora 31 it seems that the packages `python3-devel`, `python3-wheel`,
-and `python3-setuptools` are necessary, too.
 
 ### List of Python packages
 

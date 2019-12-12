@@ -68,13 +68,20 @@ RASPIDEPS="
   vlc-plugin-video-splitter flite default-jdk-headless pixz udisks2 ca-certificates
   hostapd dnsmasq usbmount python3-setuptools python3-pyaudio
 "
+# TODO
+# remove python3-pyaudio from the above when fury is updated with binary builds
+# for Py3.7/arm
+
+#
+# TODO
+# is python3-cairo really necessary????
+# removed for now
 
 RASPIPYTHONDEPS="
-  python3-cairo python3-flask
-  python3-requests python3-requests-futures python3-service-identity
+  python3-flask python3-requests python3-requests-futures python3-service-identity
   python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
-  python3-watson-developer-cloud
-  python3-aiohttp python3-bs4 python3-mutagen python3-alsaaudio
+  python3-watson-developer-cloud python3-aiohttp python3-bs4 python3-mutagen
+  python3-alsaaudio
 "
 
 if [ $RASPI = 1 ] ; then
