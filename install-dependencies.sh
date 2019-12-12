@@ -17,6 +17,7 @@ BRANCH=development
 RASPI=0
 SUDOCMD=sudo
 DISTPKGS=0
+QUIET=""
 while [[ $# -gt 0 ]]
 do
     key="$1"
@@ -33,6 +34,8 @@ do
             SUDOCMD="$2" ; shift ; shift ;;
         --branch)
             BRANCH="$2" ; shift ; shift ;;
+        --quiet)
+            QUIET="-q" ; shift ;;
         --help)
             cat <<'EOF'
 SUSI.AI Dependency Installer
@@ -43,6 +46,7 @@ Possible options:
   --raspi          Do additional installation tasks for the SUSI.AI Smart Speaker
   --sudo-cmd CMD   Use CMD instead of the default sudo
   --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
+  --quiet          Silence pip on installation
   --use-dist-packages (only with --raspi) Try to use distribution packages (apt-get on Debian etc)
 
 EOF
@@ -132,7 +136,7 @@ fi
 
 PIP="pip3 -q"
 if [ $CLEAN = 1 ] ; then
-    PIP="pip3 --no-cache-dir -q"
+    PIP="pip3 --no-cache-dir $QUIET"
 fi
 
 if [ $UPDATEPIP = 1 ] ; then
