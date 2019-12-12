@@ -18,6 +18,8 @@ RASPI=0
 SUDOCMD=sudo
 DISTPKGS=0
 QUIET=""
+SYSTEMINSTALL=0
+SYSINSTALLER=""
 while [[ $# -gt 0 ]]
 do
     key="$1"
@@ -28,10 +30,14 @@ do
             CLEAN=0 ; shift ;;
         --raspi)
             RASPI=1 ; shift ;;
-        --use-dist-packages)
+        --use-dist-packages)  # undocumented on purpose!! Should only be used for Raspi builds!
             DISTPKGS=1 ; shift ;;
         --sudo-cmd)
             SUDOCMD="$2" ; shift ; shift ;;
+        --system-install)
+            SYSTEMINSTALL=1 ; shift ;;
+        --sys-installer)
+            SYSINSTALLER="$2" ; shift ; shift ;;
         --branch)
             BRANCH="$2" ; shift ; shift ;;
         --quiet)
@@ -45,9 +51,10 @@ Possible options:
   --branch BRANCH  Use branch BRANCH to get requirement files (default: development)
   --raspi          Do additional installation tasks for the SUSI.AI Smart Speaker
   --sudo-cmd CMD   Use CMD instead of the default sudo
+  --system-install Try installing necessary programs, only supported for some distributions
+  --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
   --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
   --quiet          Silence pip on installation
-  --use-dist-packages (only with --raspi) Try to use distribution packages (apt-get on Debian etc)
 
 EOF
             exit 0
@@ -57,6 +64,61 @@ EOF
             exit 1
     esac
 done
+
+
+APTINSTALL="apt-get install --no-install-recommends -y"
+APTPKGS="git wget sox default-jre-headless vlc-bin flac python3 python3-pip python3-setuptools"
+
+DNFINSTALL="dnf install -y"
+DNFPKGS="git wget sox java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
+
+targetSystem="unknown"
+sysInstaller="unknown"
+if [ -x "$(command -v lsb_release)" ]; then
+    vendor=`lsb_release -i -s 2>/dev/null`
+    version=`lsb_release -r -s 2>/dev/null`
+    targetVersion=""
+    case "$vendor" in
+        Debian) targetSystem=debian ; sysInstaller="apt" ;;
+        Raspbian) targetSystem=raspi ; sysInstaller="apt" ;;
+        Ubuntu) targetSystem=ubuntu ; sysInstaller="apt" ;;
+        LinuxMint) targetSystem=mint ; sysInstaller="apt" ;;
+        *) targetSystem=unknown ; sysInstaller="unknown" ;;
+    esac
+else
+    # TODO
+    # how to check ubuntu/mint/fedora/raspi ... ?????
+    if [ -r /etc/debian_version ] ; then
+        sysInstaller="apt"
+    fi
+fi
+
+if [ $SYSTEMINSTALL = 1 ] ; then
+    if [ -n "$SYSINSTALLER" ] ; then
+        if [ $sysInstaller = unknown ] ; then
+            echo "Manually selection system installation method $SYSINSTALLER"
+            sysInstaller="$SYSINSTALLER"
+        else
+            if [ ! $sysInstaller = "$SYSINSTALLER" ] ; then
+                echo "Discrepancy: detected $sysInstaller, but $SYSINSTALLER was selected - giving up!" >&2
+                exit 1
+            fi
+        fi
+    fi
+    if [ $sysInstaller = unknown ] ; then
+        echo "Unknown installer system, please define one with --sys-installer apt|dnf" >&2
+        exit 1
+    elif [ $sysInstaller = apt ] ; then
+        $SUDOCMD $APTINSTALL $APTPKGS
+    elif [ $sysInstaller = dnf ] ; then
+        $SUDOCMD $DNFINSTALL https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+        $SUDOCMD $DNFINSTALL $DNFPKGS
+    else
+        echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
+        exit 1
+    fi
+fi
+
 
 
 #
