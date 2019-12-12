@@ -134,9 +134,9 @@ if [ $TRUSTPIP = 0 ] ; then
     fi
 fi
 
-PIP="pip3 -q"
+PIP="pip3 --extra-index-url https://repo.fury.io/fossasia/ $QUIET"
 if [ $CLEAN = 1 ] ; then
-    PIP="pip3 --no-cache-dir $QUIET"
+    PIP="$PIP --no-cache-dir"
 fi
 
 if [ $UPDATEPIP = 1 ] ; then
