@@ -134,7 +134,7 @@ if [ $TRUSTPIP = 0 ] ; then
     fi
 fi
 
-PIP="pip3 --extra-index-url https://repo.fury.io/fossasia/ $QUIET"
+PIP="pip3 $QUIET"
 if [ $CLEAN = 1 ] ; then
     PIP="$PIP --no-cache-dir"
 fi
@@ -169,7 +169,7 @@ done
 
 # Install pips
 for i in $reqs ; do
-    $SUDOCMD $PIP install -r $tmpdir/$i
+    $SUDOCMD $PIP install --extra-index-url https://repo.fury.io/fossasia/ -r $tmpdir/$i
 done
 
 # cleanup
