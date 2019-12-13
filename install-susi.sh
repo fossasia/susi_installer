@@ -54,7 +54,8 @@ INSTALLERDIR=$(dirname $(realpath "$0"))
 # Linux Mint: 18.*, 19.*, 18, 19
 #
 # We classify systems according to distribution and version
-# - targetSystem = raspi | debian | ubuntu | mint | <whatever lsb_release returns>
+# - targetSystem is the string that is contained in /etc/os-release as ID=....
+#   unfortunately that differs from the lsb_release -i output ...
 version=""
 targetSystem="unknown"
 targetVersion=""
@@ -65,7 +66,7 @@ if [ -x "$(command -v lsb_release)" ]; then
         Debian)    targetSystem=debian  ;;
         Raspbian)  targetSystem=raspi   ;;
         Ubuntu)    targetSystem=ubuntu  ;;
-        LinuxMint) targetSystem=mint    ;;
+        LinuxMint) targetSystem=linuxmint ;;
         *)         targetSystem=unknown ;;
     esac
 else
@@ -210,7 +211,7 @@ case "$targetSystem" in
             *) echo "Unrecognized or old Ubuntu version, expect problems: $targetVersion" >&2 ;;
         esac
         ;;
-    mint)
+    linuxmint)
         targetVersion=$version
         case "$targetVersion" in
             18.*|18|19.*|19|20.*|20) ;;
@@ -520,7 +521,7 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
       || \
       ( $targetSystem = ubuntu && $targetVersion = 18.04 ) \
       || \
-      ( $targetSystem = mint ) \
+      ( $targetSystem = linuxmint ) \
       || \
       ( $targetSystem = raspi && $targetVersion = 9 ) \
    ]]  ; then
