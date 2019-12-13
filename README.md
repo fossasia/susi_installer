@@ -103,36 +103,36 @@ files in the repositories of `susi_installer`, `susi_python`, and `susi_linux`.
 We provide PIP package names and Debian package names if available, and will
 try to provide updated lists for other distributions, too.
 
-| PIP | Debian/Buster | Fedora 31 |
+| PIP | Debian/Buster | Ubuntu 18.04/Mint 19.2 |Fedora 31 |
 | --- | --- | --- |
-| setuptools            | python3-setuptools                | python3-setuptools |
-| pyalsaaudio		| python3-alsaaudio		    | python3-alsaaudio |
-| pafy			| python3-pafy			    | - |
-| mutagen		| python3-mutagen		    | python3-mutagen |
-| colorlog		| python3-colorlog		    | python3-colorlog |
-| pyaudio		| python3-pyaudio		    | python3-pyaudio |
-| python-Levenshtein	| python3-levenshtein		    | python3-Levenshtein |
-| python-vlc		| python3-vlc			    | python3-vlc |
-| requests_futures	| python3-requests-futures	    | ? |
-| service_identity	| python3-service-identity	    | python3-service-identity |
-| watson-developer-cloud | python3-watson-developer-cloud   | - |
-| youtube-dl>=2019.6.21	| youtube-dl			    | youtube-dl |
-| requests>=2.13.0	| python3-requests		    | python3-requests |
-| flask			| python3-flask			    | python3-flask |
-| pocketsphinx==0.1.15	| - (version wrong)		    | - |
-| google_speech		| -				    | - |
-| json_config		| -				    | - |
-| rx>=3.0.0a0		| -				    | - |
-| snowboy==1.3.0	| -				    | - |
-| speechRecognition==3.8.1 | -				    | - |
-| websocket-server	| -				    | - |
-| async_promises	| -				    | - |
-| geocoder		| -				    | - |
-| soundcloud-lib	| -				    | - |
+| setuptools            | python3-setuptools | python3-setuptools	| python3-setuptools |
+| pyalsaaudio		| python3-alsaaudio  | -			| python3-alsaaudio |
+| pafy			| python3-pafy	     | python3-pafy		    | - |
+| mutagen		| python3-mutagen    | python3-mutagen		    | python3-mutagen |
+| colorlog		| python3-colorlog   | python3-colorlog		    | python3-colorlog |
+| pyaudio		| python3-pyaudio    | python3-pyaudio		    | python3-pyaudio |
+| python-Levenshtein	| python3-levenshtein | python3-levenshtein	    | python3-Levenshtein |
+| python-vlc		| python3-vlc	     | -			    | python3-vlc |
+| requests_futures	| python3-requests-futures | python3-requests-futures | ? |
+| service_identity	| python3-service-identity | python3-service-identity | python3-service-identity |
+| watson-developer-cloud | python3-watson-developer-cloud | python3-watson-developer-cloud | - |
+| youtube-dl>=2019.6.21	| youtube-dl	     | youtube-dl		    | youtube-dl |
+| requests>=2.13.0	| python3-requests   | python3-requests		    | python3-requests |
+| flask			| python3-flask	     | python3-flask		    | python3-flask |
+| pocketsphinx==0.1.15	| - (version wrong)  | - 		    | - |
+| google_speech		| -				    | - | - |
+| json_config		| -				    | - | - |
+| rx>=3.0.0a0		| -				    | - | - |
+| snowboy==1.3.0	| -				    | - | - |
+| speechRecognition==3.8.1 | -				    | - | - |
+| websocket-server	| -				    | - | - |
+| async_promises	| -				    | - | - |
+| geocoder		| -				    | - | - |
+| soundcloud-lib	| -				    | - | - |
 
 Indirect dependencies when installing some of the above
 
-| PIP | Debian/Buster | Fedora | Requested by |
+| PIP | Debian/Ubuntu/LinuxMint | Fedora | Requested by |
 | --- | --- | --- | -- |
 | click			| python3-click		| python3-click | geocoder |
 | future		| python3-future	| python3-future | geocoder |

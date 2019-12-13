@@ -10,7 +10,6 @@
 - current master branch is broken, susi server answers rubbish!
 
 
-- Fedora does not have lsb_release, check for /etc/redhat-release:
-	Fedora release 31 (Thirty One)
-  do the same for Debian?
+- Python3.6 modules!!! Linux Mint current runs on Py3.6
+
 
