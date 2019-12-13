@@ -80,7 +80,9 @@ if [ -x "$(command -v lsb_release)" ]; then
         Debian)    targetSystem=debian  ;;
         Raspbian)  targetSystem=raspi   ;;
         Ubuntu)    targetSystem=ubuntu  ;;
-        LinuxMint) targetSystem=mint    ;;
+        LinuxMint) targetSystem=linuxmint ;;
+        CentOS)    targetSystem=centos  ;;
+        Fedora)    targetSystem=fedora  ;;
         *)         targetSystem=unknown ;;
     esac
 else
@@ -99,8 +101,8 @@ fi
 
 sysInstaller=unknown
 case $targetSystem in
-    debian|ubuntu|raspi|mint) sysInstaller=apt ;;
-    fedora)                   sysInstaller=dnf ;;
+    debian|ubuntu|raspi|linuxmint) sysInstaller=apt ;;
+    fedora|centos)                 sysInstaller=dnf ;;
 esac
 
 

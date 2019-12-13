@@ -67,6 +67,8 @@ if [ -x "$(command -v lsb_release)" ]; then
         Raspbian)  targetSystem=raspi   ;;
         Ubuntu)    targetSystem=ubuntu  ;;
         LinuxMint) targetSystem=linuxmint ;;
+        CentOS)    targetSystem=centos  ;;
+        Fedora)    targetSystem=fedora  ;;
         *)         targetSystem=unknown ;;
     esac
 else
@@ -218,7 +220,7 @@ case "$targetSystem" in
             *) echo "Unrecognized or old Linux Mint version, expect problems: $targetVersion" >&2 ;;
         esac
         ;;
-    fedora)
+    fedora|centos)
         : "no details available about Fedora for now"
         ;;
     *)
