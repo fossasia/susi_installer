@@ -14,11 +14,13 @@ The preferred method is installing SUSI.AI into your home directory, but using
 `sudo` to install the required Python modules. If this is an option for you,
 first do
 ```
-  ./install-dependencies.sh --system-install
+  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-dependencies.sh
+  bash install-dependencies.sh --system-install
 ```
 followed by
 ```
-  ./install-susi.sh
+  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-susi.sh
+  bash install-susi.sh --dev
 ```
 (this will change to `install.sh` after testing).
 
@@ -32,8 +34,10 @@ This method is much less tested, because the required Python modules will
 be installed into your home directory (`~/.local/lib`). On the other hand,
 no `sudo` permissions are needed, and everything can be done as local user:
 ```
-   ./install-dependencies.sh --sudo-cmd ""
-   ./install-susi.sh
+  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-dependencies.sh
+  bash install-dependencies.sh --sudo-cmd ""
+  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-susi.sh
+  bash install-susi.sh --dev
 ```
 
 ### The rest

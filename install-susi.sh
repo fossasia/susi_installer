@@ -164,6 +164,10 @@ then
                 saved_args="$saved_args --with-coral"
                 shift
                 ;;
+            --dev)
+                INSTALLBRANCH=development
+                shift
+                ;;
             --help)
                 cat <<'EOF'
 SUSI.AI Installer
@@ -176,6 +180,7 @@ Possible options:
   --sudo-cmd <ARG> command to run programs that need root privileges
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
+  --dev            use development branch
   --with-coral     install support libraries for the Coral device (Raspberry)
 
 EOF
