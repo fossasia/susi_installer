@@ -70,8 +70,8 @@ APTINSTALL="apt-get install --no-install-recommends -y"
 APTPKGS="git wget sox default-jre-headless vlc-bin flac python3 python3-pip python3-setuptools"
 
 DNFINSTALL="dnf install -y"
-DNFPKGS="git wget sox java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
-# TODO centos 8 does NOT SHIP sox !!!!! Congratulations!!!
+DNFPKGScentos="git wget java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
+DNFPKGS="$DNFPKGScentos sox"
 
 targetSystem="unknown"
 sysInstaller="unknown"
@@ -135,7 +135,11 @@ if [ $SYSTEMINSTALL = 1 ] ; then
             echo "Don't know how to activate sources for vlc on $targetSystem!" >&2
             echo "If vlc is not installed the next command will probably fail." >&2
         fi
-        $SUDOCMD $DNFINSTALL $DNFPKGS
+        if [ $targetSystem = centos ] ; then
+            $SUDOCMD $DNFINSTALL $DNFPKGScentos
+        else
+            $SUDOCMD $DNFINSTALL $DNFPKGS
+        fi
     else
         echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
         exit 1
