@@ -78,15 +78,11 @@ If the `--system-install` command line option is used with
 installed, otherwise installations of other packages using `pip3` will
 not work.
 
-The above packages can be installed on Debian using
-```
-sudo apt-get install git wget sox default-jre-headless vlc-bin flac python3 python3-pip python3-setuptools
-```
-and on Fedora using
-```
-sudo dnf install git wget sox java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools
-```
-(but read the note (1) and (2) above!).
+The above packages (plus two packages, see below under (\*)) can be optionally
+installed by `install-requirements.sh` by adding the command line option
+`--system-install`. Other options are installation on Debian using
+`sudo apt-get install PKGS`, on Fedora `sudo dnf install PKGS`, on openSUSE
+`sudo zypper install PKGS` (but read the note (1) and (2) above!).
 
 Furthermore, a considerable list of Python libraries are required for full
 operation. The script `install-requirements` will install them using `pip3`
