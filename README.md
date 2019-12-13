@@ -115,8 +115,8 @@ try to provide updated lists for other distributions, too.
 | pafy			| python3-pafy	     | python3-pafy		    | -                   | - |
 | mutagen		| python3-mutagen    | python3-mutagen		    | python3-mutagen     | python3-mutagen |
 | colorlog		| python3-colorlog   | python3-colorlog		    | python3-colorlog    | python3-colorlog |
-| pyaudio		| python3-pyaudio    | python3-pyaudio		    | python3-pyaudio     | python3-PyAudio |
-| python-Levenshtein	| python3-levenshtein | python3-levenshtein	    | python3-Levenshtein | python3-Levenshtein |
+| (\*) pyaudio		| python3-pyaudio    | python3-pyaudio		    | python3-pyaudio     | python3-PyAudio |
+| (\*) python-Levenshtein	| python3-levenshtein | python3-levenshtein	    | python3-Levenshtein | python3-Levenshtein |
 | python-vlc		| python3-vlc	     | -			    | python3-vlc         | -
 | requests_futures	| python3-requests-futures | python3-requests-futures | ?                 | python3-requests-futures |
 | service_identity	| python3-service-identity | python3-service-identity | python3-service-identity | - |
@@ -134,6 +134,11 @@ try to provide updated lists for other distributions, too.
 | async_promises	| -		     | - | - | - |
 | geocoder		| -		     | - | - | - |
 | soundcloud-lib	| -		     | - | - | - |
+
+(\*) The packages `pyaudio` and `python-Levenshtein` **should** be installed
+via the system manager due to their dependencies on external libraries,
+in particular `libportaudio`. If `--system-install` is passed to
+`install-requirements.sh`, these two packages will be installed, too.
 
 Indirect requirements when installing some of the above
 

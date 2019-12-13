@@ -68,13 +68,16 @@ done
 
 APTINSTALL="apt-get install --no-install-recommends -y"
 APTPKGS="git wget sox default-jre-headless vlc-bin flac python3 python3-pip python3-setuptools"
+APTPKGSbin="python3-levenshtein python3-pyaudio"
 
 DNFINSTALL="dnf install -y"
 DNFPKGScentos="git wget java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
 DNFPKGS="$DNFPKGScentos sox"
+DNFPKGSbin="python3-Levenshtein python3-pyaudio"
 
 ZYPPERINSTALL="zypper install --no-recommends -y"
 ZYPPERPKGS="git wget sox java-1_8_0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
+ZYPPERPKGSbin="python3-Levenshtein python3-PyAudio"
 
 
 targetSystem="unknown"
@@ -130,6 +133,7 @@ if [ $SYSTEMINSTALL = 1 ] ; then
         exit 1
     elif [ $sysInstaller = apt ] ; then
         $SUDOCMD $APTINSTALL $APTPKGS
+        $SUDOCMD $APTINSTALL $APTPKGSbin
     elif [ $sysInstaller = dnf ] ; then
         if [ $targetSystem = fedora ] ; then
             $SUDOCMD $DNFINSTALL https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
@@ -146,8 +150,10 @@ if [ $SYSTEMINSTALL = 1 ] ; then
         else
             $SUDOCMD $DNFINSTALL $DNFPKGS
         fi
+        $SUDOCMD $DNFINSTALL $DNFPKGSbin
     elif [ $sysInstaller = zypper ] ; then
         $SUDOCMD $ZYPPERINSTALL $ZYPPERPKGS
+        $SUDOCMD $ZYPPERINSTALL $ZYPPERPKGSbin
     else
         echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
         exit 1
