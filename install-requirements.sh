@@ -73,6 +73,10 @@ DNFINSTALL="dnf install -y"
 DNFPKGScentos="git wget java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
 DNFPKGS="$DNFPKGScentos sox"
 
+ZYPPERINSTALL="zypper install --no-recommends -y"
+ZYPPERPKGS="git wget sox java-1_8_0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
+
+
 targetSystem="unknown"
 sysInstaller="unknown"
 if [ -x "$(command -v lsb_release)" ]; then
@@ -84,6 +88,7 @@ if [ -x "$(command -v lsb_release)" ]; then
         LinuxMint) targetSystem=linuxmint ;;
         CentOS)    targetSystem=centos  ;;
         Fedora)    targetSystem=fedora  ;;
+        openSUSE)  targetSystem=opensuse-leap ;;
         *)         targetSystem=unknown ;;
     esac
 else
@@ -104,6 +109,7 @@ sysInstaller=unknown
 case $targetSystem in
     debian|ubuntu|raspi|linuxmint) sysInstaller=apt ;;
     fedora|centos)                 sysInstaller=dnf ;;
+    opensuse-leap)                 sysInstaller=zypper ;;
 esac
 
 
@@ -140,6 +146,8 @@ if [ $SYSTEMINSTALL = 1 ] ; then
         else
             $SUDOCMD $DNFINSTALL $DNFPKGS
         fi
+    elif [ $sysInstaller = zypper ] ; then
+        $SUDOCMD $ZYPPERINSTALL $ZYPPERPKGS
     else
         echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
         exit 1
