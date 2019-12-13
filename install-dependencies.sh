@@ -71,6 +71,7 @@ APTPKGS="git wget sox default-jre-headless vlc-bin flac python3 python3-pip pyth
 
 DNFINSTALL="dnf install -y"
 DNFPKGS="git wget sox java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools"
+# TODO centos 8 does NOT SHIP sox !!!!! Congratulations!!!
 
 targetSystem="unknown"
 sysInstaller="unknown"
