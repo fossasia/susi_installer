@@ -49,7 +49,7 @@ on the system, in particular the following programs need to be available
 programs afterwards). The following table lists the required programs and
 the respective packages in Debian/Buster and Fedora 31:
 
-| Program | Debian/Buster        | Fedora 31 |
+| Program | Debian/Ubuntu/Mint   | Fedora 31 |
 | ------- | -------------------- | --- |
 | git     | git                  | git |
 | wget    | wget                 | wget |
@@ -104,7 +104,7 @@ We provide PIP package names and Debian package names if available, and will
 try to provide updated lists for other distributions, too.
 
 | PIP | Debian/Buster | Ubuntu 18.04/Mint 19.2 |Fedora 31 |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | setuptools            | python3-setuptools | python3-setuptools	| python3-setuptools |
 | pyalsaaudio		| python3-alsaaudio  | -			| python3-alsaaudio |
 | pafy			| python3-pafy	     | python3-pafy		    | - |
