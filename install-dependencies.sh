@@ -124,7 +124,16 @@ if [ $SYSTEMINSTALL = 1 ] ; then
     elif [ $sysInstaller = apt ] ; then
         $SUDOCMD $APTINSTALL $APTPKGS
     elif [ $sysInstaller = dnf ] ; then
-        $SUDOCMD $DNFINSTALL https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+        if [ $targetSystem = fedora ] ; then
+            $SUDOCMD $DNFINSTALL https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+        elif [ $targetSystem = centos ] ; then
+            # not sure if that works on older centos, though?
+            $SUDOCMD $DNFINSTALL --nogpgcheck https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+            $SUDOCMD $DNFINSTALL --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm
+        else
+            echo "Don't know how to activate sources for vlc on $targetSystem!" >&2
+            echo "If vlc is not installed the next command will probably fail." >&2
+        fi
         $SUDOCMD $DNFINSTALL $DNFPKGS
     else
         echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
