@@ -55,12 +55,35 @@ INSTALLERDIR=$(dirname $(realpath "$0"))
 #
 # We classify systems according to distribution and version
 # - targetSystem = raspi | debian | ubuntu | mint | <whatever lsb_release returns>
-vendor=`lsb_release -i -s 2>/dev/null`
-version=`lsb_release -r -s 2>/dev/null`
-targetSystem=""
+version=""
+targetSystem="unknown"
 targetVersion=""
+if [ -x "$(command -v lsb_release)" ]; then
+    vendor=`lsb_release -i -s 2>/dev/null`
+    version=`lsb_release -r -s 2>/dev/null`
+    case "$vendor" in
+        Debian)    targetSystem=debian  ;;
+        Raspbian)  targetSystem=raspi   ;;
+        Ubuntu)    targetSystem=ubuntu  ;;
+        LinuxMint) targetSystem=mint    ;;
+        *)         targetSystem=unknown ;;
+    esac
+else
+    # TODO
+    # how to check ubuntu/mint/fedora/raspi ... ?????
+    # what are the ID names there, maybe leave out lsb_release completely?
+    if [ -r /etc/os-release ] ; then
+        source /etc/os-release
+        if [ -n "$ID" ] ; then
+            targetSystem="$ID"
+        fi
+    elif [ -r /etc/debian_version ] ; then
+        targetSystem="debian"
+    fi
+fi
 
-if [ "$vendor" = Raspbian ]
+
+if [ "$targetSystem" = raspi ]
 then
     USER=pi
 else
@@ -96,7 +119,7 @@ fi
 
 # we save arguments in case we need to re-exec the installer after git clone
 saved_args=""
-if [ ! "$vendor" = Raspbian ]
+if [ ! "$targetSystem" = raspi ]
 then
     while [[ $# -gt 0 ]]
     do
@@ -163,10 +186,9 @@ EOF
     done
 fi
 
-case "$vendor" in
-    Debian)
+case "$targetSystem" in
+    debian)
         # remove Debian .N version number
-        targetSystem=debian
         targetVersion=${version%.*}
         # rewrite testing to 10
         if [ $targetVersion = "testing" ] ; then
@@ -177,31 +199,30 @@ case "$vendor" in
             *) echo "Unrecognized or old Debian version, expect problems: $targetVersion" >&2 ;;
         esac
         ;;
-    Raspbian)
+    raspi)
         # raspbian is Debian, so version numbers are the same - I hope
-        targetSystem=raspi
         targetVersion=${version%.*}
         ;;
-    Ubuntu)
-        targetSystem=ubuntu
+    ubuntu)
         targetVersion=$version
         case "$targetVersion" in
             18.*|19.*|20.*) ;;
             *) echo "Unrecognized or old Ubuntu version, expect problems: $targetVersion" >&2 ;;
         esac
         ;;
-    LinuxMint)
-        targetSystem=mint
+    mint)
         targetVersion=$version
         case "$targetVersion" in
             18.*|18|19.*|19|20.*|20) ;;
             *) echo "Unrecognized or old Linux Mint version, expect problems: $targetVersion" >&2 ;;
         esac
         ;;
+    fedora)
+        : "no details available about Fedora for now"
+        ;;
     *)
-        targetSystem=$vendor
         targetVersion=$version
-        echo "Unrecognized distribution: $vendor" >&2
+        echo "Unrecognized distribution: $targetSystem" >&2
         ;;
 esac
 
