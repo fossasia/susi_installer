@@ -14,8 +14,8 @@ The preferred method is installing SUSI.AI into your home directory, but using
 `sudo` to install the required Python modules. If this is an option for you,
 first do
 ```
-  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-dependencies.sh
-  bash install-dependencies.sh --system-install
+  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-requirements.sh
+  bash install-requirements.sh --system-install
 ```
 followed by
 ```
@@ -34,8 +34,8 @@ This method is much less tested, because the required Python modules will
 be installed into your home directory (`~/.local/lib`). On the other hand,
 no `sudo` permissions are needed, and everything can be done as local user:
 ```
-  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-dependencies.sh
-  bash install-dependencies.sh --sudo-cmd ""
+  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-requirements.sh
+  bash install-requirements.sh --sudo-cmd ""
   wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-susi.sh
   bash install-susi.sh --dev
 ```
@@ -57,23 +57,24 @@ the respective packages in Debian/Buster and Fedora 31:
 | ------- | -------------------- | --- |
 | git     | git                  | git |
 | wget    | wget                 | wget |
-| sox     | sox                  | sox |
+| sox     | sox                  | sox (1) |
 | java    | default-jre-headless | java-1.8.0-openjdk-headless |
-| vlc     | vlc-bin              | vlc (1) |
+| vlc     | vlc-bin              | vlc (2) |
 | flac    | flac                 | flac |
 | python3 | python3              | python3 |
 | pip3    | python3-pip          | python3-pip |
-| - (2)   | python3-setuptools   | python3-setuptools |
+| - (3)   | python3-setuptools   | python3-setuptools |
 
-(1) It is important to note that on Fedora, VLC is not available by
-default and the RPMFusion repository needs to be enabled. The procedure
-is described [here](https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/)
-and basically means:
-```
-  sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-```
+(1) `sox` is not available in CentOS 8, this will probably make some of the
+functionality break.
 
-(2) `python3-setuptools` doesn't provide a binary, but it is required to be
+(2) On Fedora and CentOS, VLC is not available by default and the RPMFusion
+repository needs to be enabled. The procedure is described 
+[here](https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/).
+If the `--system-install` command line option is used with
+`install-requirements.sh`, this will be done automatically.
+
+(3) `python3-setuptools` doesn't provide a binary, but it is required to be
 installed, otherwise installations of other packages using `pip3` will
 not work.
 
@@ -85,17 +86,17 @@ and on Fedora using
 ```
 sudo dnf install git wget sox java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools
 ```
-(but read the note (1) above!).
+(but read the note (1) and (2) above!).
 
 Furthermore, a considerable list of Python libraries are required for full
-operation. The script `install-dependencies` will install them using `pip3`
+operation. The script `install-requirements` will install them using `pip3`
 if they are not already installed. That means, at installation time one
 can decide to either use the distribution (Debian, Fedora,...) provided
 packages or those directly available from the PyPy distribution.
 
 To ensure that additional repositories can be used, `pip3` needs to be
 at least at version 19 to ensure we can specify additional repositories
-in the requirement files. The `install-dependencies` script will update
+in the requirement files. The `install-requirements` script will update
 `pip3` if this requirement is not fulfilled.
 
 ### List of Python packages
@@ -134,7 +135,7 @@ try to provide updated lists for other distributions, too.
 | geocoder		| -				    | - | - |
 | soundcloud-lib	| -				    | - | - |
 
-Indirect dependencies when installing some of the above
+Indirect requirements when installing some of the above
 
 | PIP | Debian/Ubuntu/LinuxMint | Fedora | Requested by |
 | --- | --- | --- | -- |
@@ -161,15 +162,15 @@ SUSI.AI smart speaker:
 
 Installation of some of these packages requires adding an extra repository
 for `pip3` using `--extra-index-url https://repo.fury.io/fossasia/`.
-This is done automatically by the `install-dependencies` script.
+This is done automatically by the `install-requirements` script.
 
 
-### Installation of dependencies
+### Installation of requirements
 
-The provided script `install-dependencies` checks that the above mentioned
+The provided script `install-requirements` checks that the above mentioned
 programs are available, checks the version number of the available `pip3`
 binary, updating it if necessary using `pip3` itself, and then uses `pip3`
-to install the missing dependencies.
+to install the missing requirements.
 
 The script uses `sudo` to obtain `root` rights to install the necessary Python
 libraries.
