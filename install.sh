@@ -947,8 +947,8 @@ if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     for i in $sldd/*.desktop ; do
         if [ -f "$i" ] ; then
             cp $i "$HOME/.local/share/applications"
+            rm $i
         fi
-        rm $i
     done
 else
     sudo mkdir -p "$PREFIX/share/applications"
@@ -959,8 +959,8 @@ else
     for i in $sldd/*.desktop ; do
         if [ -f "$i" ] ; then
             sudo cp $i "$PREFIX/share/applications"
+            rm $i
         fi
-        rm $i
     done
 fi
 
