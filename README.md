@@ -25,8 +25,7 @@ followed by
 (this will change to `install.sh` after testing).
 
 This will install all necessary system packages and Python libraries, and
-SUSI.AI into `~/SUSI.AI`. After that you can start it
-according to the output of the installer at the end.
+SUSI.AI into `~/SUSI.AI`.
 
 ### Another method: user install without `sudo`
 
@@ -44,6 +43,24 @@ no `sudo` permissions are needed, and everything can be done as local user:
 
 All other methods require root permissions and we recommend reading the
 full document before trying them.
+
+
+### Running SUSI.AI after installation
+
+The installation procedure gives indication how to use `systemctl` command to
+start the SUSI.AI server and personal assistant, but if your desktop
+environment supports `.desktop` files, then the following items should be
+available in your desktop environment menu:
+
+- **SUSI Server**
+- **SUSI.AI Personal Assistant** - starts the privacy assistant in the background
+- **SUSI.AI Personal Assistant - Application Window** - an application that
+  allows interaction via an GUI
+- **SUSI.AI Personal Assistant - Configuration** - configuration of various
+  parameters of SUSI.AI
+
+More programs and services will be added over time.
+
 
 ## Prerequisites
 
