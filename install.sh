@@ -842,8 +842,13 @@ fi
 
 echo "Updating Susi Linux Systemd service file"
 cd "$DESTDIR"
-cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
-cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
+if [ -d susi_linux/systemd ] ; then
+    cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
+    cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
+elif [ -d susi_linux/system-integration/systemd ] ; then
+    cp 'susi_linux/system-integration/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
+    cp 'susi_linux/system-integration/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
+fi
 sed -i -e "s!@BINDIR@!$BINDIR!" ss-susi-linux.service
 sed -i -e "s!@BINDIR@!$BINDIR!" 'ss-susi-linux@.service'
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
@@ -907,7 +912,8 @@ rm ss-susi-server.service
 
 sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
 
-echo "Installing Susi Linux Server desktop file"
+echo "Installing Susi Desktop files"
+# susi server
 if [ -d susi_server/desktop ] ; then
     cp 'susi_server/desktop/ss-susi-server.desktop.in' 'ss-susi-server.desktop'
 elif [ -d susi_server/system-integration/desktop ] ; then
@@ -916,12 +922,26 @@ fi
 if [ -r ss-susi-server.desktop ] ; then
     sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.desktop
 fi
+# susi linux
+sldd=""
+if [ -d susi_linux/desktop ] ; then
+    sldd=susi_linux/desktop
+elif [ -d susi_server/system-integration/desktop ] ; then
+    sldd=susi_server/system-integration/desktop
+fi
+for i in $sldd/*.desktop.in ; do
+    deskfile=${i%.in}
+    cp $i $deskfile
+    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!" $deskfile
+done
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     mkdir -p "$HOME/.local/share/applications"
     cp ss-susi-server.desktop "$HOME/.local/share/applications"
+    cp $sldd/*.desktop "$HOME/.local/share/applications"
 else
     sudo mkdir -p "$PREFIX/share/applications"
     sudo cp ss-susi-server.desktop "$PREFIX/share/applications"
+    sudo cp $sldd/*.desktop "$PREFIX/share/applications"
 fi
 
 
