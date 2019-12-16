@@ -932,7 +932,7 @@ fi
 for i in $sldd/*.desktop.in ; do
     deskfile=${i%.in}
     cp $i $deskfile
-    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!" $deskfile
+    sed -i -e "s!@BINDIR@!$BINDIR!" $deskfile
 done
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     mkdir -p "$HOME/.local/share/applications"
