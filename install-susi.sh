@@ -664,7 +664,11 @@ rm ss-susi-linux.service
 
 echo "Installing Susi Linux Server Systemd service file"
 cd "$DESTDIR"
-cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
+if [ -d susi_server/systemd ] ; then
+    cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
+elif [ -d susi_server/system-integration/systemd ] ; then
+    cp 'susi_server/system-integration/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
+fi
 sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.service
 sed -i -e "s!@SUSI_SERVER_USER@!$SUSI_SERVER_USER!" ss-susi-server.service
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
@@ -695,6 +699,25 @@ fi
 rm ss-susi-server.service
 
 sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
+
+echo "Installing Susi Linux Server desktop file"
+if [ -d susi_server/desktop ] ; then
+    cp 'susi_server/desktop/ss-susi-server.desktop.in' 'ss-susi-server.desktop'
+elif [ -d susi_server/system-integration/desktop ] ; then
+    cp 'susi_server/system-integration/desktop/ss-susi-server.desktop.in' 'ss-susi-server.desktop'
+fi
+if [ -r ss-susi-server.desktop ] ; then
+    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.desktop
+fi
+if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
+    mkdir -p "$HOME/.local/share/applications"
+    cp ss-susi-server.desktop "$HOME/.local/share/applications"
+else
+    sudo mkdir -p "$PREFIX/share/applications"
+    sudo cp ss-susi-server.desktop "$PREFIX/share/applications"
+fi
+
+
 
 # enable the client service ONLY on Desktop, NOT on RPi
 # On raspi we do other setups like reset folder etc
