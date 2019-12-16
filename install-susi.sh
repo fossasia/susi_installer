@@ -735,8 +735,8 @@ if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     mkdir -p "$HOME/.local/share/applications"
     if [ -r ss-susi-server.desktop ] ; then
         cp ss-susi-server.desktop "$HOME/.local/share/applications"
+        rm ss-susi-server.desktop
     fi
-    rm ss-susi-server.desktop
     for i in $sldd/*.desktop ; do
         if [ -f "$i" ] ; then
             cp $i "$HOME/.local/share/applications"
@@ -747,8 +747,8 @@ else
     sudo mkdir -p "$PREFIX/share/applications"
     if [ -r ss-susi-server.desktop ] ; then
         sudo cp ss-susi-server.desktop "$PREFIX/share/applications"
+        rm ss-susi-server.desktop
     fi
-    rm ss-susi-server.desktop
     for i in $sldd/*.desktop ; do
         if [ -f "$i" ] ; then
             sudo cp $i "$PREFIX/share/applications"
