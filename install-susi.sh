@@ -706,6 +706,7 @@ rm ss-susi-server.service
 sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
 
 echo "Installing Susi Desktop files"
+cd "$DESTDIR"
 # susi server
 if [ -d susi_server/desktop ] ; then
     cp 'susi_server/desktop/ss-susi-server.desktop.in' 'ss-susi-server.desktop'
@@ -715,26 +716,41 @@ fi
 if [ -r ss-susi-server.desktop ] ; then
     sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.desktop
 fi
+
 # susi linux
 sldd=""
 if [ -d susi_linux/desktop ] ; then
     sldd=susi_linux/desktop
 elif [ -d susi_server/system-integration/desktop ] ; then
-    sldd=susi_server/system-integration/desktop
+    sldd=susi_linux/system-integration/desktop
 fi
 for i in $sldd/*.desktop.in ; do
-    deskfile=${i%.in}
-    cp $i $deskfile
-    sed -i -e "s!@BINDIR@!$BINDIR!" $deskfile
+    if [ -f "$i" ] ; then
+        deskfile=${i%.in}
+        cp $i $deskfile
+        sed -i -e "s!@BINDIR@!$BINDIR!" $deskfile
+    fi
 done
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
     mkdir -p "$HOME/.local/share/applications"
     cp ss-susi-server.desktop "$HOME/.local/share/applications"
-    cp $sldd/*.desktop "$HOME/.local/share/applications"
+    rm ss-susi-server.desktop
+    for i in $sldd/*.desktop ; do
+        if [ -f "$i" ] ; then
+            cp $i "$HOME/.local/share/applications"
+        fi
+        rm $i
+    done
 else
     sudo mkdir -p "$PREFIX/share/applications"
     sudo cp ss-susi-server.desktop "$PREFIX/share/applications"
-    sudo cp $sldd/*.desktop "$PREFIX/share/applications"
+    rm ss-susi-server.desktop
+    for i in $sldd/*.desktop ; do
+        if [ -f "$i" ] ; then
+            sudo cp $i "$PREFIX/share/applications"
+        fi
+        rm $i
+    done
 fi
 
 
