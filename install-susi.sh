@@ -721,7 +721,7 @@ fi
 sldd=""
 if [ -d susi_linux/desktop ] ; then
     sldd=susi_linux/desktop
-elif [ -d susi_server/system-integration/desktop ] ; then
+elif [ -d susi_linux/system-integration/desktop ] ; then
     sldd=susi_linux/system-integration/desktop
 fi
 for i in $sldd/*.desktop.in ; do
