@@ -161,14 +161,17 @@ class VlcPlayer():
         # play additional stream via sayplayer
         media = self.instance.media_new(mrl)
         self.sayplayer.set_media(media)
+        logger.debug("vlcplayer: starting to say something!")
         self.sayplayer.play()
         if self.saved_softvolume > 0:
             self.softvolume(self.saved_softvolume, self.sayplayer)
         else:
             self.softvolume(100, self.sayplayer)
         if wait_restore:
+            logger.debug("vlcplayer: waiting for player to be finished")
             self.wait_till_end(self.sayplayer)
             self.restore_softvolume()
+        logger.debug("vlcplayer: finished saying")
 
     def volume(self, val):
         return mixer.volume(val)
