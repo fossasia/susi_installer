@@ -81,6 +81,8 @@ the respective packages in Debian/Buster and Fedora 31:
 | python3 | python3              | python3     | python3 |
 | pip3    | python3-pip          | python3-pip | python3-pip |
 | - (3)   | python3-setuptools   | python3-setuptools | python3-setuptools |
+| - (4)   | libatlas3-base       | blas        | libopenblas_pthreads0 |
+
 
 (1) `sox` is not available in CentOS 8, this will probably make some of the
 functionality break.
@@ -94,6 +96,8 @@ If the `--system-install` command line option is used with
 (3) `python3-setuptools` doesn't provide a binary, but it is required to be
 installed, otherwise installations of other packages using `pip3` will
 not work.
+
+(4) Some package providing `libcblas` is necessary.
 
 The above packages (plus two packages, see below under (\*)) can be optionally
 installed by `install-requirements.sh` by adding the command line option
