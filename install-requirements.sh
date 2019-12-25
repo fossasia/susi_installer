@@ -132,6 +132,7 @@ if [ $SYSTEMINSTALL = 1 ] ; then
         echo "Unknown installer system, please define one with --sys-installer apt|dnf" >&2
         exit 1
     elif [ $sysInstaller = apt ] ; then
+        $SUDOCMD apt-get update
         $SUDOCMD $APTINSTALL $APTPKGS
         $SUDOCMD $APTINSTALL $APTPKGSbin
     elif [ $sysInstaller = dnf ] ; then
