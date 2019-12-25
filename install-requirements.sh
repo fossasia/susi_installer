@@ -195,7 +195,7 @@ if [ $RASPI = 1 ] ; then
         $SUDOCMD apt-get install --no-install-recommends -y $RASPIPYTHONDEPS
     fi
     if [ $CLEAN = 1 ] ; then
-        apt-get clean
+        $SUDOCMD apt-get clean
     fi
 fi
 
