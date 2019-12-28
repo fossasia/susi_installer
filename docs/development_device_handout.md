@@ -37,6 +37,9 @@ The device needs an internet connection to work. To configure the device to use 
 * After you hear the sound, talk to susi.
 * If you don't like the speaker quality you can plug external speakers into the 3.5mm jack that is on the **Respeaker Pi Hat card** 
 
+### Skill Development
+* Read the Skill Development Tutorial at https://github.com/fossasia/susi.ai/blob/master/docs/Skill_Tutorial.md
+
 ### Problems and Fixes
 The development device may crash and never work again. Here is what may happen:
 * The Raspberry Pi has a huge underpower-problem. Because the processor drains a lot of current and the power must be shared with the speaker amplifier, it may happen that applications crash at any time in the development device. It may even happen during startup. You can recognize this if the red LED goes off.
