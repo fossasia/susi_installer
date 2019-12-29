@@ -20,7 +20,8 @@ An assembly video can be found at https://youtu.be/jAEmRvQLmc0
 * USB (very strong!) power/charger (2.5A recommended) and a USB charging cable
 
 ### Installation
-* check the source of this document and compare if the installation instructions has been enhanced: https://github.com/fossasia/susi_linux/edit/development/docs/development_device_handout.md
+* check the source of this document and compare if the installation instructions has been enhanced: 
+https://github.com/fossasia/susi_installer/blob/development/docs/development_device_handout.md
 * If your SD card has no SUSI.AI operation system on it (or is too old), download the image from https://github.com/fossasia/susi_installer/releases and flash it yourself
 The device needs an internet connection to work. To configure the device to use a wifi connection, it starts a Wifi hotspot with SSID "SUSI.AI" itself.
 * Power on the device
