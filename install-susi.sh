@@ -398,8 +398,7 @@ function install_seeed_voicecard_driver()
     # and is not necessary
     sed -i -e 's/apt-get -y install \(.*\) libasound2-plugins/apt-get -y install \1/g' install.sh
     # This happens *ONLY* on the RPi, so we can do sudo!
-    # Use -e so that errors occuring in the script are caught
-    sudo bash -e ./install.sh
+    sudo bash ./install.sh
     cd ..
     tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
     rm -rf seeed-voicecard
