@@ -1,9 +1,5 @@
-#!/bin/bash
-# SUSI.AI Smart Assistant Installer
-#
-# Copyright 2018-2019 Norbert Preining
-#
-set -euo pipefail
+#!/bin/bash -e
+set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 INSTALLERDIR=$(dirname $(realpath "$0"))
@@ -43,50 +39,29 @@ INSTALLERDIR=$(dirname $(realpath "$0"))
 #   etherpad.db (link target foretherpad-lite/var/dirty.db)
 
 #
+# TODO items
+# - how would partial replacement of single packages with Debian packages work
+# - RedHat and SuSE and Alpine and Mint and ... support ???
+
 #
+# determine Debian/Ubuntu release - we don't support anything else at the moment
 #                   Raspbian       Debian 9      Ubuntu          Debian 10  Mint
 # lsb_release -i    Raspbian       Debian        Ubuntu          Debian     LinuxMint
 # lsb_release -r    9.N            9.N           14.04/16.04     10.N       18.2
 #
 # Ubuntu release: 14.04, 16.04, 18.04, 18.10, 19.04, ...
 # Debian release: 9.N (2017/06 released, stretch, current stable, Raspbian), 10 (2019/0? released, buster), 11 (???)
-# Raspbian release: 9.N, 10.N (like Debian stretch)
+# Raspbian release: 9.N (like Debian stretch)
 # Linux Mint: 18.*, 19.*, 18, 19
 #
 # We classify systems according to distribution and version
-# - targetSystem is the string that is contained in /etc/os-release as ID=....
-#   unfortunately that differs from the lsb_release -i output ...
-version=""
-targetSystem="unknown"
+# - targetSystem = raspi | debian | ubuntu | mint
+vendor=`lsb_release -i -s 2>/dev/null`
+version=`lsb_release -r -s 2>/dev/null`
+targetSystem=""
 targetVersion=""
-if [ -x "$(command -v lsb_release)" ]; then
-    vendor=`lsb_release -i -s 2>/dev/null`
-    version=`lsb_release -r -s 2>/dev/null`
-    case "$vendor" in
-        Debian)    targetSystem=debian  ;;
-        Raspbian)  targetSystem=raspi   ;;
-        Ubuntu)    targetSystem=ubuntu  ;;
-        LinuxMint) targetSystem=linuxmint ;;
-        CentOS)    targetSystem=centos  ;;
-        Fedora)    targetSystem=fedora  ;;
-        *)         targetSystem=unknown ;;
-    esac
-else
-    # TODO
-    # how to check ubuntu/mint/fedora/raspi ... ?????
-    # what are the ID names there, maybe leave out lsb_release completely?
-    if [ -r /etc/os-release ] ; then
-        source /etc/os-release
-        if [ -n "$ID" ] ; then
-            targetSystem="$ID"
-        fi
-    elif [ -r /etc/debian_version ] ; then
-        targetSystem="debian"
-    fi
-fi
 
-
-if [ "$targetSystem" = raspi ]
+if [ "$vendor" = Raspbian ]
 then
     USER=pi
 else
@@ -101,7 +76,8 @@ PREFIX=""
 CLEAN=0
 SUSI_SERVER_USER=
 CORAL=0
-SUDOCMD=sudo
+# should dependencies installed via apt-get or pip
+NODEPS=0
 # default installation branch
 # we use the same branch across repositories
 # so if we build from susi_installer:master, we use the master branch of
@@ -122,7 +98,7 @@ fi
 
 # we save arguments in case we need to re-exec the installer after git clone
 saved_args=""
-if [ ! "$targetSystem" = raspi ]
+if [ ! "$vendor" = Raspbian ]
 then
     while [[ $# -gt 0 ]]
     do
@@ -149,14 +125,24 @@ then
                 saved_args="$saved_args --clean"
                 shift
                 ;;
-            --sudo-cmd)
-                SUDOCMD="$2"
-                saved_args="$saved_args --sudo-cmd \"$2\""
-                shift ; shift
+            --use-sudo)
+                SUDOCMD="sudo"
+                saved_args="$saved_args --use-sudo"
+                shift
                 ;;
             --susi-server-user)
                 SUSI_SERVER_USER="$2"
                 saved_args="$saved_args --susi-server-user \"$2\""
+                shift ; shift
+                ;;
+            --force-vendor)
+                vendor="$2"
+                saved_args="$saved_args --force-vendor \"$2\""
+                shift ; shift
+                ;;
+            --force-version)
+                version="$2"
+                saved_args="$saved_args --force-version \"$2\""
                 shift ; shift
                 ;;
             --with-coral)
@@ -164,9 +150,9 @@ then
                 saved_args="$saved_args --with-coral"
                 shift
                 ;;
-            --dev)
-                INSTALLBRANCH=development
-                saved_args="$saved_args --dev"
+            --no-dependency-installation)
+                NODEPS=1
+                saved_args="$saved_args --no-dependency-installation"
                 shift
                 ;;
             --help)
@@ -178,11 +164,21 @@ Possible options:
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
                    defaults to $HOME/SUSI.AI
-  --sudo-cmd <ARG> command to run programs that need root privileges
+  --use-sudo       use sudo for installation of packages without asking
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
-  --dev            use development branch
-  --with-coral     install support libraries for the Coral device (Raspberry)
+  --force-vendor
+  --force-version  the installer uses `lsb_release` to determine the vendor and version
+                   and has a limited set of allowed combinations that are supported.
+                   These two options allow to override the detection using lsb_release.
+                   Typical usage case are Debian/Ubuntu-based distributions that have
+                   a different vendor name/version. Use with care. Currently supported
+                   combinations:
+                   - Debian: 9, 10, 11
+                   - Ubuntu and LinuxMint: 18*, 19*, 20*
+  --no-dependency-installation
+                   Do not attempt to install dependencies via apt-get or pip.
+                   You are responsible to install all required packages.
 
 EOF
                 exit 0
@@ -195,43 +191,44 @@ EOF
     done
 fi
 
-case "$targetSystem" in
-    debian)
+case "$vendor" in
+    Debian)
         # remove Debian .N version number
+        targetSystem=debian
         targetVersion=${version%.*}
         # rewrite testing to 10
         if [ $targetVersion = "testing" ] ; then
-            targetVersion=11
+            targetVersion=10
         fi
         case "$targetVersion" in
             9|10|11|unstable) ;;
-            *) echo "Unrecognized or old Debian version, expect problems: $targetVersion" >&2 ;;
+            *) echo "Unsupported Debian version: $targetVersion" >&2 ; exit 1 ;;
         esac
         ;;
-    raspi)
+    Raspbian)
         # raspbian is Debian, so version numbers are the same - I hope
+        targetSystem=raspi
         targetVersion=${version%.*}
         ;;
-    ubuntu)
+    Ubuntu)
+        targetSystem=ubuntu
         targetVersion=$version
         case "$targetVersion" in
             18.*|19.*|20.*) ;;
-            *) echo "Unrecognized or old Ubuntu version, expect problems: $targetVersion" >&2 ;;
+            *) echo "Unsupported Ubuntu version: $targetVersion" >&2 ; exit 1 ;;
         esac
         ;;
-    linuxmint)
+    LinuxMint)
+        targetSystem=mint
         targetVersion=$version
         case "$targetVersion" in
             18.*|18|19.*|19|20.*|20) ;;
-            *) echo "Unrecognized or old Linux Mint version, expect problems: $targetVersion" >&2 ;;
+            *) echo "Unsupported Linux Mint version: $targetVersion" >&2 ; exit 1 ;;
         esac
         ;;
-    fedora|centos)
-        : "no details available about Fedora for now"
-        ;;
     *)
-        targetVersion=$version
-        echo "Unrecognized distribution: $targetSystem" >&2
+        echo "Unsupported distribution: $vendor" >&2
+        exit 1
         ;;
 esac
 
@@ -256,6 +253,55 @@ else
     fi
 fi
 
+
+
+# Dependencies of the packages or building
+# we try to move as many pip packages to Debian packages
+DEBDEPS="
+  git openssl wget python3-pip sox libsox-fmt-all flac libasound2-plugins
+  libportaudio2 libatlas3-base libpulse0 libasound2 vlc-bin vlc-plugin-base
+  vlc-plugin-video-splitter python3-cairo python3-flask flite
+  default-jdk-headless pixz udisks2 python3-requests python3-requests-futures python3-service-identity
+  python3-pyaudio python3-levenshtein python3-pafy python3-colorlog python3-psutil
+  python3-setuptools python3-watson-developer-cloud ca-certificates
+  python3-aiohttp python3-bs4 python3-mutagen
+"
+
+# If snowboy cannot be installed via pip we need to build it
+SNOWBOYBUILDDEPS="
+  perl libterm-readline-gnu-perl \
+  i2c-tools python3-dev \
+  swig libpulse-dev libasound2-dev \
+  libatlas-base-dev
+"
+
+# CORAL dependencies
+CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil"
+
+# python3-alsaaudio is not available on older distributions
+# only install it on:
+# - Debian buster and upwards
+# - Ubuntu 19.04 and upwards
+# - Linux Mint by now doesn't have python3-alsaaudio
+if [[ ( $targetSystem = debian && ! $targetVersion = 9 ) \
+      || \
+      ( $targetSystem = ubuntu && ! $targetVersion = 18.04 && ! $targetVersion = 18.10 && ! $targetVersion = 19.01 ) \
+      || \
+      ( $targetSystem = raspi  && ! $targetVersion = 9 ) \
+   ]]  ; then
+  DEBDEPS="$DEBDEPS python3-alsaaudio"
+fi
+
+# we need hostapd and dnsmask for access point mode
+# usbmount is needed to automount usb drives on susibian(raspbian lite)
+if [ $targetSystem = raspi ] ; then
+  DEBDEPS="$DEBDEPS hostapd dnsmasq usbmount"
+fi
+
+# add necessary dependencies for Coral device
+if [ $CORAL = 1 ] ; then
+    DEBDEPS="$DEBDEPS $CORALDEPS"
+fi
 
 # support external triggers in Travis builds,
 TRIGGER_BRANCH=${TRIGGER_BRANCH:-""}
@@ -323,7 +369,7 @@ if [ ! -d "raspi" ] ; then
     git clone https://github.com/fossasia/susi_installer.git
     cd susi_installer
     git checkout $SUSI_INSTALLER_BRANCH
-    exec ./install-susi.sh $saved_args
+    exec ./install.sh $saved_args
 fi
 
 
@@ -343,12 +389,161 @@ if [ "$INSTALLERDIR" != "$DESTDIR/susi_installer" ] ; then
 fi
 
 
-# only called for raspi, so debian style
+# Set up default sudo mode
+# on Raspi and in system mode, use sudo
+# Otherwise leave empty so that user is asked whether to use it
+if [ $targetSystem = raspi -o $INSTALLMODE = system ] ; then
+    # on the RPi we always can run sudo
+    # in system mode we expect root or sudo-able user to do it
+    SUDOCMD=sudo
+else
+    SUDOCMD=${SUDOCMD:-""}
+fi
+
+#
+# dpkg-architecture is in dpkg-dev, which might not be installed
+HOSTARCH=`dpkg --print-architecture`
+if [ $HOSTARCH = amd64 ] ; then
+    HOSTARCHTRIPLE=x86_64-linux-gnu
+elif [ $HOSTARCH = armhf ] ; then
+    HOSTARCHTRIPLE=arm-linux-gnueabihf
+elif [ $HOSTARCH = "i386" ] ; then
+    HOSTARCHTRIPLE=i386-linux-gnu
+else
+    echo "Unknown host architecture: $HOSTARCH" >&2
+    exit 1
+fi
+
+ask_for_sudo()
+{
+    # we only ask once for sudo command!
+    if [ -z "$SUDOCMD" ] ; then
+        if [[ $EUID -eq 0 ]]; then
+            # root can always run sudo so we use it
+            SUDOCMD="sudo"
+            return
+        fi
+        echo -n "Do you want to use 'sudo' for this and following tasks? (Y/n): "
+        REPLY=y
+        read REPLY
+        case $REPLY in
+            n*|N*) SUDOCMD="echo Command to be run by root/via sudo: " ;;
+            *) SUDOCMD="sudo" ; echo "Ok, running sudo!";;
+        esac
+    fi
+}
+
+check_debian_installation_status()
+{
+    # we need to be careful since multiarch means that if multiple arch versions
+    # for one package are installed, a query without the ARchitecture returns all
+    # of them
+    stat=$(dpkg-query -W -f='${Status} ${Architecture}\n' $1 2>/dev/null || true)
+    case "$stat" in
+        *"install ok installed $HOSTARCH"*)
+            return 0
+            ;;
+        *"install ok installed all"*)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+check_python_installation_status()
+{
+    printf %b "try:\n import $1\n exit(0)\nexcept ImportError:\n exit(1)"  | python3
+}
+
+install_debian_dependencies()
+{
+    # collect missing dependencies
+    missing_packages=""
+    for i in "$@" ; do
+        if check_debian_installation_status $i ; then
+            : all fine
+        else
+            missing_packages="$missing_packages $i"
+        fi
+    done
+    if [ -z "$missing_packages" ] ; then
+        # all packages are already installed, return happily
+        return 0
+    fi
+
+    echo "The following packages are missing on your system:"
+    echo "  $missing_packages"
+    echo "Should we install them?"
+    ask_for_sudo
+
+    $SUDOCMD apt-get update
+    $SUDOCMD -E apt-get install --no-install-recommends -y $missing_packages
+    if [ $CLEAN = 1 ] ; then
+        $SUDOCMD apt-get clean
+    fi
+}
+
+install_pip_dependencies()
+{
+    reqfiles=$(ls susi_*/requirements.txt)
+    reqpifiles=$(ls susi_*/requirements-rpi.txt)
+    reqoptionalfiles=$(ls susi_*/requirements-optional.txt)
+
+    echo "Installing Python Dependencies"
+    if [ ! $targetSystem = raspi ] ; then
+        PIPDEPS="`cat $reqfiles | grep -v '^\(\s*#\|\s*$\|--\)' | sed -e 's/=.*//' -e 's/>.*$//' -e 's/\s.*$//'`"
+
+        # For now ignore the versioned deps
+        missing_pips=""
+        echo "Checking for available Python modules: "
+        for i in $PIPDEPS ; do
+            echo "checking for $i ..."
+            # we are running under -e, so a not present packages would exit the script
+            ret=`pip3 show $i || true`
+            if [ -z "$ret" ] ; then
+                missing_pips="$missing_pips $i"
+            else
+                :
+                # check version
+                # TODO ignore for now!
+            fi
+        done
+        if [ -n "$missing_pips" ] ; then
+            echo "The following Python packages are missing on your system:"
+            echo "  $missing_pips"
+            echo "Should we install them (using pip3)?"
+            ask_for_sudo
+        fi
+    fi
+
+    PIP=pip3
+    if [ $CLEAN = 1 ] ; then
+        PIP="pip3 --no-cache-dir"
+    fi
+
+    # we need to update pip, since pip 18 or so is too old and cannot work with --extra-index-url
+    # properly
+    $SUDOCMD $PIP install -U pip
+    # wheel should not be necessary since we are not compiling anything?
+    # $SUDOCMD $PIP install -U wheel
+    for i in $reqfiles ; do
+        $SUDOCMD $PIP install -r $i
+    done
+    for i in $reqoptionalfiles ; do
+        $SUDOCMD $PIP install -r $i || true
+    done
+    if [ $targetSystem = raspi ] ; then
+        for i in $reqpifiles ; do
+            $SUDOCMD $PIP install -r $i
+        done
+    fi
+}
+
 function install_coral()
 {
     cd "$DESTDIR"
-    CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil"
-    $SUDOCMD apt-get install --no-install-recommends -y $CORALDEPS
     wget https://dl.google.com/coral/edgetpu_api/edgetpu_api_latest.tar.gz -O edgetpu_api.tar.gz --trust-server-names
     tar -xzf edgetpu_api.tar.gz
     cd edgetpu_api/
@@ -359,13 +554,10 @@ function install_coral()
 }
 
 
-# only called for raspi, so debian style
 function install_snowboy()
 {
     cd "$DESTDIR"
-    SNOWBOYBUILDDEPS="perl libterm-readline-gnu-perl i2c-tools python3-dev swig libpulse-dev
-        libasound2-dev libatlas-base-dev"
-    $SUDOCMD apt-get install --no-install-recommends -y $SNOWBOYBUILDDEPS
+    install_debian_dependencies $SNOWBOYBUILDDEPS
     if [ ! -r v1.3.0.tar.gz ] ; then
         wget https://github.com/Kitt-AI/snowboy/archive/v1.3.0.tar.gz
     else
@@ -375,6 +567,7 @@ function install_snowboy()
     cd snowboy-1.3.0
     sed -i -e "s/version='1\.2\.0b1'/version='1.3.0'/" setup.py
     python3 setup.py build
+    ask_for_sudo
     $SUDOCMD python3 setup.py install
     cd ..
     if [ $CLEAN = 1 ] ; then
@@ -382,7 +575,6 @@ function install_snowboy()
     fi
 }
 
-# only called for raspi, so debian style
 function install_seeed_voicecard_driver()
 {
     if arecord -l | grep -q voicecard
@@ -398,7 +590,12 @@ function install_seeed_voicecard_driver()
     # and is not necessary
     sed -i -e 's/apt-get -y install \(.*\) libasound2-plugins/apt-get -y install \1/g' install.sh
     # This happens *ONLY* on the RPi, so we can do sudo!
-    sudo bash ./install.sh
+    sudo ./install.sh
+    # TODO Fix for crashes in pasound module that tear down susi-linux
+    # src/hostapi/alsa/pa_linux_alsa.c:3641: PaAlsaStreamComponent_BeginPolling: Assertion `ret == self->nfds' failed
+    # https://github.com/alexa/avs-device-sdk/issues/532
+    # suggests that it has something to do with dsnoop
+    # But that doesn't help a lot, just thinking about solutions.
     cd ..
     tar -czf ~/seeed-voicecard.tar.gz seeed-voicecard
     rm -rf seeed-voicecard
@@ -523,30 +720,34 @@ else
     echo "WARNING: susi.ai directory already present, not cloning it!" >&2
 fi
 
+if [ $NODEPS = 0 ]
+then
+    echo "Installing required dependencies"
+    install_debian_dependencies $DEBDEPS
+    install_pip_dependencies
+    # in case that snowboy installation failed, build it from source
+    # also, make sure that we don't exit in case of not present snowboy
+    ret=`pip3 show snowboy || true`
+    if [ -z "$ret" ] ; then
+        install_snowboy
+    fi
+else
+    echo "Not installing dependencies, be sure to have everything available!"
+fi
+
 # function to update the latest vlc drivers which will allow it to play MRL of latest videos
 # Only do this on old systems (stretch etc)
 if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
       || \
       ( $targetSystem = ubuntu && $targetVersion = 18.04 ) \
       || \
-      ( $targetSystem = linuxmint ) \
+      ( $targetSystem = mint ) \
       || \
       ( $targetSystem = raspi && $targetVersion = 9 ) \
    ]]  ; then
-    HOSTARCH=`dpkg --print-architecture`
-    if [ $HOSTARCH = amd64 ] ; then
-        HOSTARCHTRIPLE=x86_64-linux-gnu
-    elif [ $HOSTARCH = armhf ] ; then
-        HOSTARCHTRIPLE=arm-linux-gnueabihf
-    elif [ $HOSTARCH = "i386" ] ; then
-        HOSTARCHTRIPLE=i386-linux-gnu
-    else
-        echo "Unknown host architecture: $HOSTARCH" >&2
-        echo "Cannot update vlc player youtube plugin" >&2
-        return
-    fi
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
+    ask_for_sudo
     if [ -d /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/ ] ; then
         $SUDOCMD mv youtube.lua /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac
     else
@@ -555,18 +756,17 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
     rm -f youtube.lua
 fi
 
+#
+# Add coral if selected
+#
+if [ $CORAL = 1 ] ; then
+    install_coral
+fi
 
 #
 # install seeed card driver only on RPi
 if [ $targetSystem = raspi ]
 then
-    #
-    # Add coral if selected
-    #
-    if [ $CORAL = 1 ] ; then
-        install_coral
-    fi
-    # install seeed voicecard driver
     install_seeed_voicecard_driver
 fi
 
@@ -694,7 +894,14 @@ else
     # $SUDOCMD cp ss-susi-server.service $systemduser
     #
     # add a new user for susi-server
-    $SUDOCMD useradd -r -d /nonexistent $SUSI_SERVER_USER
+    $SUDOCMD adduser --system \
+            --quiet \
+            --home /nonexistent \
+            --no-create-home \
+            --disabled-password \
+            --group \
+            --force-badname \
+            $SUSI_SERVER_USER
     $SUDOCMD mkdir -p /var/lib/susi-server/data
     $SUDOCMD chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
     $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
