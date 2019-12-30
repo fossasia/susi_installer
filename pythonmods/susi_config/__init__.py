@@ -183,7 +183,7 @@ class SusiConfig():
         elif k == 'hotword':
             if not (v is None):
                 if v == 'y' or v == 'n' or v == 'Snowboy' or v == 'PocketSphinx':
-                    request_hotword_choice( v == 'y' or v == 'Snowboy' )
+                    self.request_hotword_choice( v == 'y' or v == 'Snowboy' )
                 else:
                     raise ValueError(k, v)
             return self.config[self.keys_conf[k]]

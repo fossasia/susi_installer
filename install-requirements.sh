@@ -247,7 +247,7 @@ if [ $TRUSTPIP = 0 ] ; then
         exit 1
     fi
     if [ "$pipversion" -lt 19 ] ; then
-        echo "pip3 version \`$pipversion\' is less than the required version number 19" >&2
+        echo "pip3 version \`$pipversion' is less than the required version number 19" >&2
         echo "Will update pip3 using itself."
         UPDATEPIP=1
     fi
