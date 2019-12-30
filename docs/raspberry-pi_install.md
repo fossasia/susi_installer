@@ -43,7 +43,8 @@ network={
     ```
 - Run the install script by running
     ```
-    $ ./install.sh
+    $ sudo ./install-requirements.sh --system-install --raspi
+    $ sudo ./install.sh --clean
     ```
 - Enjoy :smile:
 

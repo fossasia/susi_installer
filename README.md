@@ -20,7 +20,7 @@ first do
 followed by
 ```
   wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install.sh
-  bash install.sh --dev
+  bash install.sh
 ```
 (this will change to `install.sh` after testing).
 
@@ -36,7 +36,7 @@ no `sudo` permissions are needed, and everything can be done as local user:
   wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-requirements.sh
   bash install-requirements.sh --sudo-cmd ""
   wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install.sh
-  bash install.sh --dev
+  bash install.sh
 ```
 
 ### The rest

@@ -2,7 +2,7 @@
 This is a short tutorial to get started with the parts of the SUSI.AI development kit.
 You should have the following parts:
 
-* A Raspberry Pi 3 Model B+
+* A Raspberry Pi 3 Model B+ (or above)
 * A ReSpeaker 2-Mics Pi HAT
 * A speaker (like Audiocore AC870) with attached JST PH 2.0 2-Pin cable
 * A 3D-printed SUSI.AI Faceplate - or DIY print from https://www.thingiverse.com/thing:3124755
@@ -28,7 +28,7 @@ The device needs an internet connection to work. To configure the device to use 
 * Connect your computer or mobile phone to the SUSI.AI hotspot using the password "password".
 * Open http://10.0.0.1:7070/setup which will show you the set-up page as visible below:
 ![SUSI.AI Wifi Setup](images/SUSI.AI-Wifi-Setup.png "SUSI.AI Wifi Setup")
-* Put in your Wifi credentials. For an open network set an empty password. If The device should connect automatically to any open network, leave SSID and password empty.
+* Put in your Wifi credentials. For an open network set an empty password. The device should connect automatically to any open network, leave SSID and password empty.
 * Click on "Reboot Smart Speaker" 
 * Wait for re-boot of the speaker, SUSI will say "SUSI has started" as soon it is ready.
 * If you want to return to the installation process (i.e. to configure another network), you can reset the device by pushing and holding the button for at least 7 seconds (a beep sounds is played).
