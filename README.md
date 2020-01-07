@@ -88,7 +88,7 @@ the respective packages in Debian/Buster and Fedora 31:
 functionality break.
 
 (2) On Fedora and CentOS, VLC is not available by default and the RPMFusion
-repository needs to be enabled. The procedure is described 
+repository needs to be enabled. The procedure is described
 [here](https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/).
 If the `--system-install` command line option is used with
 `install-requirements.sh`, this will be done automatically.
@@ -176,7 +176,7 @@ Indirect requirements when installing some of the above
 Packages that are only required for installation on the Raspbian based
 SUSI.AI smart speaker:
 
-| PIP      | Debian/Buster | Fedora | 
+| PIP      | Debian/Buster | Fedora |
 | -------- | --- | --- |
 | spidev   | -   | python3-spidev |
 | RPi.GPIO | -   | - |
@@ -202,8 +202,8 @@ libraries.
 
 The installaction script `install.sh` carries out the actual installation
 on the target system. It checks that the above set of programs is availabe,
-clones the necessary git repositories from github, and installs Systemd 
-unit files to allow starting/enabling the respective programs. On the 
+clones the necessary git repositories from github, and installs Systemd
+unit files to allow starting/enabling the respective programs. On the
 Raspberry based SUSI.AI Smart Speaker, several further tasks are carried
 out to set up audio playback, sound device setup etc.
 
@@ -221,9 +221,9 @@ mode:
   `/usr/local` (again, the location can be configured), and systemd unit
   files are installed in the system-wide systemd configuration directories.
   Utility programs for SUSI.AI are installed into `/usr/local/bin`.
-  
+
   In `system mode` a new dedicated user for the SUSI.AI server process
-  is necessary, and will be created. By default it will be named 
+  is necessary, and will be created. By default it will be named
   `_susiserver`.
 
 
@@ -248,6 +248,3 @@ command line options:
 
 During installation of the SUSI.AI Smart Speaker, further tasks are
 performed, and the behaviour cannot be changed using command line options.
-
-
-
