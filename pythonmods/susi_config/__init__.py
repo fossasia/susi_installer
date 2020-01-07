@@ -36,6 +36,7 @@ class SusiConfig():
     # detection_bell_sound <value>
     # problem_sound <value>
     # recognition_error_sound <value>
+    # hotword_model <value>
     
     keys_conf = {
             'stt': 'default_stt',
@@ -56,7 +57,8 @@ class SusiConfig():
             'detection_bell_sound': 'detection_bell_sound',
             'problem_sound': 'problem_sound',
             'recognition_error_sound': 'recognition_error_sound',
-            'device': 'Device'
+            'device': 'Device',
+            'hotword.model': 'hotword_model'
         }
     
 
@@ -211,7 +213,10 @@ class SusiConfig():
             if not (v is None):
                 self.config[self.keys_conf[k]] = v
             return self.config[self.keys_conf[k]]
-    
+        elif k == 'hotword.model':
+            if not (v is None):
+                self.config[self.keys_conf[k]] = v
+            return self.config[self.keys_conf[k]]
         else:
             raise ValueError(k, v)
     
