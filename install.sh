@@ -323,7 +323,7 @@ if [ ! -d "raspi" ] ; then
     git clone https://github.com/fossasia/susi_installer.git
     cd susi_installer
     git checkout $SUSI_INSTALLER_BRANCH
-    exec ./install-susi.sh $saved_args
+    exec ./install.sh $saved_args
 fi
 
 
