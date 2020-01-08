@@ -36,6 +36,7 @@ class SusiConfig():
     # detection_bell_sound <value>
     # problem_sound <value>
     # recognition_error_sound <value>
+    # timeout_error_sound <value>
     # hotword_model <value>
     
     keys_conf = {
@@ -57,6 +58,7 @@ class SusiConfig():
             'detection_bell_sound': 'detection_bell_sound',
             'problem_sound': 'problem_sound',
             'recognition_error_sound': 'recognition_error_sound',
+            'timeout_error_sound': 'timeout_error_sound',
             'device': 'Device',
             'hotword.model': 'hotword_model'
         }
@@ -70,6 +72,7 @@ class SusiConfig():
         self.config.setdefault('detection_bell_sound', 'extras/detection-bell.wav')
         self.config.setdefault('problem_sound', 'extras/problem.wav')
         self.config.setdefault('recognition_error_sound', 'extras/recognition-error.wav')
+        self.config.setdefault('timeout_error_sound', 'extras/error-tada.wav')
 
     def setup_wake_button(self, enable = False):
         try:
@@ -206,6 +209,10 @@ class SusiConfig():
                 self.config[self.keys_conf[k]] = v
             return self.config[self.keys_conf[k]]
         elif k == 'recognition_error_sound':
+            if not (v is None):
+                self.config[self.keys_conf[k]] = v
+            return self.config[self.keys_conf[k]]
+        elif k == 'timeout_error_sound':
             if not (v is None):
                 self.config[self.keys_conf[k]] = v
             return self.config[self.keys_conf[k]]
