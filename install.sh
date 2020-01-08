@@ -805,8 +805,8 @@ fi
 
 echo "Updating Susi Linux Systemd service file"
 cd "$DESTDIR"
-cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
-cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
+cp 'susi_linux/system-integration/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
+cp 'susi_linux/system-integration/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
 sed -i -e "s!@BINDIR@!$BINDIR!" ss-susi-linux.service
 sed -i -e "s!@BINDIR@!$BINDIR!" 'ss-susi-linux@.service'
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
@@ -827,7 +827,7 @@ rm ss-susi-linux.service
 
 echo "Installing Susi Linux Server Systemd service file"
 cd "$DESTDIR"
-cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
+cp 'susi_server/system-integration/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
 sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.service
 sed -i -e "s!@SUSI_SERVER_USER@!$SUSI_SERVER_USER!" ss-susi-server.service
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
