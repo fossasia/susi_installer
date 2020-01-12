@@ -109,13 +109,16 @@ SUDOCMD=sudo
 # the development branch of the others.
 # For other branches than master and development, we use the "development" branch
 INSTALLBRANCH=master
+SERVERINSTALLBRANCH=stable-dist
 if [ -d "$INSTALLERDIR/.git" ] ; then
     pushd "$INSTALLERDIR"
     CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
     if [ "$CURRENTBRANCH" = "master" ] ; then
         INSTALLBRANCH=master
+        SERVERINSTALLBRANCH=stable-dist
     else
         INSTALLBRANCH=development
+        SERVERINSTALLBRANCH=dev-dist
     fi
     popd
 fi
@@ -271,6 +274,7 @@ if [[ ( -n $TRIGGER_SOURCE ) && ( -n $TRIGGER_BRANCH ) ]] ; then
 fi
 export SUSI_LINUX_BRANCH=${SUSI_LINUX_BRANCH:-$INSTALLBRANCH}
 export SUSI_PYTHON_BRANCH=${SUSI_PYTHON_BRANCH:-$INSTALLBRANCH}
+export SUSI_SERVER_BRANCH=${SUSI_SERVER_BRANCH:-$SERVERINSTALLBRANCH}
 # if we are travis testing, then the correct branch is already
 # checked out, so no need to do anything (see below).
 # But if we git clone, we use this variable
@@ -496,7 +500,7 @@ fi
 echo "Downloading: Susi server"
 if [ ! -d susi_server ]
 then
-    git clone -b stable-dist --single-branch https://github.com/fossasia/susi_server.git
+    git clone -b $SUSI_SERVER_BRANCH --single-branch https://github.com/fossasia/susi_server.git
     # creating a local anonymous user with credentials:
     # Username: anonymous@susi.ai and password: password
     mkdir -p ./susi_server/data/settings/
