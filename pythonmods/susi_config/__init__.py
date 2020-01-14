@@ -245,17 +245,27 @@ class SusiConfig():
     
  
     def main(self, args):
-        if len(args) == 1:
-            print("""
-    Usage:
-      susi-config get [ key key ... ]
-      susi-config set key=value [ key=value ... ]
-      susi-config login
-    """)
+        if len(args) == 1 or args[1] == "-h" or args[1] == "--help":
+            print("""susi-config -- SUSI.AI configuration utility
+Usage:
+  susi-config keys
+         Lists all possible keys
+  susi-config get [ key key ... ]
+         Retrieves a set of keys, all if no argument is given
+  susi-config set key=value [ key=value ... ]
+         Sets a set of keys to values
+  susi-config login
+         Tries to log into the SUSI.AI Server
+""")
             sys.exit(1)
     
         try:
-            if args[1] == 'set':
+            if args[1] == 'keys':
+                print("Possible keys:")
+                for i in self.keys_conf.keys():
+                    print(f"  {i}")
+
+            elif args[1] == 'set':
                 for kv in args[2:]:
                     k,v = kv.split('=', 2)
                     if k in self.keys_conf:

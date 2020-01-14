@@ -243,6 +243,12 @@ command line options:
   of the dedicated user for the SUSI.AI server user. Will be created if
   not existing already.
 
+### Configuration file ###
+
+During installation a configuration file is generated in `$XDG_CONFIG_HOME/SUSI.AI/config.json`,
+which normally is `~/.config/SUSI.AI/config.json`. This file is read from various
+parts of the SUSI.AI system. Changes to this file are preferrably made
+by calling `susi-config` which is installed into `SUSI.AI/bin`.
 
 ## SUSI.AI Smart Speaker
 
