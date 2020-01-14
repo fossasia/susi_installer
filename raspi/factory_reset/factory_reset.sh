@@ -30,7 +30,6 @@ mv /home/pi/SUSI.AI.OLD/susi_installer/raspi/factory_reset/reset_folder.tar.xz /
 # rescue config file 
 # TODO we can provide options for full reset and partial reset
 if [ $mode = soft ] ; then
-  cp -a /home/pi/SUSI.AI.OLD/config.json /home/pi/SUSI.AI/
   cp -a /home/pi/SUSI.AI.OLD/etherpad.db /home/pi/SUSI.AI/
   cp -a /home/pi/SUSI.AI.OLD/susi_server_data /home/pi/SUSI.AI/
 fi

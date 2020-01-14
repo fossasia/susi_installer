@@ -8,9 +8,6 @@ import os
 from . import SusiConfig
 
 if __name__ == '__main__':
-    cfg = SusiConfig(
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '../../..')))
+    cfg = SusiConfig()
     cfg.main(sys.argv)
 

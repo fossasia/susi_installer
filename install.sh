@@ -30,6 +30,7 @@ INSTALLERDIR=$(dirname $(realpath "$0"))
 #   which defaults to _susiserver and can be configured via --susi-server-user
 #
 # Layout withing DESTDIR
+#   pythonmods (containing links to susi_installer/pythonmods/* and susi_python)
 #   susi_installer
 #   susi_linux
 #   susi_python
@@ -38,7 +39,6 @@ INSTALLERDIR=$(dirname $(realpath "$0"))
 #   seeed_voicecard
 #   etherpad-lite (for raspi)
 # Contents of WORKDIR
-#   config.json
 #   susidata (link target for susi_server/data)
 #   etherpad.db (link target foretherpad-lite/var/dirty.db)
 
@@ -292,6 +292,7 @@ if [ $INSTALLMODE = system ] ; then
     fi
     DESTDIR="$PREFIX/lib/SUSI.AI"
     BINDIR="$PREFIX/bin"
+    PYTHONMODDIR="$DESTDIR/pythonmods"
     # note that we do NOT expand $HOME here, since it must be replaced as is
     # in the common-script-start.in of susi_linux!
     WORKDIR='$HOME/.SUSI.AI'
@@ -309,6 +310,7 @@ else
     fi
     BINDIR="$DESTDIR/bin"
     WORKDIR="$DESTDIR"
+    PYTHONMODDIR="$DESTDIR/pythonmods"
 fi
 
 
@@ -416,39 +418,6 @@ function install_seeed_voicecard_driver()
 
 ####  Main  ####
 cd "$DESTDIR"
-mkdir -p $BINDIR
-cp susi_installer/scripts/susi-config.in $BINDIR/susi-config
-sed -i -e "s!@SUSI_WORKING_DIR@!$WORKDIR!g"  $BINDIR/susi-config
-chmod +x $BINDIR/susi-config
-# generate initial config.json
-CFG="$WORKDIR/config.json"
-DEVICENAME="Desktop Computer"
-if [ $targetSystem = raspi ] ; then
-    DEVICENAME="RaspberryPi"
-fi
-if [ ! -r "$CFG" ] ; then
-  cat >"$CFG" <<EOF
-{
-  "Device": "$DEVICENAME",
-  "WakeButton": "enabled",
-  "default_stt": "google",
-  "default_tts": "google",
-  "data_base_dir": "$DESTDIR/susi_linux",
-  "detection_bell_sound": "extras/detection-bell.wav",
-  "problem_sound": "extras/problem.wav",
-  "recognition_error_sound": "extras/recognition-error.wav",
-  "timeout_error_sound": "extras/error-tada.wav",
-  "flite_speech_file_path": "extras/cmu_us_slt.flitevox",
-  "hotword_engine": "Snowboy",
-  "usage_mode": "anonymous",
-  "room_name": "office",
-  "watson_tts_config": {
-      "username": "", "password": ""
-  }
-}
-EOF
-fi
-
 
 echo "Downloading: Susi Linux"
 if [ ! -d "susi_linux" ]
@@ -456,25 +425,20 @@ then
     git clone https://github.com/fossasia/susi_linux.git
     cd susi_linux
     git checkout $SUSI_LINUX_BRANCH
-    # link the vlcplayer and hwmixer
-    ln -s ../susi_installer/pythonmods/hwmixer .
-    ln -s ../susi_installer/pythonmods/vlcplayer .
     cd ..
 else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
 fi
 echo "Setting up wrapper scripts for susi_linux"
 cd susi_linux/wrapper
+mkdir -p $BINDIR
 for i in *.in ; do
     wr=`basename $i .in`
     cp $i $BINDIR/$wr
-    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!g" $BINDIR/$wr
+    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!g" -e "s!@PYTHONMODS@!$PYTHONMODDIR!g" $BINDIR/$wr
     chmod ugo+x $BINDIR/$wr
 done
-cd ..
-cp common-script-start.in common-script-start
-sed -i -e "s!@SUSI_WORKING_DIR@!$WORKDIR!g" -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!g" common-script-start
-cd ..
+cd ../..
 
 
 echo "Downloading: Susi Python API Wrapper"
@@ -484,7 +448,6 @@ then
     cd susi_python
     git checkout $SUSI_PYTHON_BRANCH
     cd ..
-    ln -s ../susi_python/susi_python susi_linux/
 else
     echo "WARNING: susi_python directory already present, not cloning it!" >&2
 fi
@@ -527,6 +490,46 @@ then
 else
     echo "WARNING: susi.ai directory already present, not cloning it!" >&2
 fi
+
+
+echo "Setting up Python modules"
+mkdir -p "$PYTHONMODDIR"
+for i in hwmixer susi_config vlcplayer ; do
+    ln -s ../susi_installer/pythonmods/$i "$PYTHONMODDIR/$i"
+done
+ln -s ../susi_python/susi_python "$PYTHONMODDIR/susi_python"
+ln -s ../susi_linux/susi_linux "$PYTHONMODDIR/susi_linux"
+
+
+echo "Initializing SUSI config"
+mkdir -p $BINDIR
+cp susi_installer/scripts/susi-config.in $BINDIR/susi-config
+sed -i -e "s!@PYTHONMODS@!$PYTHONMODDIR!g"  $BINDIR/susi-config
+chmod +x $BINDIR/susi-config
+DEVICENAME="Desktop Computer"
+if [ $targetSystem = raspi ] ; then
+    DEVICENAME="RaspberryPi"
+fi
+# generate initial configuration file for susi-config
+$BINDIR/susi-config set \
+    data_base_dir="$DESTDIR/susi_linux" \
+    device="$DEVICENAME" \
+    wakebutton=enable \
+    tts=google \
+    stt=google \
+    detection_bell_sound=extras/detection-bell.wav \
+    problem_sound=extras/problem.wav \
+    recognition_error_sound=extras/recognition-error.wav \
+    timeout_error_sound=extras/error-tada.wav \
+    flite_speech_file_path=extras/cmu_us_slt.flitevox \
+    hotword=Snowboy \
+    susi.mode=anonymous \
+    roomname=office \
+    watson.tts.user="" \
+    watson.tts.pass=""
+
+
+
 
 # function to update the latest vlc drivers which will allow it to play MRL of latest videos
 # Only do this on old systems (stretch etc)
@@ -814,7 +817,7 @@ if [ $targetSystem = raspi ] ; then
 
     cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"
-    tar -I 'pixz -p 2' -cf ../reset_folder.tar.xz --checkpoint=.1000 --exclude susi_server_data --exclude etherpad.db --exclude config.json .
+    tar -I 'pixz -p 2' -cf ../reset_folder.tar.xz --checkpoint=.1000 --exclude susi_server_data --exclude etherpad.db .
     echo ""  # To add newline after tar's last checkpoint
     mv ../reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 

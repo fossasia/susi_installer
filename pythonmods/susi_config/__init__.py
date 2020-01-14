@@ -38,6 +38,7 @@ class SusiConfig():
     # recognition_error_sound <value>
     # timeout_error_sound <value>
     # hotword_model <value>
+    # language <value>
     
     keys_conf = {
             'stt': 'default_stt',
@@ -60,14 +61,25 @@ class SusiConfig():
             'recognition_error_sound': 'recognition_error_sound',
             'timeout_error_sound': 'timeout_error_sound',
             'device': 'Device',
-            'hotword.model': 'hotword_model'
+            'hotword.model': 'hotword_model',
+            'language': 'language'
         }
     
 
-    def __init__(self, working_dir):
-        # TODO check for existing file?
-        self.config = json_config.connect(working_dir + '/config.json')
-        self.config.setdefault('data_base_dir', working_dir + '/susi_linux')
+    def __init__(self, conffile = None, data_dir = "."):
+        if 'XDG_CONFIG_HOME' in os.environ:
+            confdir = os.path.join(os.environ['XDG_CONFIG_HOME'], "SUSI.AI")
+        else:
+            confdir = os.path.join(os.environ['HOME'], ".config", "SUSI.AI")
+        if conffile:
+            self.conffile = conffile
+        else:
+            self.conffile = os.path.join(confdir, "config.json")
+        if not os.path.exists(confdir):
+            os.makedirs(confdir)
+        self.config = json_config.connect(self.conffile)
+        self.config.setdefault('language', 'en_US')
+        self.config.setdefault('data_base_dir', data_dir)
         self.config.setdefault('flite_speech_file_path', 'extras/cmu_us_slt.flitevox')
         self.config.setdefault('detection_bell_sound', 'extras/detection-bell.wav')
         self.config.setdefault('problem_sound', 'extras/problem.wav')
@@ -174,7 +186,7 @@ class SusiConfig():
         elif k == 'wakebutton':
             if not (v is None):
                 if v == 'y' or v == 'n' or v == 'enable' or v == 'disable':
-                    setup_wake_button( v == 'y' or v == 'enable')
+                    self.setup_wake_button( v == 'y' or v == 'enable')
                 else:
                     raise ValueError(k, v)
             return self.config[self.keys_conf[k]]
@@ -221,6 +233,10 @@ class SusiConfig():
                 self.config[self.keys_conf[k]] = v
             return self.config[self.keys_conf[k]]
         elif k == 'hotword.model':
+            if not (v is None):
+                self.config[self.keys_conf[k]] = v
+            return self.config[self.keys_conf[k]]
+        elif k == 'language':
             if not (v is None):
                 self.config[self.keys_conf[k]] = v
             return self.config[self.keys_conf[k]]

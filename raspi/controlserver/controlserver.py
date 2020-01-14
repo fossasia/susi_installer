@@ -23,7 +23,7 @@ mountPath = '/media'
 
 wifi_search_folder = os.path.join(dir_path, '../access_point')
 susiconfig = '/home/pi/SUSI.AI/bin/susi-config'
-cfg = susi_config.SusiConfig(dir_path + "/../../..")
+cfg = susi_config.SusiConfig()
 
 def get_token():
     url = 'http://api.susi.ai/aaa/login.json'

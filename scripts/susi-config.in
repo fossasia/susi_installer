@@ -3,6 +3,6 @@
 # susi-config
 # Konfiguration of SUSI.AI, via the config.json
 
-export PYTHONPATH=@SUSI_WORKING_DIR@/susi_installer/pythonmods:@SUSI_WORKING_DIR@/susi_python:
+export PYTHONPATH=@PYTHONMODS@:$PYTHONPATH
 python3 -m susi_config "$@"
 
