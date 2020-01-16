@@ -9,6 +9,7 @@ import json_config
 import requests
 from pathlib import Path
 from importlib import util
+import subprocess
 
 
 class SusiConfig():
@@ -16,6 +17,11 @@ class SusiConfig():
     # susi-config set key=value ...
     # susi-config get key ...
     # susi-config login
+    # TODO
+    # susi-config init [-f]
+    # susi-config install links DIR
+    # susi-config install desktop user|system
+    # susi-config install systemd user|system
     #
     # key value(s)
     # stt google|watson|bing|pocketsphinx
@@ -85,6 +91,16 @@ class SusiConfig():
         self.config.setdefault('problem_sound', 'extras/problem.wav')
         self.config.setdefault('recognition_error_sound', 'extras/recognition-error.wav')
         self.config.setdefault('timeout_error_sound', 'extras/error-tada.wav')
+
+    def __run_pkgconfig(self, default, *args):
+        try:
+            runresult = subprocess.run(args, capture_output=True)
+            ret = runresult.stdout.decode('utf-8').rstrip()
+            if ret == '':
+                ret = default
+        except FileNotFoundError:
+            ret = default
+        return ret
 
     def setup_wake_button(self, enable = False):
         try:
@@ -244,10 +260,11 @@ class SusiConfig():
             raise ValueError(k, v)
     
  
-    def main(self, args):
-        if len(args) == 1 or args[1] == "-h" or args[1] == "--help":
-            print("""susi-config -- SUSI.AI configuration utility
+    def usage(self, exitcode):
+        print("""susi-config -- SUSI.AI configuration utility
 Usage:
+  susi-config init [-f]
+         Create minimal configuration file, overwrite previous one with -f
   susi-config keys
          Lists all possible keys
   susi-config get [ key key ... ]
@@ -256,8 +273,19 @@ Usage:
          Sets a set of keys to values
   susi-config login
          Tries to log into the SUSI.AI Server
+  susi-config install links DIR
+         Install links to user programs into DIR
+  susi-config install desktop user|system
+         Install desktop files into user or system directories
+  susi-config install systemd user|system
+         Install systemd service files into user or system directories
 """)
-            sys.exit(1)
+        sys.exit(exitcode)
+    
+
+    def main(self, args):
+        if len(args) == 1 or args[1] == "-h" or args[1] == "--help":
+            self.usage(0)
     
         try:
             if args[1] == 'keys':
@@ -290,15 +318,66 @@ Usage:
                     print(i)
     
             elif args[1] == 'login':
+                if len(args) > 2:
+                    raise ValueError
                 import susi_python as susi
                 susi.sign_in(self.config['login_credentials']['email'],
                              self.config['login_credentials']['password'],
                              room_name=self.config['room_name'])
     
+            elif args[1] == 'init':
+                if len(args) == 2:
+                    force = False
+                elif len(args) == 3:
+                    if args[2] == '-f':
+                        force = True
+                    else:
+                        raise ValueError
+                else:
+                    raise ValueError
+
+                print(f"TODO create initial config file with force = {force}")
+
+
+            # susi-config install links DIR
+            # susi-config install desktop user|system
+            # susi-config install systemd user|system
+            elif args[1] == 'install':
+                if len(args) != 4:
+                    raise ValueError
+
+                if args[2] == 'links':
+                    if os.path.exists(args[3]):
+                        # TODO link all kind of scripts to args[3]
+                        print(f"TODO installing links into {args[3]}")
+                    else:
+                        raise ValueError
+                elif args[2] == 'desktop':
+                    if args[3] == 'user':
+                        destdir = str(Path.home()) + '/.config/share/applications'
+                    elif args[3] == 'system':
+                        destdir = '/usr/local/share/applications'
+                    else:
+                        raise ValueError
+                    print(f"TODO installing desktop files into {destdir}")
+                elif args[2] == 'systemd':
+                    # TODO should we install some services into systemduserunitdir = /usr/lib/systemd/user?
+                    if args[3] == 'user':
+                        destdir = str(Path.home()) + "/.config/systemd/user"
+                    elif args[3] == 'system':
+                        destdir = self.__run_pkgconfig("/lib/systemd/system",
+                                'pkg-config', 'systemd', '--variable=systemdsystemunitdir')
+                    else:
+                        raise ValueError
+                    print(f"TODO installing systemd files into {destdir}")
+                else:
+                    raise ValueError
+
             else:
                 raise ValueError
     
         except ValueError as ex:
-            print('Invalid input', ex, args)
+            print("Invalid input")
+            self.usage(1)
     
 
