@@ -9,6 +9,14 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 INSTALLERDIR=$(dirname $(realpath "$0"))
 
 #
+# TODO
+# - use susi-config init; susi-config install desktop user|system; etc
+#   instead of doing everything by hand
+# - relocatable
+#   make all of SUSI.AI folder relocatable for easy distribution
+
+
+#
 # Target layout as with the developer-setup.md layout
 #
 # Two modes of installation: "user" and "system"

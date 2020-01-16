@@ -20,9 +20,8 @@ first do
 followed by
 ```
   wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install.sh
-  bash install.sh
+  bash install.sh --dev
 ```
-(this will change to `install.sh` after testing).
 
 This will install all necessary system packages and Python libraries, and
 SUSI.AI into `~/SUSI.AI`.
