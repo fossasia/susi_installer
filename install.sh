@@ -430,14 +430,12 @@ else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
 fi
 echo "Setting up scripts for susi_linux"
-cd susi_linux/scripts
 mkdir -p $BINDIR
-for i in *.in ; do
+for i in susi_linux/scripts/* ; do
     cp $i $BINDIR/
     # shouldn't be necessary, but for safety
-    chmod ugo+x $BINDIR/$i
+    chmod ugo+x "$BINDIR/$(basename $i)"
 done
-cd ../..
 
 
 echo "Downloading: Susi Python API Wrapper"
