@@ -1,8 +1,0 @@
-#!/bin/bash
-#
-# susi-config
-# Konfiguration of SUSI.AI, via the config.json
-
-export PYTHONPATH=@PYTHONMODS@:$PYTHONPATH
-python3 -m susi_config "$@"
-

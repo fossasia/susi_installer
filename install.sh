@@ -502,8 +502,7 @@ ln -s ../susi_linux/susi_linux "$PYTHONMODDIR/susi_linux"
 
 echo "Initializing SUSI config"
 mkdir -p $BINDIR
-cp susi_installer/scripts/susi-config.in $BINDIR/susi-config
-sed -i -e "s!@PYTHONMODS@!$PYTHONMODDIR!g"  $BINDIR/susi-config
+cp susi_installer/scripts/susi-config $BINDIR/susi-config
 chmod +x $BINDIR/susi-config
 DEVICENAME="Desktop Computer"
 if [ $targetSystem = raspi ] ; then
