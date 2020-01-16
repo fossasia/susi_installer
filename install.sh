@@ -429,14 +429,13 @@ then
 else
     echo "WARNING: susi_linux directory already present, not cloning it!" >&2
 fi
-echo "Setting up wrapper scripts for susi_linux"
-cd susi_linux/wrapper
+echo "Setting up scripts for susi_linux"
+cd susi_linux/scripts
 mkdir -p $BINDIR
 for i in *.in ; do
-    wr=`basename $i .in`
-    cp $i $BINDIR/$wr
-    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_linux!g" -e "s!@PYTHONMODS@!$PYTHONMODDIR!g" $BINDIR/$wr
-    chmod ugo+x $BINDIR/$wr
+    cp $i $BINDIR/
+    # shouldn't be necessary, but for safety
+    chmod ugo+x $BINDIR/$i
 done
 cd ../..
 
