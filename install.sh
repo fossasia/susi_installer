@@ -477,6 +477,15 @@ EOL
 else
     echo "WARNING: susi_server directory already present, not cloning it!" >&2
 fi
+if [ -d susi_server/system-integration/scripts ] ; then
+    echo "Setting up scripts for susi_server"
+    mkdir -p $BINDIR
+    for i in susi_server/system-integration/scripts/* ; do
+        cp $i $BINDIR/
+        # shouldn't be necessary, but for safety
+        chmod ugo+x "$BINDIR/$(basename $i)"
+    done
+fi
 
 echo "Downloading: Susi.AI webclient"
 if [ ! -d "susi.ai" ]
