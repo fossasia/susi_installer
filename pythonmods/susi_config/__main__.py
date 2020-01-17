@@ -27,11 +27,12 @@ Usage:
          Tries to log into the SUSI.AI Server
   susi-config install links DIR
          Install links to user programs into DIR
-  susi-config install desktop user|system
+  susi-config install desktop user|system|raspi
          Install desktop files into user or system directories
+         (or for the SUSI Smart Speaker when `raspi' is given)
   susi-config install systemd user|system|raspi
          Install systemd service files into user or system directories
-         (or for the SUSI Smart Speaker when `raspi' is given
+         (or for the SUSI Smart Speaker when `raspi' is given)
 
 Notes:
   - if path.base key is a literal . ("."), susi-config get path.base
@@ -130,7 +131,7 @@ def main(args):
                     os.symlink(os.path.join(susiai_bin, f), os.path.join(args[3], f))  
 
             elif args[2] == 'desktop':
-                if args[3] == 'user':
+                if args[3] == 'user' or args[3] == 'raspi':
                     destdir = str(Path.home()) + '/.local/share/applications'
                 elif args[3] == 'system':
                     destdir = '/usr/local/share/applications'

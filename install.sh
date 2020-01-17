@@ -615,29 +615,6 @@ then
     wget "http://www.festvox.org/flite/packed/flite-2.0/voices/cmu_us_slt.flitevox" -P susi_linux/extras
 fi
 
-#
-# Use pkg-config to get correct systemd install path
-#   system units: pkg-config systemd --variable=systemdsystemunitdir
-#                 on Debian: /lib/systemd/system
-#   user units:   pkg-config systemd --variable=systemduserunitdir
-#                 on Debian: /usr/lib/systemd/user
-# but install path into $HOME are fixed I guess
-systemdsystem=""
-systemduser=""
-if [ -x "$(command -v pkg-config)" ]
-then
-    systemdsystem=$(pkg-config systemd --variable=systemdsystemunitdir 2>/dev/null)
-    systemduser=$(pkg-config systemd --variable=systemduserunitdir 2>/dev/null)
-fi
-if [ -z "$systemdsystem" ] ; then
-    systemdsystem=/lib/systemd/system
-fi
-if [ -z "$systemduser" ] ; then
-    systemduser=/usr/lib/systemd/user
-fi
-systemdhomeuser=$HOME/.config/systemd/user
-
-
 if [ $targetSystem = raspi ]
 then
     echo "Preparing USB automount"
@@ -651,8 +628,8 @@ then
 
     echo "Installing RPi specific Systemd Rules"
     # TODO !!! we need to make the vlcplayer available to controlserver, as of now it does not find it
-    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service $systemdsystem
-    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.timer $systemdsystem
+    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.service /lib/systemd/system
+    sudo cp $INSTALLERDIR/raspi/systemd/ss-*.timer /lib/systemd/system
     sudo systemctl enable ss-update-daemon.service
     sudo systemctl enable ss-update-daemon.timer
     sudo systemctl enable ss-factory-daemon.service
@@ -660,53 +637,12 @@ then
 fi
 
 echo "Updating Susi Linux Systemd service file"
-cd "$DESTDIR"
-if [ -d susi_linux/systemd ] ; then
-    cp 'susi_linux/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
-    cp 'susi_linux/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
-elif [ -d susi_linux/system-integration/systemd ] ; then
-    cp 'susi_linux/system-integration/systemd/ss-susi-linux@.service.in' 'ss-susi-linux@.service'
-    cp 'susi_linux/system-integration/systemd/ss-susi-linux.service.in' 'ss-susi-linux.service'
-fi
-sed -i -e "s!@BINDIR@!$BINDIR!" ss-susi-linux.service
-sed -i -e "s!@BINDIR@!$BINDIR!" 'ss-susi-linux@.service'
-if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
-    # on RasPi, we install the system units into the system directories
-    if [ $targetSystem = raspi ] ; then
-        sudo cp 'ss-susi-linux@.service' $systemdsystem
-    else
-        # Desktop in user mode
-        mkdir -p $systemdhomeuser
-        cp ss-susi-linux.service $systemdhomeuser
-    fi
-else
-    $SUDOCMD cp 'ss-susi-linux@.service' $systemdsystem
-    $SUDOCMD cp ss-susi-linux.service $systemduser
-fi
-rm 'ss-susi-linux@.service'
-rm ss-susi-linux.service
-
-echo "Installing Susi Linux Server Systemd service file"
-cd "$DESTDIR"
-if [ -d susi_server/systemd ] ; then
-    cp 'susi_server/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
-elif [ -d susi_server/system-integration/systemd ] ; then
-    cp 'susi_server/system-integration/systemd/ss-susi-server.service.in' 'ss-susi-server.service'
-fi
-sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.service
-sed -i -e "s!@SUSI_SERVER_USER@!$SUSI_SERVER_USER!" ss-susi-server.service
-if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
-    # on RasPi, we install the system units into the system directories
-    if [ $targetSystem = raspi ] ; then
-        sudo cp 'ss-susi-server.service' $systemdsystem
-        sudo systemctl daemon-reload || true
-    else
-        # Desktop in user mode
-        mkdir -p $systemdhomeuser
-        # we need to filter out the User= line from user units!
-        grep -v '^User=' ss-susi-server.service > $systemdhomeuser/ss-susi-server.service
-        systemctl --user daemon-reload || true
-    fi
+if [ $targetSystem = raspi ] ; then
+    $BINDIR/susi-config install systemd raspi
+    sudo systemctl daemon-reload || true
+elif [ $INSTALLMODE = user ] ; then
+    $BINDIR/susi-config install systemd $INSTALLMODE
+    systemctl --user daemon-reload || true
 else
     # susi-server does not support multi-user functionality by now
     # since data/log dirs are shared
@@ -717,63 +653,20 @@ else
     $SUDOCMD mkdir -p /var/lib/susi-server/data
     $SUDOCMD chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
     $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
-    $SUDOCMD cp ss-susi-server.service $systemdsystem
+    $SUDOCMD $BINDIR/susi-config install systemd $INSTALLMODE
     $SUDOCMD systemctl daemon-reload || true
 fi
-rm ss-susi-server.service
 
 sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
 
-echo "Installing Susi Desktop files"
-cd "$DESTDIR"
-# susi server
-if [ -d susi_server/desktop ] ; then
-    cp 'susi_server/desktop/ss-susi-server.desktop.in' 'ss-susi-server.desktop'
-elif [ -d susi_server/system-integration/desktop ] ; then
-    cp 'susi_server/system-integration/desktop/ss-susi-server.desktop.in' 'ss-susi-server.desktop'
-fi
-if [ -r ss-susi-server.desktop ] ; then
-    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" -e "s!@SUSIDIR@!$DESTDIR!" ss-susi-server.desktop
-fi
 
-# susi linux
-sldd=""
-if [ -d susi_linux/desktop ] ; then
-    sldd=susi_linux/desktop
-elif [ -d susi_linux/system-integration/desktop ] ; then
-    sldd=susi_linux/system-integration/desktop
-fi
-for i in $sldd/*.desktop.in ; do
-    if [ -f "$i" ] ; then
-        deskfile=${i%.in}
-        cp $i $deskfile
-        sed -i -e "s!@BINDIR@!$BINDIR!" -e "s!@SUSIDIR@!$DESTDIR!" $deskfile
-    fi
-done
-if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
-    mkdir -p "$HOME/.local/share/applications"
-    if [ -r ss-susi-server.desktop ] ; then
-        cp ss-susi-server.desktop "$HOME/.local/share/applications"
-        rm ss-susi-server.desktop
-    fi
-    for i in $sldd/*.desktop ; do
-        if [ -f "$i" ] ; then
-            cp $i "$HOME/.local/share/applications"
-            rm $i
-        fi
-    done
+echo "Installing Susi Desktop files"
+if [ $targetSystem = raspi ] ; then
+    $BINDIR/susi-config install desktop raspi
+elif [ $INSTALLMODE = user ] ; then
+    $BINDIR/susi-config install desktop $INSTALLMODE
 else
-    sudo mkdir -p "$PREFIX/share/applications"
-    if [ -r ss-susi-server.desktop ] ; then
-        sudo cp ss-susi-server.desktop "$PREFIX/share/applications"
-        rm ss-susi-server.desktop
-    fi
-    for i in $sldd/*.desktop ; do
-        if [ -f "$i" ] ; then
-            sudo cp $i "$PREFIX/share/applications"
-            rm $i
-        fi
-    done
+    $SUDOCMD $BINDIR/susi-config install desktop $INSTALLMODE
 fi
 
 
