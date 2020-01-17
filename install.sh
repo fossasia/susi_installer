@@ -523,16 +523,16 @@ if [ $targetSystem = raspi ] ; then
 fi
 # generate initial configuration file for susi-config
 $BINDIR/susi-config set \
-    path.base="$DESTDIR/susi_linux" \
+    path.base="." \
     device="$DEVICENAME" \
     wakebutton=enable \
     tts=google \
     stt=google \
-    path.sound.detection=extras/detection-bell.wav \
-    path.sound.problem=extras/problem.wav \
-    path.sound.error.recognition=extras/recognition-error.wav \
-    path.sound.error.timeout=extras/error-tada.wav \
-    path.flite_speech=extras/cmu_us_slt.flitevox \
+    path.sound.detection=susi_linux/extras/detection-bell.wav \
+    path.sound.problem=susi_linux/extras/problem.wav \
+    path.sound.error.recognition=susi_linux/extras/recognition-error.wav \
+    path.sound.error.timeout=susi_linux/extras/error-tada.wav \
+    path.flite_speech=susi_linux/extras/cmu_us_slt.flitevox \
     hotword.engine=Snowboy \
     susi.mode=anonymous \
     roomname=office \

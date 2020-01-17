@@ -26,6 +26,10 @@ Usage:
          Install desktop files into user or system directories
   susi-config install systemd user|system
          Install systemd service files into user or system directories
+
+Notes:
+  - if path.base key is a literal . ("."), susi-config get path.base
+    will try to return the absolute and resolved path of SUSI.AI directory
 """)
     sys.exit(exitcode)
 

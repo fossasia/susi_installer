@@ -48,15 +48,17 @@ class SusiConfig():
                                               'options': [ 'Snowboy', 'PocketSphinx' ] },
             'hotword.model':                { 'default': '' },
             'path.base':                    { 'default': '.' },
-            'path.flite_speech':            { 'default': 'extras/cmu_us_slt.flitevox' },
-            'path.sound.detection':         { 'default': 'extras/detection-bell.wav' },
-            'path.sound.problem':           { 'default': 'extras/problem.wav' },
-            'path.sound.error.recognition': { 'default': 'extras/recognition-error.wav' },
-            'path.sound.error.timeout':     { 'default': 'extras/error-tada.wav' }
+            'path.flite_speech':            { 'default': 'susi_linux/extras/cmu_us_slt.flitevox' },
+            'path.sound.detection':         { 'default': 'susi_linux/extras/detection-bell.wav' },
+            'path.sound.problem':           { 'default': 'susi_linux/extras/problem.wav' },
+            'path.sound.error.recognition': { 'default': 'susi_linux/extras/recognition-error.wav' },
+            'path.sound.error.timeout':     { 'default': 'susi_linux/extras/error-tada.wav' }
         }
         self.config = json_config.connect(self.conffile)
         for k,v in self.defaults.items():
             self.config.setdefault(k,v['default'])
+
+        self.susiai_path = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../.."))
 
     def __run_pkgconfig(self, default, *args):
         try:
@@ -137,6 +139,16 @@ class SusiConfig():
                 else:
                     raise ValueError(f"unsupported value for {k}", v)
             return self.config[k]
+
+        elif k == 'path.base':
+            if not (v is None):
+                self.config[k] = v
+            # make the return value resolve "." to the location of SUSI.AI directory
+            if self.config[k] == '.':
+                return self.susiai_path
+            else:
+                return self.config[k]
+
 
         else:
             # default case, check if options are defined, otherwise
