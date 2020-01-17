@@ -7,6 +7,31 @@ import sys
 import os
 from . import SusiConfig
 
+default_keys = {
+    'default_stt':                'google',
+    'default_tts':                'google',
+    'watson_stt_config.username': '',
+    'watson_stt_config.password': '',
+    'watson_tts_config.username': '',
+    'watson_tts_config.password': '',
+    'login_credentials.email':    '',
+    'login_credentials.password': '',
+    'usage_mode':                 'anonymous',
+    'room_name':                  'Office',
+    'bing_speech_api_key':        '',
+    'WakeButton':                 'enable',
+    'hotword_engine':             'Snowboy',
+    'data_base_dir':              '.',
+    'flite_speech_file_path':     'extras/cmu_us_slt.flitevox',
+    'detection_bell_sound':       'extras/detection-bell.wav',
+    'problem_sound':              'extras/problem.wav',
+    'recognition_error_sound':    'extras/recognition-error.wav',
+    'timeout_error_sound':        'extras/error-tada.wav',
+    'Device':                     'Desktop',
+    'hotword_model':              '',
+    'language':                   'en-US'
+}
+
 def usage(exitcode):
     print("""susi-config -- SUSI.AI configuration utility
 Usage:
@@ -87,7 +112,12 @@ def main(args):
             else:
                 raise ValueError
 
-            print(f"TODO create initial config file with force = {force}")
+            cfg = SusiConfig()
+            for k,v in default_keys.items():
+                if force:
+                    cfg.config[k] = v
+                else:
+                    cfg.config.setdefault(k,v)
 
 
         # susi-config install links DIR
