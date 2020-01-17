@@ -5,8 +5,12 @@
 
 import sys
 import os
+import re
+import logging
 from pathlib import Path
 from . import SusiConfig
+
+logger = logging.getLogger(__name__)
 
 def usage(exitcode):
     print("""susi-config -- SUSI.AI configuration utility
@@ -34,6 +38,14 @@ Notes:
 """)
     sys.exit(exitcode)
 
+
+def sed(in_file, out_file, needle, replacement):
+    logger.debug(f"sed-ing {in_file} to {out_file}")
+    with open(in_file, "r") as source:
+        lines = source.readlines()
+    with open(out_file, "w") as dest:
+        for line in lines:
+            dest.write(re.sub(needle, replacement, line))
 
 def main(args):
     if len(args) == 1 or args[1] == "-h" or args[1] == "--help":
@@ -118,7 +130,7 @@ def main(args):
 
             elif args[2] == 'desktop':
                 if args[3] == 'user':
-                    destdir = str(Path.home()) + '/.config/share/applications'
+                    destdir = str(Path.home()) + '/.local/share/applications'
                 elif args[3] == 'system':
                     destdir = '/usr/local/share/applications'
                 else:
@@ -135,17 +147,17 @@ def main(args):
                 if not os.path.exists(destdir):
                     os.makedirs(destdir)
                 desktop_files = []
-                for f in os.listdir(os.path.join(susi_server_dir, "system-integration/desktop")):
+                server_desktop_dir = os.path.join(susi_server_dir, "system-integration/desktop")
+                linux_desktop_dir = os.path.join(susi_linux_dir, "system-integration/desktop")
+                for f in os.listdir(server_desktop_dir):
                     if f.endswith("desktop.in"):
-                        desktop_files.append(f)
-                for f in os.listdir(os.path.join(susi_linux_dir, "system-integration/desktop")):
+                        desktop_files.append((f[:-3], os.path.join(server_desktop_dir, f)))
+                for f in os.listdir(linux_desktop_dir):
                     if f.endswith("desktop.in"):
-                        desktop_files.append(f)
-                for f in desktop_files:
-                    pass
+                        desktop_files.append((f[:-3], os.path.join(linux_desktop_dir, f)))
+                for f,p in desktop_files:
+                    sed(p, os.path.join(destdir, f), '@SUSIDIR@', susiai_dir)
 
-
-                print(f"TODO installing desktop files into {destdir}")
             elif args[2] == 'systemd':
                 # TODO should we install some services into systemduserunitdir = /usr/lib/systemd/user?
                 if args[3] == 'user':

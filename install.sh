@@ -733,7 +733,7 @@ elif [ -d susi_server/system-integration/desktop ] ; then
     cp 'susi_server/system-integration/desktop/ss-susi-server.desktop.in' 'ss-susi-server.desktop'
 fi
 if [ -r ss-susi-server.desktop ] ; then
-    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" ss-susi-server.desktop
+    sed -i -e "s!@INSTALL_DIR@!$DESTDIR/susi_server!" -e "s!@SUSIDIR@!$DESTDIR!" ss-susi-server.desktop
 fi
 
 # susi linux
@@ -747,7 +747,7 @@ for i in $sldd/*.desktop.in ; do
     if [ -f "$i" ] ; then
         deskfile=${i%.in}
         cp $i $deskfile
-        sed -i -e "s!@BINDIR@!$BINDIR!" $deskfile
+        sed -i -e "s!@BINDIR@!$BINDIR!" -e "s!@SUSIDIR@!$DESTDIR!" $deskfile
     fi
 done
 if [ $targetSystem = raspi -o $INSTALLMODE = user ] ; then
