@@ -172,6 +172,7 @@ def main(args):
                     sed(p, os.path.join(destdir, f), '@SUSIDIR@', susiai_dir)
 
             elif args[2] == 'systemd':
+                susiai_dir = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../.."))
                 systemd_system_dir = __run_pkgconfig("/lib/systemd/system",
                     'pkg-config', 'systemd', '--variable=systemdsystemunitdir')
                 systemd_user_dir = __run_pkgconfig("/usr/lib/systemd/user",
