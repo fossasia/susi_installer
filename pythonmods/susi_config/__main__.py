@@ -107,11 +107,14 @@ def main(args):
                 raise ValueError("incorrect invocation of install action", args[2:])
 
             if args[2] == 'links':
-                if os.path.exists(args[3]):
-                    # TODO link all kind of scripts to args[3]
-                    print(f"TODO installing links into {args[3]}")
-                else:
-                    raise ValueError
+                if not os.path.exists(args[3]):
+                    raise ValueError("target directory not existing", args[3])
+                susiai_bin = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../bin"))
+                if not os.path.isdir(susiai_bin):
+                    raise ValueError("cannot find SUSI.AI/bin directory", susiai_bin)
+                for f in os.listdir(susiai_bin):
+                    os.symlink(os.path.join(susiai_bin, f), os.path.join(args[3], f))  
+
             elif args[2] == 'desktop':
                 if args[3] == 'user':
                     destdir = str(Path.home()) + '/.config/share/applications'
