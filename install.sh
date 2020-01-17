@@ -523,17 +523,17 @@ if [ $targetSystem = raspi ] ; then
 fi
 # generate initial configuration file for susi-config
 $BINDIR/susi-config set \
-    data_base_dir="$DESTDIR/susi_linux" \
+    path.base="$DESTDIR/susi_linux" \
     device="$DEVICENAME" \
     wakebutton=enable \
     tts=google \
     stt=google \
-    detection_bell_sound=extras/detection-bell.wav \
-    problem_sound=extras/problem.wav \
-    recognition_error_sound=extras/recognition-error.wav \
-    timeout_error_sound=extras/error-tada.wav \
-    flite_speech_file_path=extras/cmu_us_slt.flitevox \
-    hotword=Snowboy \
+    path.sound.detection=extras/detection-bell.wav \
+    path.sound.problem=extras/problem.wav \
+    path.sound.error.recognition=extras/recognition-error.wav \
+    path.sound.error.timeout=extras/error-tada.wav \
+    path.flite_speech=extras/cmu_us_slt.flitevox \
+    hotword.engine=Snowboy \
     susi.mode=anonymous \
     roomname=office \
     watson.tts.user="" \
@@ -878,13 +878,13 @@ if [ ! $targetSystem = raspi ] ; then
 else
     echo -e "SUSI is installed successfully!"
     echo -e "Please add $BINDIR to your PATH, then"
-    echo -e "Run configuration script by 'susi-config set stt=<stt engine> tts=<tts engine> hotword=<snowboy> or pocketsphinx> wakebutton=<wake button>'"
+    echo -e "Run configuration script by 'susi-config set stt=<stt engine> tts=<tts engine> hotword.engine=<snowboy> or pocketsphinx> wakebutton=<wake button>'"
     echo "For example, to configure SUSI as following: "
     echo -e "\t - Google for speech-to-text"
     echo -e "\t - Google for text-to-speech"
     echo -e "\t - Use snowboy for hot-word detection"
     echo -e "\t - Do not use GPIO for wake button"
-    echo -e "susi-config set stt=google tts=google hotword=SnowBoy wakebutton=disable"
+    echo -e "susi-config set stt=google tts=google hotword.engine=SnowBoy wakebutton=disable"
 fi
 
 # vim: set expandtab shiftwidth=4 softtabstop=4 smarttab:

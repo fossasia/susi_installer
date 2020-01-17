@@ -19,9 +19,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 susicfg = SusiConfig()
-user = susicfg.config['login_credentials']['email']
-password = susicfg.config['login_credentials']['password']
-room = susicfg.config['room_name']
+user = susicfg.get('susi.user')
+password = susicfg.get('susi.pass')
+room = susicfg.get('roomname')
 
 def get_token(login,password):
     url = 'http://api.susi.ai/aaa/login.json?type=access-token'
@@ -58,9 +58,9 @@ for i in range(3):
             logger.warning("Failed to register the device,retrying.")
         else:
             logger.warning("Resetting the device to hotspot mode")
-            susicfg.config['usage_mode']="anonymous"
-            susicfg.config['login_credentials']['email']=""
-            susicfg.config['login_credentials']['password']=""
+            susicfg.set('susi.mode', 'anonymous')
+            susicfg.set('susi.user', '')
+            susicfg.set('susi.pass', '')
             subprocess.Popen(['sudo','bash', 'susi_installer/raspi/access_point/wap.sh'])
 
 os.system('sudo systemctl disable ss-susi-register.service')

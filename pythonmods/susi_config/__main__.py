@@ -7,31 +7,6 @@ import sys
 import os
 from . import SusiConfig
 
-default_keys = {
-    'default_stt':                'google',
-    'default_tts':                'google',
-    'watson_stt_config.username': '',
-    'watson_stt_config.password': '',
-    'watson_tts_config.username': '',
-    'watson_tts_config.password': '',
-    'login_credentials.email':    '',
-    'login_credentials.password': '',
-    'usage_mode':                 'anonymous',
-    'room_name':                  'Office',
-    'bing_speech_api_key':        '',
-    'WakeButton':                 'enable',
-    'hotword_engine':             'Snowboy',
-    'data_base_dir':              '.',
-    'flite_speech_file_path':     'extras/cmu_us_slt.flitevox',
-    'detection_bell_sound':       'extras/detection-bell.wav',
-    'problem_sound':              'extras/problem.wav',
-    'recognition_error_sound':    'extras/recognition-error.wav',
-    'timeout_error_sound':        'extras/error-tada.wav',
-    'Device':                     'Desktop',
-    'hotword_model':              '',
-    'language':                   'en-US'
-}
-
 def usage(exitcode):
     print("""susi-config -- SUSI.AI configuration utility
 Usage:
@@ -63,14 +38,14 @@ def main(args):
         if args[1] == 'keys':
             cfg = SusiConfig()
             print("Possible keys:")
-            for i in cfg.keys_conf.keys():
+            for i in cfg.defaults.keys():
                 print(f"  {i}")
 
         elif args[1] == 'set':
             cfg = SusiConfig()
             for kv in args[2:]:
                 k,v = kv.split('=', 2)
-                if k in cfg.keys_conf:
+                if k in cfg.defaults:
                     pass
                 else:
                     raise ValueError('unknown key', k)
@@ -79,7 +54,7 @@ def main(args):
         elif args[1] == 'get':
             cfg = SusiConfig()
             if len(args) == 2:
-                args = list(cfg.keys_conf.keys())
+                args = list(cfg.defaults.keys())
             else:
                 args = args[2:]
             ret = []
@@ -95,11 +70,11 @@ def main(args):
         elif args[1] == 'login':
             cfg = SusiConfig()
             if len(args) > 2:
-                raise ValueError
+                raise ValueError("too many arguments for action", 'login')
             import susi_python as susi
-            susi.sign_in(cfg.config['login_credentials']['email'],
-                         cfg.config['login_credentials']['password'],
-                         room_name=cfg.config['room_name'])
+            susi.sign_in(cfg.config['susi.user'],
+                         cfg.config['susi.pass'],
+                         room_name=cfg.config['roomname'])
 
         elif args[1] == 'init':
             if len(args) == 2:
@@ -108,16 +83,16 @@ def main(args):
                 if args[2] == '-f':
                     force = True
                 else:
-                    raise ValueError
+                    raise ValueError("unsupported option to init", args[2])
             else:
-                raise ValueError
+                raise ValueError("unsupported options to init", args[2:])
 
             cfg = SusiConfig()
-            for k,v in default_keys.items():
+            for k,v in cfg.defaults.items():
                 if force:
-                    cfg.config[k] = v
+                    cfg.config[k] = v['default']
                 else:
-                    cfg.config.setdefault(k,v)
+                    cfg.config.setdefault(k,v['default'])
 
 
         # susi-config install links DIR
@@ -125,7 +100,7 @@ def main(args):
         # susi-config install systemd user|system
         elif args[1] == 'install':
             if len(args) != 4:
-                raise ValueError
+                raise ValueError("incorrect invocation of install action", args[2:])
 
             if args[2] == 'links':
                 if os.path.exists(args[3]):
@@ -152,13 +127,13 @@ def main(args):
                     raise ValueError
                 print(f"TODO installing systemd files into {destdir}")
             else:
-                raise ValueError
+                raise ValueError("unknown variant of install action", args[2])
 
         else:
-            raise ValueError
+            raise ValueError("unknown action", args[1])
 
     except ValueError as ex:
-        print("Invalid input")
+        print("Invalid input: ", ex)
         usage(1)
 
 
