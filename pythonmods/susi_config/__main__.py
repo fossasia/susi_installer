@@ -29,8 +29,9 @@ Usage:
          Install links to user programs into DIR
   susi-config install desktop user|system
          Install desktop files into user or system directories
-  susi-config install systemd user|system
+  susi-config install systemd user|system|raspi
          Install systemd service files into user or system directories
+         (or for the SUSI Smart Speaker when `raspi' is given
 
 Notes:
   - if path.base key is a literal . ("."), susi-config get path.base
@@ -159,15 +160,55 @@ def main(args):
                     sed(p, os.path.join(destdir, f), '@SUSIDIR@', susiai_dir)
 
             elif args[2] == 'systemd':
-                # TODO should we install some services into systemduserunitdir = /usr/lib/systemd/user?
+                systemd_system_dir = self.__run_pkgconfig("/lib/systemd/system",
+                    'pkg-config', 'systemd', '--variable=systemdsystemunitdir')
+                systemd_user_dir = self.__run_pkgconfig("/usr/lib/systemd/user",
+                    'pkg-config', 'systemd', '--variable=systemduserunitdir')
+                systemd_home_user = str(Path.home()) + "/.config/systemd/user"
                 if args[3] == 'user':
-                    destdir = str(Path.home()) + "/.config/systemd/user"
+                    sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux.service.in'),
+                        os.path.join(systemd_home_user, 'ss-susi-linux.service'),
+                        '@SUSIDIR@', susiai_dir)
+                    destfile = os.path.join(systemd_home_user, 'ss-susi-server.service')
+                    sed(os.path.join(susiai_dir,'susi_server/system-integration/systemd/ss-susi-server.service.in'),
+                        destfile, '@SUSIDIR@', susiai_dir)
+                    # we need to remove the line with ^User=
+                    with open(destfile, "r") as source:
+                        lines = source.readlines()
+                    with open(destfile, "w") as dest:
+                        for line in lines:
+                            if not line.startswith('User='):
+                                dest.write(line)
                 elif args[3] == 'system':
-                    destdir = self.__run_pkgconfig("/lib/systemd/system",
-                            'pkg-config', 'systemd', '--variable=systemdsystemunitdir')
+                    sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux@.service.in'),
+                        os.path.join(systemd_system_dir, 'ss-susi-linux@.service'),
+                        '@SUSIDIR@', susiai_dir)
+                    sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux.service.in'),
+                        os.path.join(systemd_user_dir, 'ss-susi-linux.service'),
+                        destfile, '@SUSIDIR@', susiai_dir)
+                    destfile = os.path.join(systemd_system_dir, 'ss-susi-server.service')
+                    sed(os.path.join(susiai_dir,'susi_server/system-integration/systemd/ss-susi-server.service.in'),
+                        destfile, '@SUSIDIR@', susiai_dir)
+                    # replace @SUSI_SERVER_USER@
+                    # TODO make _susi_server configurable!
+                    sed(destfile, destfile, '@SUSI_SERVER_USER@', '_susiserver')
+                    # TODO do the rest from install.sh
+                    #     $SUDOCMD useradd -r -d /nonexistent $SUSI_SERVER_USER
+                    #     $SUDOCMD mkdir -p /var/lib/susi-server/data
+                    #     $SUDOCMD chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
+                    #     $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
+                    #     $SUDOCMD cp ss-susi-server.service $systemdsystem
+                    #     $SUDOCMD systemctl daemon-reload || true
+                elif args[3] == 'raspi':
+                    sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux@.service.in'),
+                        os.path.join(systemd_system_dir, 'ss-susi-linux@.service'),
+                        '@SUSIDIR@', susiai_dir)
+                    destfile = os.path.join(systemd_system_dir, 'ss-susi-server.service')
+                    sed(os.path.join(susiai_dir,'susi_server/system-integration/systemd/ss-susi-server.service.in'),
+                        destfile, '@SUSIDIR@', susiai_dir)
+                    sed(destfile, destfile, '@SUSI_SERVER_USER@', '_susiserver')
                 else:
                     raise ValueError
-                print(f"TODO installing systemd files into {destdir}")
             else:
                 raise ValueError("unknown variant of install action", args[2])
 
