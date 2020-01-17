@@ -3,6 +3,12 @@
 # susi-config
 # Konfiguration of SUSI.AI, via the config.json
 
+# TODO
+# - configuration of susi server dedicated user in system install
+# - creation of susi server user etc (see below)
+# - uninstall: rm -rf ~/SUSI.AI  ~/.config/SUSI.AI/ ~/.local/share/systemd/user/ss-susi-*
+#
+
 import sys
 import os
 import re
