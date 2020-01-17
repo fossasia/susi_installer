@@ -7,6 +7,7 @@ import sys
 import os
 import re
 import logging
+import subprocess
 from pathlib import Path
 from . import SusiConfig
 
@@ -48,6 +49,16 @@ def sed(in_file, out_file, needle, replacement):
     with open(out_file, "w") as dest:
         for line in lines:
             dest.write(re.sub(needle, replacement, line))
+
+def __run_pkgconfig(default, *args):
+    try:
+        runresult = subprocess.run(args, capture_output=True)
+        ret = runresult.stdout.decode('utf-8').rstrip()
+        if ret == '':
+            ret = default
+    except FileNotFoundError:
+        ret = default
+    return ret
 
 def main(args):
     if len(args) == 1 or args[1] == "-h" or args[1] == "--help":
@@ -161,9 +172,9 @@ def main(args):
                     sed(p, os.path.join(destdir, f), '@SUSIDIR@', susiai_dir)
 
             elif args[2] == 'systemd':
-                systemd_system_dir = self.__run_pkgconfig("/lib/systemd/system",
+                systemd_system_dir = __run_pkgconfig("/lib/systemd/system",
                     'pkg-config', 'systemd', '--variable=systemdsystemunitdir')
-                systemd_user_dir = self.__run_pkgconfig("/usr/lib/systemd/user",
+                systemd_user_dir = __run_pkgconfig("/usr/lib/systemd/user",
                     'pkg-config', 'systemd', '--variable=systemduserunitdir')
                 systemd_home_user = str(Path.home()) + "/.config/systemd/user"
                 if args[3] == 'user':

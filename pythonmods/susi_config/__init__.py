@@ -9,7 +9,6 @@ import json_config
 import requests
 from pathlib import Path
 from importlib import util
-import subprocess
 
 class SusiConfig():
     def __init__(self, conffile = None, data_dir = "."):
@@ -59,16 +58,6 @@ class SusiConfig():
             self.config.setdefault(k,v['default'])
 
         self.susiai_path = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../.."))
-
-    def __run_pkgconfig(self, default, *args):
-        try:
-            runresult = subprocess.run(args, capture_output=True)
-            ret = runresult.stdout.decode('utf-8').rstrip()
-            if ret == '':
-                ret = default
-        except FileNotFoundError:
-            ret = default
-        return ret
 
 
     def request_hotword_choice(self, use_snowboy = True):
