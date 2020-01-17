@@ -5,6 +5,7 @@
 
 import sys
 import os
+from pathlib import Path
 from . import SusiConfig
 
 def usage(exitcode):
@@ -121,7 +122,29 @@ def main(args):
                 elif args[3] == 'system':
                     destdir = '/usr/local/share/applications'
                 else:
-                    raise ValueError
+                    raise ValueError("unknown mode for install desktop", args[3])
+                susiai_dir = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../.."))
+                if not os.path.isdir(susiai_dir):
+                    raise ValueError("cannot find SUSI.AI directory", susiai_dir)
+                susi_linux_dir = os.path.join(susiai_dir, 'susi_linux')
+                susi_server_dir = os.path.join(susiai_dir, 'susi_server')
+                if not os.path.isdir(susi_linux_dir):
+                    raise ValueError("cannot find SUSI.AI susi_linux directory", susi_linux_dir)
+                if not os.path.isdir(susi_server_dir):
+                    raise ValueError("cannot find SUSI.AI susi_server directory", susi_server_dir)
+                if not os.path.exists(destdir):
+                    os.makedirs(destdir)
+                desktop_files = []
+                for f in os.listdir(os.path.join(susi_server_dir, "system-integration/desktop")):
+                    if f.endswith("desktop.in"):
+                        desktop_files.append(f)
+                for f in os.listdir(os.path.join(susi_linux_dir, "system-integration/desktop")):
+                    if f.endswith("desktop.in"):
+                        desktop_files.append(f)
+                for f in desktop_files:
+                    pass
+
+
                 print(f"TODO installing desktop files into {destdir}")
             elif args[2] == 'systemd':
                 # TODO should we install some services into systemduserunitdir = /usr/lib/systemd/user?
