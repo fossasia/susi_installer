@@ -288,7 +288,7 @@ for i in $reqs ; do
     if [ -d $d ] && [ -r $d/$f ] ; then
         cp $d/$f $tmpdir/$i
     else
-        p="$d/$BRANCH/$i"
+        p="$d/$BRANCH/$f"
         wget -q -O $tmpdir/$i https://raw.githubusercontent.com/fossasia/$p
     fi
 done
