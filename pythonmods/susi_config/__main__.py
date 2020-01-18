@@ -79,13 +79,16 @@ def main(args):
 
         elif args[1] == 'set':
             cfg = SusiConfig()
+            ans = [ "Values set to:" ]
             for kv in args[2:]:
                 k,v = kv.split('=', 2)
                 if k in cfg.defaults:
                     pass
                 else:
                     raise ValueError('unknown key', k)
-                cfg.get_set(k,v)
+                newv = cfg.get_set(k,v)
+                ans.append(f"  {k} = {newv} (requested {v})")
+                print("\n".join(ans))
 
         elif args[1] == 'get':
             cfg = SusiConfig()
