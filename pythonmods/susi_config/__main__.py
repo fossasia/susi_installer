@@ -163,8 +163,7 @@ def main(args):
                     raise ValueError("cannot find SUSI.AI susi_linux directory", susi_linux_dir)
                 if not os.path.isdir(susi_server_dir):
                     raise ValueError("cannot find SUSI.AI susi_server directory", susi_server_dir)
-                if not os.path.exists(destdir):
-                    os.makedirs(destdir)
+                os.makedirs(destdir, exist_ok=True)
                 desktop_files = []
                 server_desktop_dir = os.path.join(susi_server_dir, "system-integration/desktop")
                 linux_desktop_dir = os.path.join(susi_linux_dir, "system-integration/desktop")
@@ -188,6 +187,7 @@ def main(args):
                     sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux.service.in'),
                         os.path.join(systemd_home_user, 'ss-susi-linux.service'),
                         '@SUSIDIR@', susiai_dir)
+                    os.makedirs(systemd_home_user, exist_ok=True)
                     destfile = os.path.join(systemd_home_user, 'ss-susi-server.service')
                     sed(os.path.join(susiai_dir,'susi_server/system-integration/systemd/ss-susi-server.service.in'),
                         destfile, '@SUSIDIR@', susiai_dir)
@@ -199,6 +199,7 @@ def main(args):
                             if not line.startswith('User='):
                                 dest.write(line)
                 elif args[3] == 'system':
+                    os.makedirs(systemd_system_dir, exist_ok=True)
                     sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux@.service.in'),
                         os.path.join(systemd_system_dir, 'ss-susi-linux@.service'),
                         '@SUSIDIR@', susiai_dir)
@@ -219,6 +220,7 @@ def main(args):
                     #     $SUDOCMD cp ss-susi-server.service $systemdsystem
                     #     $SUDOCMD systemctl daemon-reload || true
                 elif args[3] == 'raspi':
+                    os.makedirs(systemd_system_dir, exist_ok=True)
                     sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux@.service.in'),
                         os.path.join(systemd_system_dir, 'ss-susi-linux@.service'),
                         '@SUSIDIR@', susiai_dir)
