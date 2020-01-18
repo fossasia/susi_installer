@@ -549,6 +549,7 @@ susicfg = SusiConfig()
 susicfg.config['wakebutton'] = 'enabled'
 susicfg.config['device'] = 'RaspberryPi'
 EOF
+fi
 
 
 

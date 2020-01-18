@@ -88,7 +88,7 @@ def main(args):
                     raise ValueError('unknown key', k)
                 newv = cfg.get_set(k,v)
                 ans.append(f"  {k} = {newv} (requested {v})")
-                print("\n".join(ans))
+            print("\n".join(ans))
 
         elif args[1] == 'get':
             cfg = SusiConfig()
