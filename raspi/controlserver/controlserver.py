@@ -302,6 +302,10 @@ def config():
 @app.route('/auth', methods=['GET'])
 def login():
     auth = request.args.get('auth')
+    if auth == 'n':
+        auth = 'anonymous'
+    elif auth == 'y':
+        auth = 'authenticated'
     email = request.args.get('email')
     password = request.args.get('password')
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password]) #nosec #pylint-disable type: ignore
@@ -358,6 +362,10 @@ def reboot():
 
     # auth
     auth = request.form['auth']
+    if auth == 'n':
+        auth = 'anonymous'
+    elif auth == 'y':
+        auth = 'authenticated'
     email = request.form['email']
     password = request.form['password']
 
@@ -369,6 +377,10 @@ def reboot():
     stt = request.form['stt']
     tts = request.form['tts']
     hotword = request.form['hotword']
+    if hotword == 'y':
+        hotword = 'Snowboy'
+    elif hotword == 'n':
+        hotword = 'PocketSphinx'
     subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword.engine="+hotword])  #nosec #pylint-disable type: ignore
     display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "message":"SUSI is rebooting"}
     resp = jsonify(display_message)
