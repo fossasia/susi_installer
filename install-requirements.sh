@@ -48,7 +48,8 @@ SUSI.AI Dependency Installer
 
 Possible options:
   --trust-pip      Don't do version checks on pip3, trust it to be new enough
-  --branch BRANCH  Use branch BRANCH to get requirement files (default: development)
+  --branch BRANCH  If no local checkouts are available, use the git remotes
+                   with branch BRANCH to get requirement files (default: development)
   --raspi          Do additional installation tasks for the SUSI.AI Smart Speaker
   --sudo-cmd CMD   Use CMD instead of the default sudo
   --system-install Try installing necessary programs, only supported for some distributions
@@ -280,10 +281,16 @@ fi
 # Create temp dir
 tmpdir=$(mktemp -d)
 
-# Download requirement files
+# Copy or download requirement files
 for i in $reqs ; do
-    p=$(echo $i | sed -e s+:+/$BRANCH/+)
-    wget -q -O $tmpdir/$i https://raw.githubusercontent.com/fossasia/$p
+    d=${i%:*}
+    f=${i#*:}
+    if [ -d $d ] && [ -r $d/$f ] ; then
+        cp $d/$f $tmpdir/$i
+    else
+        p="$d/$BRANCH/$i"
+        wget -q -O $tmpdir/$i https://raw.githubusercontent.com/fossasia/$p
+    fi
 done
 
 # Install pips
