@@ -4,6 +4,7 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
+User=pi
 Type=oneshot
 ExecStart=/home/pi/SUSI.AI/susi_installer/raspi/update_daemon/update_check.sh
 

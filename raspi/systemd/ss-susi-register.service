@@ -4,6 +4,7 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
+User=pi
 Type=oneshot
 WorkingDirectory=/home/pi/SUSI.AI
 ExecStart=/usr/bin/python3 susi_installer/raspi/access_point/register.py

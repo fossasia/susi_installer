@@ -710,6 +710,7 @@ if [ $targetSystem = raspi ] ; then
     ln -s $WORKDIR/etherpad.db $DESTDIR/etherpad-lite/var/dirty.db
 
     # save susi_linux server data outside of server dir
+    rm -rf $DESTDIR/susi_server/data
     mkdir $WORKDIR/susi_server_data
     ln -s $WORKDIR/susi_server_data $DESTDIR/susi_server/data
 

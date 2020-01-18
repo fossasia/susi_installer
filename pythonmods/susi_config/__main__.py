@@ -227,7 +227,7 @@ def main(args):
                     destfile = os.path.join(systemd_system_dir, 'ss-susi-server.service')
                     sed(os.path.join(susiai_dir,'susi_server/system-integration/systemd/ss-susi-server.service.in'),
                         destfile, '@SUSIDIR@', susiai_dir)
-                    sed(destfile, destfile, '@SUSI_SERVER_USER@', '_susiserver')
+                    sed(destfile, destfile, '@SUSI_SERVER_USER@', 'pi')
                 else:
                     raise ValueError
             else:
