@@ -539,6 +539,16 @@ $BINDIR/susi-config set \
     watson.tts.user="" \
     watson.tts.pass=""
 
+# we have to override wakebutton and devicename
+# since susi-config cannot detect the right hardware
+# during image build via qemu
+if [ $targetSystem = raspi ] ; then
+    env PYTHONPATH=$DESTDIR/SUSI.AI/pythonmods python3 - <<EOF
+from susi_config import SusiConfig
+susicfg = SusiConfig()
+susicfg.config['wakebutton'] = 'enabled'
+susicfg.config['device'] = 'RaspberryPi'
+EOF
 
 
 
