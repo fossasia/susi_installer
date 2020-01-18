@@ -638,7 +638,7 @@ fi
 
 echo "Updating Susi Linux Systemd service file"
 if [ $targetSystem = raspi ] ; then
-    $BINDIR/susi-config install systemd raspi
+    sudo $BINDIR/susi-config install systemd raspi
     sudo systemctl daemon-reload || true
 elif [ $INSTALLMODE = user ] ; then
     $BINDIR/susi-config install systemd $INSTALLMODE
@@ -662,7 +662,7 @@ sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/
 
 echo "Installing Susi Desktop files"
 if [ $targetSystem = raspi ] ; then
-    $BINDIR/susi-config install desktop raspi
+    sudo $BINDIR/susi-config install desktop raspi
 elif [ $INSTALLMODE = user ] ; then
     $BINDIR/susi-config install desktop $INSTALLMODE
 else
