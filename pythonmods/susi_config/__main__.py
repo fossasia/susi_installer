@@ -184,10 +184,10 @@ def main(args):
                     'pkg-config', 'systemd', '--variable=systemduserunitdir')
                 systemd_home_user = str(Path.home()) + "/.config/systemd/user"
                 if args[3] == 'user':
+                    os.makedirs(systemd_home_user, exist_ok=True)
                     sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux.service.in'),
                         os.path.join(systemd_home_user, 'ss-susi-linux.service'),
                         '@SUSIDIR@', susiai_dir)
-                    os.makedirs(systemd_home_user, exist_ok=True)
                     destfile = os.path.join(systemd_home_user, 'ss-susi-server.service')
                     sed(os.path.join(susiai_dir,'susi_server/system-integration/systemd/ss-susi-server.service.in'),
                         destfile, '@SUSIDIR@', susiai_dir)
