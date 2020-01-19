@@ -58,7 +58,9 @@ def sed(in_file, out_file, needle, replacement):
 
 def __run_pkgconfig(default, *args):
     try:
-        runresult = subprocess.run(args, capture_output=True)
+        # capture_output only available on Python 3.7 onward :-(
+        # runresult = subprocess.run(args, scapture_output=True)
+        runresult = subprocess.run(args, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         ret = runresult.stdout.decode('utf-8').rstrip()
         if ret == '':
             ret = default
