@@ -53,8 +53,9 @@ jobs:
         - RELEASEBUILDER=1
         - TARGET=debian
         - VERSION=buster
-      before_install: sudo apt-get update ; sudo apt-get install -y --no-install-recommends lsb-release git ca-certificates wget
+      before_install: sudo apt-get update ; sudo apt-get install -y --no-install-recommends lsb-release git ca-certificates wget python3-pip
       script:
+        - sudo pip3 install json_config
         - export TRIGGER_SOURCE=$TRIGGER_SOURCE
         - export TRIGGER_BRANCH=$TRIGGER_BRANCH
         - ./install.sh --clean
