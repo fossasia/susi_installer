@@ -48,6 +48,7 @@ jobs:
           on:
             tags: true
     - os: linux
+      dist: bionic
       env:
         - RELEASEBUILDER=1
         - TARGET=debian
