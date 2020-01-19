@@ -73,9 +73,12 @@ def main(args):
     try:
         if args[1] == 'keys':
             cfg = SusiConfig()
-            print("Possible keys:")
+            print("Possible keys (if no options listed then the value is free form):")
             for i in cfg.defaults.keys():
-                print(f"  {i}")
+                if 'options' in cfg.defaults[i]:
+                    print(f"  {i} -- possible values: {', '.join(cfg.defaults[i]['options'])}")
+                else:
+                    print(f"  {i}")
 
         elif args[1] == 'set':
             cfg = SusiConfig()
