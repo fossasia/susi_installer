@@ -64,7 +64,7 @@ $ ~/SUSI.AI/bin/susi-linux-app
 ```
 - Alternatively ,you can run SUSI without User Interface by executing the following command
 ```
-$ ~/SUSI.AI/bin/start-susi-linux
+$ ~/SUSI.AI/bin/susi-linux-start
 ```
 
 In both case SUSI will start in always listening Hotword Detection Mode. To ask SUSI a question, say "Susi". If detection of

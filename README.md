@@ -71,11 +71,11 @@ After this, you are ready to start SUSI.AI Smart Assistant by
 
 - first starting the SUSI.AI Server
 ```
-.../SUSI.AI/bin/start-susi-server
+.../SUSI.AI/bin/susi-server-start
 ```
 - then starting the SUSI.AI Assistant
 ```
-.../SUSI.AI/bin/start-susi-linux
+.../SUSI.AI/bin/susi-linux-start
 ```
 
 (where `.../SUSI.AI` is the path you have choosen)
