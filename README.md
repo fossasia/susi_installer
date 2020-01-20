@@ -71,7 +71,7 @@ After this, you are ready to start SUSI.AI Smart Assistant by
 
 - first starting the SUSI.AI Server
 ```
-.../SUSI.AI/bin/susi-server-start
+.../SUSI.AI/bin/susi-server start
 ```
 - then starting the SUSI.AI Assistant
 ```
@@ -83,7 +83,7 @@ After this, you are ready to start SUSI.AI Smart Assistant by
 You can stop the two service in the similar way:
 ```
 .../SUSI.AI/bin/susi-linux stop
-.../SUSI.AI/bin/susi-server-stop
+.../SUSI.AI/bin/susi-server stop
 ```
 
 
