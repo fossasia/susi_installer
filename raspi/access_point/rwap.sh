@@ -17,6 +17,7 @@ cp /etc/network/interfaces.d/wlan.client /etc/network/interfaces.d/wlan-client
 # these are dual to wap.sh
 systemctl disable hostapd
 systemctl disable dnsmasq
+systemctl disable ss-susi-ap-msg
 systemctl enable ss-susi-linux@pi.service
 systemctl enable ss-susi-login.service
 

@@ -23,13 +23,13 @@ mountPath = '/media'
 
 wifi_search_folder = os.path.join(dir_path, '../access_point')
 susiconfig = '/home/pi/SUSI.AI/bin/susi-config'
-cfg = susi_config.SusiConfig(dir_path + "/../../..")
+cfg = susi_config.SusiConfig()
 
 def get_token():
     url = 'http://api.susi.ai/aaa/login.json'
     PARAMS = {
-        'login': cfg.get_set('susi.user'),
-        'password': cfg.get_set('susi.pass'),
+        'login': cfg.get('susi.user'),
+        'password': cfg.get('susi.pass'),
         'type': 'access-token'
     }
     r1 = requests.get(url, params=PARAMS).json()
@@ -291,7 +291,7 @@ def config():
     tts = request.args.get('tts')
     hotword = request.args.get('hotword')
     wake = request.args.get('wake')
-    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword, "wakebutton="+wake])  #nosec #pylint-disable type: ignore
+    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword.engine="+hotword, "wakebutton="+wake])  #nosec #pylint-disable type: ignore
     # TODO we should check the actual return code of susi-linux-config-generator
     display_message = {"configuration":"successful", "stt": stt, "tts": tts, "hotword": hotword, "wake":wake}
     resp = jsonify(display_message)
@@ -302,6 +302,10 @@ def config():
 @app.route('/auth', methods=['GET'])
 def login():
     auth = request.args.get('auth')
+    if auth == 'n':
+        auth = 'anonymous'
+    elif auth == 'y':
+        auth = 'authenticated'
     email = request.args.get('email')
     password = request.args.get('password')
     subprocess.call(['sudo', '-u', 'pi', susiconfig, 'set', "susi.mode="+auth, "susi.user="+email, "susi.pass="+password]) #nosec #pylint-disable type: ignore
@@ -358,6 +362,10 @@ def reboot():
 
     # auth
     auth = request.form['auth']
+    if auth == 'n':
+        auth = 'anonymous'
+    elif auth == 'y':
+        auth = 'authenticated'
     email = request.form['email']
     password = request.form['password']
 
@@ -369,7 +377,11 @@ def reboot():
     stt = request.form['stt']
     tts = request.form['tts']
     hotword = request.form['hotword']
-    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword="+hotword])  #nosec #pylint-disable type: ignore
+    if hotword == 'y':
+        hotword = 'Snowboy'
+    elif hotword == 'n':
+        hotword = 'PocketSphinx'
+    subprocess.Popen(['sudo', '-u', 'pi', susiconfig, 'set', "stt="+stt, "tts="+tts, "hotword.engine="+hotword])  #nosec #pylint-disable type: ignore
     display_message = {"wifi":"configured", "room_name":room_name, "wifi_ssid":wifi_ssid, "auth":auth, "email":email, "stt":stt, "tts":tts, "hotword":hotword, "message":"SUSI is rebooting"}
     resp = jsonify(display_message)
     resp.status_code = 200

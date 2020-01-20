@@ -28,26 +28,50 @@ jobs:
   include:
     - os: linux
       env:
+        - RELEASEBUILDER=1
         - TARGET=raspi
         - VERSION=buster
-      before_install: sudo apt-get update ; sudo apt-get install qemu qemu-user-static binfmt-support parted wget dosfstools zip pixz
+      before_install: sudo apt-get update ; sudo apt-get install -y --no-install-recommends qemu qemu-user-static binfmt-support parted wget dosfstools zip pixz
       script:
         - sudo -E bash ./.travis/create-image
         - ls -lh raspbian.img
-
-before_deploy:
-  - export TSTAMP=$(date +'%Y%m%d%H%M')
-  - mv raspbian.img susibian-$TSTAMP.img
-  - travis_wait 30 pixz susibian-$TSTAMP.img susibian-$TSTAMP.img.xz
-  - rm -f susibian-$TSTAMP.img
-
-deploy:
-  provider: releases
-  api_key: $GH_TOKEN
-  file_glob: true
-  file: susibian-*.img.xz
-  skip_cleanup: true
-  on:
-    tags: true
-    condition: $TARGET = raspi
+      before_deploy:
+        - mv raspbian.img susibian-$TSTAMP.img
+        - travis_wait 30 pixz susibian-$TRAVIS_TAG.img susibian-$TRAVIS_TAG.img.xz
+        - rm -f susibian-$TRAVIS_TAG.img
+      deploy:
+        - provider: releases
+          api_key: $GH_TOKEN
+          file_glob: true
+          file: susibian-*.img.xz
+          skip_cleanup: true
+          on:
+            tags: true
+    - os: linux
+      dist: bionic
+      env:
+        - RELEASEBUILDER=1
+        - TARGET=debian
+        - VERSION=buster
+      before_install: sudo apt-get update ; sudo apt-get install -y --no-install-recommends lsb-release git ca-certificates wget python3-pip python3-setuptools
+      script:
+        - sudo pip3 install json_config
+        - export TRIGGER_SOURCE=$TRIGGER_SOURCE
+        - export TRIGGER_BRANCH=$TRIGGER_BRANCH
+        - ./install.sh --clean
+        - cp install-requirements.sh $HOME/SUSI.AI/install-requirements.sh
+        - cp README.md $HOME/SUSI.AI/README
+        - cd $HOME
+        - tar --owner 0 --group 0 --format ustar -cf SUSI.tar SUSI.AI
+        - gzip -9 SUSI.tar
+      before_deploy:
+        - mv SUSI.tar.gz SUSIAI-$TRAVIS_TAG.tar.gz
+      deploy:
+        - provider: releases
+          api_key: $GH_TOKEN
+          file_glob: true
+          file: SUSIAI-*.tar.gz
+          skip_cleanup: true
+          on:
+            tags: true
 

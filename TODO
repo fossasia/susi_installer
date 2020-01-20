@@ -1,2 +1,16 @@
 - install youtube_dl on buster and above?
 
+- make susi-server systemd socket activated so that
+  starting susi_linux starts susi-server automatically
+- ApplicationIcon for susi-linux
+  example code maybe https://github.com/bluppfisk/coinprice-indicator/blob/master/coin/indicator.py
+
+- current master branch is broken, susi server answers rubbish!
+
+- Python3.6 modules!!! Linux Mint current runs on Py3.6
+
+- snowboy library check: too many libraries are linked, and thus
+  installation on Fedora etc is broken since the libraries are
+  named differently. I guess **only** cblas needs to be linked,
+  at least this is what my trials showed.
+

@@ -3,6 +3,7 @@ Description=Control Server for SUSI Linux
 After=multi-user.target
 
 [Service]
+User=pi
 Type=simple
 WorkingDirectory=/home/pi/SUSI.AI
 Environment=PYTHONPATH=/home/pi/SUSI.AI/susi_installer/pythonmods

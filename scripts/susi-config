@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# susi-config
+# Konfiguration of SUSI.AI, via the config.json
+
+# user mode
+#   .../SUSI.AI/bin/
+#   .../SUSI.AI/pythonmods/
+#   .../SUSI.AI/susi_linux/
+# system mode
+#   prefix/bin/
+#   prefix/lib/SUSI.AI/pythonmods
+#   prefix/lib/SUSI.AI/susi_linux/
+
+DIR="$(dirname "$(readlink -f "$0")")"
+PMA="$(readlink -m "$DIR/../pythonmods")"
+PMB="$(readlink -m "$DIR/../lib/SUSI.AI/pythonmods")"
+if [ -d "$PMA" ] && [ -r "$PMA/susi_config" ] ; then
+    PYTHONPATH="$PMA":$PYTHONPATH
+    export PYTHONPATH
+elif [ -d "$PMB" ] && [ -r "$PMB/susi_config" ] ; then
+    PYTHONPATH="$PMB":$PYTHONPATH
+    export PYTHONPATH
+else
+    echo "Cannot find SUSI.AI susi_config folder, trying without it" >&2
+fi
+python3 -m susi_config "$@"
+

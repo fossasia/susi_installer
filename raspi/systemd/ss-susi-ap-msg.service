@@ -1,0 +1,10 @@
+[Unit]
+Description=Inform the user how to setup the device on bootup in AP mode
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/pi/SUSI.AI
+ExecStart=/usr/bin/play /home/pi/SUSI.AI/susi_installer/raspi/access_point/how-to-connect.wav
+
+[Install]
+WantedBy=multi-user.target

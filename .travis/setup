@@ -59,6 +59,8 @@ fi
 
 # Run the installer
 # we need to keep environment otherwise the TRIGGER_* variables are lost
+# sudo -EHu pi ./install.sh --clean
+sudo -EHu pi ./install-requirements.sh --system-install --raspi
 sudo -EHu pi ./install.sh --clean
 
 # After ./install.sh, the /dev is occupied by some processes and cannot be released by build script.

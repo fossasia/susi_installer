@@ -10,35 +10,8 @@ DEVDIR=~/SUSI.AI
 Install necessary packages
 --------------------------
 
-```
-sudo apt-get install ca-certificates git openssl wget python3-setuptools perl libterm-readline-gnu-perl \
-	python3-pip sox libsox-fmt-all flac libportaudio2 libatlas3-base libpulse0 libasound2 \
-	vlc-bin vlc-plugin-base vlc-plugin-video-splitter python3-cairo python3-flask flite \
-	openjdk-8-jdk-headless pixz udisks2 i2c-tools libasound2-plugins python3-dev \
-	swig python3-requests python3-service-identity python3-pyaudio python3-levenshtein \
-	python3-pafy python3-colorlog python3-watson-developer-cloud libpulse-dev libasound2-dev \
-	libatlas-base-dev
-```
-
-On Debian/stretch add vlc-nox at least
-
-
-Install snowboy
----------------
-
-We install snowboy from the Github release. The only useful fix is to
-correctly identify the version in the pip install cache
-```
-cd $DEVDIR
-wget https://github.com/Kitt-AI/snowboy/archive/v1.3.0.tar.gz
-tar -xf v1.3.0.tar.gz
-cd snowboy-1.3.0
-sed -i -e "s/version='1\.2\.0b1'/version='1.3.0'/" setup.py
-python3 setup.py build
-sudo python3 setup.py install
-cd ..
-rm -rf snowboy-1.3.0 v1.3.0.tar.gz
-```
+Run the script `install-requisites.sh` with `sudo`. See the toplevel
+`README.md` for details.
 
 
 Install SUSI.AI
@@ -61,28 +34,16 @@ git submodule update --recursive --remote
 git submodule update --init --recursive
 ```
 
-We need to link a directory from `susi_api_wrapper` to `susi_linux`.
-We also add this link to the ignored files of git:
+We need to link several python modules into `susi_linux` to be able to
+run it directly from the directory:
 ```
 cd $DEVDIR
 ln -s ../susi_api_wrapper/python_wrapper/susi_python susi_linux/
-echo "/susi_python" >> susi_linux/.git/info/exclude
-```
-
-Install other necessary pip modules
------------------------------------
-If you are on stretch, first upgrade pip and wheel
-```
-sudo pip3 install -U pip wheel
-```
-
-then
-```
-cd $DEVDIR
-sudo pip3 install -r susi_api_wrapper/python_wrapper/requirements.txt
-# these are the reqs from sus_linux/requirements-hw.txt adjusted and cleaned
-sudo pip3 install pip3 install speechRecognition==3.8.1 service_identity pocketsphinx==0.1.15 pyaudio json_config google_speech async_promises python-Levenshtein pyalsaaudio 'youtube-dl>2018' python-vlc pafy colorlog rx requests_futures
-sudo pip3 install -r susi_linux/requirements-special.txt
+ln -s ../susi_installer/pythonmods/vlcplayer susi_linux/
+ln -s ../susi_installer/pythonmods/hwmixer susi_linux/
+for i in "susi_python vlcplayer hwmixer ; do
+  echo "/$i" >> susi_linux/.git/info/exclude
+done
 ```
 
 Download speech data for flite TTS
