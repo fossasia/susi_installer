@@ -1,57 +1,122 @@
 # Installation of SUSI.AI Personal Assistant
 
-This repository provides installation script for SUSI.AI for Linux Desktops
-as well as for our development SUSI.AI Smart Speaker based on Raspberry Pi.
+This repository provides installation packages for the SUSI.AI Personal Assistant,
+both for desktop installation as well as images for the SUSI.AI Smart Speaker
+based on Raspberry Pi.
 
 ## Quickstart
 
 If you want to get SUSI.AI Personal Assistant installed quickly without reading
 all the small print, here is a quickstart.
 
-### Preferred method: user install with `sudo`
+### Step 1: Download the SUSI.AI Smart Assistant package
 
-The preferred method is installing SUSI.AI into your home directory, but using
-`sudo` to install the required Python modules. If this is an option for you,
-first do
+Get the installer package SUSIAI-release-YYYYMMDD.S.tar.gz from
+the Github [SUSI Installer release page](https://github.com/fossasia/susi_installer/releases/latest).
+
+
+### Step 2: Unpack the package to your preferred location
+
+The package unpacks into a directory
 ```
-  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-requirements.sh
-  bash install-requirements.sh --system-install
+SUSI.AI
 ```
-followed by
+which can be placed anywhere in your system. We generally
+recommend placing it into
 ```
-  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install.sh
-  bash install.sh --dev
+$HOME/SUSI.AI
+```
+but feel free to move it somewhere else.
+
+### Step 3: Install necessary dependencies
+
+The SUSI.AI Smart Assistant depends on a lot of additional
+software that can be installed using the included script
+```
+install-requirements.sh
+```
+which can install dependencies either system wide or locally,
+with or without sudo. Please see the help output below:
+
+Possible options:
+```
+  --trust-pip      Don't do version checks on pip3, trust it to be new enough
+  --branch BRANCH  If no local checkouts are available, use the git remotes
+                   with branch BRANCH to get requirement files (default: development)
+  --raspi          Do additional installation tasks for the SUSI.AI Smart Speaker
+  --sudo-cmd CMD   Use CMD instead of the default sudo
+  --system-install Try installing necessary programs, only supported for some distributions
+  --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
+  --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
+  --quiet          Silence pip on installation
 ```
 
-This will install all necessary system packages and Python libraries, and
-SUSI.AI into `~/SUSI.AI`.
+We recommend running this script as someone with sudo permissions as follows
+```
+bash install-requirements.sh --system-install
+```
+See below for a detailed list of requirements. 
 
-### Another method: user install without `sudo`
-
+If `sudo` is not an option, the following method can be used
+```
+bash install-requirements.sh --sudo-cmd ""
+```
 This method is much less tested, because the required Python modules will
 be installed into your home directory (`~/.local/lib`). On the other hand,
-no `sudo` permissions are needed, and everything can be done as local user:
+no `sudo` permissions are needed, and everything can be done as local user.
+
+
+
+After this, you are ready to start SUSI.AI Smart Assistant by
+
+- first starting the SUSI.AI Server
 ```
-  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install-requirements.sh
-  bash install-requirements.sh --sudo-cmd ""
-  wget https://raw.githubusercontent.com/fossasia/susi_installer/development/install.sh
-  bash install.sh
+.../SUSI.AI/bin/start-susi-server
+```
+- then starting the SUSI.AI Assistant
+```
+.../SUSI.AI/bin/start-susi-linux
 ```
 
-### The rest
-
-All other methods require root permissions and we recommend reading the
-full document before trying them.
+(where `.../SUSI.AI` is the path you have choosen)
 
 
-### Running SUSI.AI after installation
 
-The installation procedure gives indication how to use `systemctl` command to
-start the SUSI.AI server and personal assistant, but if your desktop
-environment supports `.desktop` files, then the following items should be
+### Optional step 1: Linking start/stop scripts
+
+There are several script to start, stop, and configure SUSI.AI
+available in `.../SUSI.AI/bin`, but this directory is usually not
+in your PATH environment variable.
+
+If you don't want to call the scripts always with full path, you
+can either add `.../SUSI.AI/bin` to your PATH
+```bash
+PATH=.../SUSI.AI/bin:$PATH ; export PATH
+```
+or link the scripts to one of the directories already in your
+PATH
+```
+.../SUSI.AI/bin/susi-config install links <SOME_DIR>
+```
+where `<SOME_DIR>` is the place where the links are created.
+
+So for example
+```
+.../SUSI.AI/bin/susi-config install links ~/bin
+```
+would make the SUSI.AI scripts available in `~/bin`
+
+
+### Optional step 2: Adding entries to the DE menus
+
+You can add menu entries to your desktop environment by calling
+```
+.../SUSI.AI/bin/susi-config install desktop user
+```
+Having done this, the following items should be
 available in your desktop environment menu:
 
-- **SUSI Server**
+- **SUSI Server** - starts the SUSI Server, a necessary component
 - **SUSI.AI Personal Assistant** - starts the privacy assistant in the background
 - **SUSI.AI Personal Assistant - Application Window** - an application that
   allows interaction via an GUI
@@ -59,6 +124,33 @@ available in your desktop environment menu:
   parameters of SUSI.AI
 
 More programs and services will be added over time.
+
+
+### Optional step 3: Adding Systemd integration
+
+Systemd integration can be achieved by installing several
+.service files into the respective locations using
+```
+.../SUSI.AI/bin/susi-config install systemd user
+```
+
+After installation of the systemd service files, the SUSI.AI Personal
+Assistant can be started once by typing:
+```
+systemctl --user start ss-susi-server
+systemctl --user start ss-susi-linux
+```
+If you want to enable the assistant permantenly on your desktop, use
+```
+systemctl --user enable ss-susi-server
+systemctl --user enable ss-susi-linux
+```
+
+
+### Additional options
+
+For more controlled installation with lots of options to be configured,
+see below for the detailed explanation of the installation scripts.
 
 
 ## Prerequisites
