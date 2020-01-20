@@ -439,7 +439,7 @@ else
 fi
 echo "Setting up scripts for susi_linux"
 mkdir -p $BINDIR
-for i in susi_linux/scripts/* ; do
+for i in susi_linux/system-integration/scripts/* ; do
     cp $i $BINDIR/
     # shouldn't be necessary, but for safety
     chmod ugo+x "$BINDIR/$(basename $i)"
