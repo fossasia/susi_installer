@@ -75,11 +75,16 @@ After this, you are ready to start SUSI.AI Smart Assistant by
 ```
 - then starting the SUSI.AI Assistant
 ```
-.../SUSI.AI/bin/susi-linux-start
+.../SUSI.AI/bin/susi-linux start
 ```
 
 (where `.../SUSI.AI` is the path you have choosen)
 
+You can stop the two service in the similar way:
+```
+.../SUSI.AI/bin/susi-linux stop
+.../SUSI.AI/bin/susi-server-stop
+```
 
 
 ### Optional step 1: Linking start/stop scripts

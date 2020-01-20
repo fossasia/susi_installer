@@ -141,7 +141,7 @@ asked.
 #### Configure and Run SUSI Linux
 
 Several executables are installed into `~/SUSI.AI/bin`, in particular
-`susi-config` (configuration utility), `susi-linux-start` (headless start),
+`susi-config` (configuration utility), `susi-linux start` (headless start),
 and `susi-linux-app` (GUI app).
 
 - Run the SUSI configuration script. This will allow you to customize the
@@ -167,7 +167,7 @@ $ susi-linux-app
 ```
 - Alternatively ,you can run SUSI without User Interface by executing the following command
 ```
-$ susi-linux-start
+$ susi-linux start
 ```
 In both case SUSI will start in always listening Hotword Detection Mode. To ask SUSI a question, say "Susi". If detection of
 hotword is successful, you will hear a small bell sound. Ask your query after the bell sound. Your query will be
