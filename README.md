@@ -166,7 +166,7 @@ on the system, in particular the following programs need to be available
 programs afterwards). The following table lists the required programs and
 the respective packages in Debian/Buster and Fedora 31:
 
-| Program | Debian/Ubuntu/Mint   | Fedora 31   | OpenSuSE Leap 15.1 |
+| Program | Debian/Ubuntu/Mint   | Fedora 31   | openSUSE Leap 15.1 |
 | ------- | -------------------- | ----------- | ------------------ |
 | git     | git                  | git         | git |
 | wget    | wget                 | wget        | wget |
