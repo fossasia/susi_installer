@@ -17,6 +17,7 @@ BRANCH=development
 RASPI=0
 SUDOCMD=sudo
 DISTPKGS=0
+DEEPSPEECH=0
 QUIET=""
 SYSTEMINSTALL=0
 SYSINSTALLER=""
@@ -40,6 +41,8 @@ do
             SYSINSTALLER="$2" ; shift ; shift ;;
         --branch)
             BRANCH="$2" ; shift ; shift ;;
+        --with-deepspeech)
+            DEEPSPEECH=1; shift ;;
         --quiet)
             QUIET="-q" ; shift ;;
         --help)
@@ -54,6 +57,7 @@ Possible options:
   --sudo-cmd CMD   Use CMD instead of the default sudo
   --system-install Try installing necessary programs, only supported for some distributions
   --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
+  --with-deepspeech Install DeepSpeech and en-US model data
   --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
   --quiet          Silence pip on installation
 
@@ -65,6 +69,12 @@ EOF
             exit 1
     esac
 done
+
+#
+# On our raspi images we install DeepSpeech in any case
+if [ $RASPI = 1 ] ; then
+    DEEPSPEECH=1
+fi
 
 
 APTINSTALL="apt-get install --no-install-recommends -y"
@@ -297,6 +307,23 @@ done
 for i in $reqs ; do
     $SUDOCMD $PIP install --extra-index-url https://repo.fury.io/fossasia/ -r $tmpdir/$i
 done
+
+if [ $DEEPSPEECH = 1 ] ; then
+    $SUDOCMD $PIP install deepspeech==0.7.0
+    # we need to find out where SpeechRecognition is installed
+    sr_dir=$($PIP show SpeechRecognition | grep ^Location | awk '{print$2}' 2>/dev/null)
+    if [ ! -d "$sr_dir/speech_recognition" ] ; then
+        echo "Cannot find directory of SpeechRecognition!" >&2
+        exit 1
+    fi
+    mkdir -p "$sr_dir/speech_recognition/deepspeech-data/en-US"
+    for i in pbmm tflite scorer ; do
+        if [ ! -r "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-0.7.0-models.$i" ] ; then
+            $SUDOCMD wget -O "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-0.7.0-models.$i" \
+                https://github.com/mozilla/DeepSpeech/releases/download/v0.7.0/deepspeech-0.7.0-models.$i
+        fi
+    done
+fi
 
 # cleanup
 if [ $CLEAN = 1 ] ; then
