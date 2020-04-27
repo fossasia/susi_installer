@@ -319,7 +319,7 @@ if [ $DEEPSPEECH = 1 ] ; then
     $SUDOCMD mkdir -p "$sr_dir/speech_recognition/deepspeech-data/en-US"
     for i in pbmm tflite scorer ; do
         if [ ! -r "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-0.7.0-models.$i" ] ; then
-            $SUDOCMD wget -O "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-0.7.0-models.$i" \
+            $SUDOCMD wget -nv -O "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-0.7.0-models.$i" \
                 https://github.com/mozilla/DeepSpeech/releases/download/v0.7.0/deepspeech-0.7.0-models.$i
         fi
     done
