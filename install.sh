@@ -510,7 +510,7 @@ echo "Initializing SUSI config"
 mkdir -p $BINDIR
 cp susi_installer/scripts/susi-config $BINDIR/susi-config
 if [ -r susi_installer/scripts/test-deepspeech ] ; then
-    cp susi_installer/scripts/test-deepspeech $BINDIR/susi-config
+    cp susi_installer/scripts/test-deepspeech $BINDIR/test-deepspeech
 fi
 chmod +x $BINDIR/susi-config
 DEVICENAME="Desktop Computer"
