@@ -1,0 +1,18 @@
+#!/usr/bin/python3
+
+from speech_recognition import Microphone, Recognizer
+
+# using the micropone from speech_recognition as we do in susi
+microphone = Microphone(sample_rate = 16000)
+recognizer = Recognizer()
+recognizer.dynamic_energy_threshold = True
+recognizer.energy_threshold = 2000
+
+with microphone as source:
+    while True:
+        print("=============================================")
+        print("Speak now!")
+        audio = recognizer.listen(source, phrase_time_limit=5, timeout=10.0)
+        output = recognizer.recognize_deepspeech(audio)
+        print(f"recognized string = {output}")
+

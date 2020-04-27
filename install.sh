@@ -509,6 +509,9 @@ ln -s ../susi_linux/susi_linux "$PYTHONMODDIR/susi_linux"
 echo "Initializing SUSI config"
 mkdir -p $BINDIR
 cp susi_installer/scripts/susi-config $BINDIR/susi-config
+if [ -r susi_installer/scripts/test-deepspeech ] ; then
+    cp susi_installer/scripts/test-deepspeech $BINDIR/susi-config
+fi
 chmod +x $BINDIR/susi-config
 DEVICENAME="Desktop Computer"
 if [ $targetSystem = raspi ] ; then
