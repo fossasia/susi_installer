@@ -16,7 +16,7 @@ env:
     TRIGGER_SOURCE=""
   matrix:
     - TARGET=debian VERSION=buster
-    - TARGET=ubuntu VERSION=19.04
+    - TARGET=ubuntu VERSION=19.10
 
 # the default script for docker tests
 # try running installation as user pi instead of root
