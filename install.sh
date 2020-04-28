@@ -522,8 +522,8 @@ $BINDIR/susi-config set \
     path.base="." \
     device="$DEVICENAME" \
     wakebutton=enable \
-    tts=google \
-    stt=google \
+    tts=flite \
+    stt=deepspeech-local \
     path.sound.detection=susi_linux/extras/detection-bell.wav \
     path.sound.problem=susi_linux/extras/problem.wav \
     path.sound.error.recognition=susi_linux/extras/recognition-error.wav \
