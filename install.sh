@@ -625,6 +625,15 @@ fi
 
 if [ $targetSystem = raspi ]
 then
+    # make sure that wifi is turned on on boot
+    # recent raspbian kernel default to disable that via
+    # systemd-rfkill.service
+    echo "Ensuring WIFI is turned on on first boot"
+    if [ -d /var/lib/systemd/rfkill ] ; then
+        for i in /var/lib/systemd/rfkill/*':wlan' ; do
+            echo "0" | sudo tee $i
+        done
+    fi
     echo "Preparing USB automount"
     # systemd-udevd creates its own filesystem namespace, so mount is done, but it is not visible in the principal namespace.
     sudo mkdir /etc/systemd/system/systemd-udevd.service.d/
