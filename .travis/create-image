@@ -56,7 +56,7 @@ fi
 mv ????-??-??-raspbian-*-lite.img raspbian.img
 ls
 
-qemu-img resize raspbian.img 6G
+qemu-img resize raspbian.img 4.7G
 echo ", +" | sfdisk -N 2 raspbian.img
 
 loopdev=$(losetup -fP --show raspbian.img)
