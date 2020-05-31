@@ -625,7 +625,7 @@ if [ -n "$NODEJS" ] ; then
         mkdir etherpad-lite
         # get latest release of etherpad
         epurl=$(curl --silent https://api.github.com/repos/ether/etherpad-lite/releases/latest | grep -Po '"tarball_url": "\K.*?(?=")')
-        curl -sL "$epurl" | tar -xf - --strip-components=1 -C etherpad-lite
+        curl -sL "$epurl" | tar -xzf - --strip-components=1 -C etherpad-lite
         # git clone --branch master https://github.com/ether/etherpad-lite.git
     else
         echo "WARNING: etherpad-lite directory already present, not cloning it!" >&2
