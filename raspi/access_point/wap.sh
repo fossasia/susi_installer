@@ -41,7 +41,8 @@ cp /etc/network/interfaces.d/wlan.hostap /etc/network/interfaces.d/wlan-hostap
 systemctl enable hostapd
 systemctl enable dnsmasq
 systemctl enable ss-susi-ap-msg
-systemctl disable ss-susi-linux@pi.service
+# by default everything is now local, so we can start susi-linux anyway
+#systemctl disable ss-susi-linux@pi.service
 systemctl disable ss-susi-login.service
 
 # add server in the auto-boot up list

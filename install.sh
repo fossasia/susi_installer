@@ -720,6 +720,8 @@ if [ $targetSystem = raspi ] ; then
     # enable the server service unconditionally
     sudo systemctl enable ss-susi-server
     sudo systemctl enable ss-etherpad-lite
+    # we default to local (flite/deepspeech) so we can start the client right ahead
+    sudo systemctl enable ss-susi-linux@pi.service
 
     # we need UTF8 char encoding, otherwise files with UTF8 names cannot
     # be dealt with in Python

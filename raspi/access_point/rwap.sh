@@ -18,7 +18,8 @@ cp /etc/network/interfaces.d/wlan.client /etc/network/interfaces.d/wlan-client
 systemctl disable hostapd
 systemctl disable dnsmasq
 systemctl disable ss-susi-ap-msg
-systemctl enable ss-susi-linux@pi.service
+# by default everything is local now, so we can keep susi linux running
+#systemctl enable ss-susi-linux@pi.service
 systemctl enable ss-susi-login.service
 
 echo "Please reboot"
