@@ -9,7 +9,7 @@ class HwMixer():
     def __init__(self):
         self.mixerid = ''
         for ci in alsaaudio.card_indexes():
-            if "seeed" in alsaaudio.cards[ci]:
+            if "seeed" in alsaaudio.cards()[ci]:
                 self.cardindex = ci
         if self.cardindex is None:
             # We don't run a seeed card, use the default mixer
