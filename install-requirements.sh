@@ -309,7 +309,9 @@ for i in $reqs ; do
 done
 
 if [ $DEEPSPEECH = 1 ] ; then
-    $SUDOCMD $PIP install deepspeech==0.7.0
+    $SUDOCMD $PIP install deepspeech==0.7.*
+    # check which version is actually installed
+    DSVersion=$(pip show deepspeech | grep ^Version | awk '{print$2}')
     # we need to find out where SpeechRecognition is installed
     sr_dir=$($PIP show SpeechRecognition | grep ^Location | awk '{print$2}' 2>/dev/null)
     if [ ! -d "$sr_dir/speech_recognition" ] ; then
@@ -318,9 +320,9 @@ if [ $DEEPSPEECH = 1 ] ; then
     fi
     $SUDOCMD mkdir -p "$sr_dir/speech_recognition/deepspeech-data/en-US"
     for i in pbmm tflite scorer ; do
-        if [ ! -r "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-0.7.0-models.$i" ] ; then
-            $SUDOCMD wget -nv -O "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-0.7.0-models.$i" \
-                https://github.com/mozilla/DeepSpeech/releases/download/v0.7.0/deepspeech-0.7.0-models.$i
+        if [ ! -r "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-${DSVersion}-models.$i" ] ; then
+            $SUDOCMD wget -nv -O "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-${DSVersion}-models.$i" \
+                https://github.com/mozilla/DeepSpeech/releases/download/v${DSVersion}/deepspeech-${DSVersion}-models.$i
         fi
     done
 fi
