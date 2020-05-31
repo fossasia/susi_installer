@@ -5,6 +5,11 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 export LANG=C
 export LC_ALL=C
 
+# TODO
+# support new rasp os and maybe 64bit version!
+# https://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2020-05-28/2020-05-27-raspios-buster-arm64.zip
+# https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-05-28/2020-05-27-raspios-buster-lite-armhf.zip
+
 firstarg=
 if [ "${1-}" = "--stretch" ] ; then
     DOSTRETCH=1
