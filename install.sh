@@ -414,6 +414,11 @@ function install_seeed_voicecard_driver()
     fi
 }
 
+prog_available() {
+    if ! [ -x "$(command -v $1)" ]; then
+        return 1
+    fi
+}
 
 
 
@@ -597,9 +602,23 @@ then
     install_seeed_voicecard_driver
 fi
 
-# install Etherpad on RPi, including the depending modules
+# install Etherpad, including the depending modules
+# on RPi install nodejs, on Desktop systems only install Etherpad if node/nodejs is installed
 if [ $targetSystem = raspi ]
 then
+    echo "Installing NodeJS"
+    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+    sudo apt-get install --no-install-recommends -y nodejs
+fi
+NODEJS=""
+if prog_available node ; then
+    NODEJS=node
+elif prog_available nodejs ; then
+    NODEJS=nodejs
+else
+    echo "Neither node nor nodejs available, not installing EtherPad!" >&2
+fi
+if [ -n "$NODEJS" ] ; then
     echo "Downloading: Etherpad-lite"
     cd "$DESTDIR"
     if [ ! -d etherpad-lite ] ; then
@@ -607,9 +626,6 @@ then
     else
         echo "WARNING: etherpad-lite directory already present, not cloning it!" >&2
     fi
-    echo "Adding node.js repository"
-    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-    sudo apt-get install --no-install-recommends -y nodejs
     echo "Installing node modules for etherpad"
     cd etherpad-lite
     bin/installDeps.sh

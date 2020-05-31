@@ -206,6 +206,18 @@ def main(args):
                         for line in lines:
                             if not line.startswith('User='):
                                 dest.write(line)
+                    # do the same for etherpad
+                    if os.path.isdir(os.path.join(susiai_dir,'etherpad')):
+                        destfile = os.path.join(systemd_home_user, 'ss-etherpad-lite.service')
+                        sed(os.path.join(susiai_dir,'susi_installer/system-integration/systemd/ss-etherpad-lite.service.in'),
+                            destfile, '@SUSIDIR@', susiai_dir)
+                        # we need to remove the line with ^User=
+                        with open(destfile, "r") as source:
+                            lines = source.readlines()
+                        with open(destfile, "w") as dest:
+                            for line in lines:
+                                if not line.startswith('User='):
+                                    dest.write(line)
                 elif args[3] == 'system':
                     os.makedirs(systemd_system_dir, exist_ok=True)
                     sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux@.service.in'),
@@ -227,6 +239,14 @@ def main(args):
                     #     $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
                     #     $SUDOCMD cp ss-susi-server.service $systemdsystem
                     #     $SUDOCMD systemctl daemon-reload || true
+                    #
+                    # Install etherpad if available
+                    if os.path.isdir(os.path.join(susiai_dir,'etherpad')):
+                        destfile = os.path.join(systemd_system_dir, 'ss-etherpad-lite.service')
+                        sed(os.path.join(susiai_dir,'susi_installer/system-integration/systemd/ss-etherpad-lite.service.in'),
+                            destfile, '@SUSIDIR@', susiai_dir)
+                        sed(destfile, destfile, '@SUSI_ETHERPAD_USER@', '_susiserver')
+
                 elif args[3] == 'raspi':
                     os.makedirs(systemd_system_dir, exist_ok=True)
                     sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux@.service.in'),
@@ -236,6 +256,10 @@ def main(args):
                     sed(os.path.join(susiai_dir,'susi_server/system-integration/systemd/ss-susi-server.service.in'),
                         destfile, '@SUSIDIR@', susiai_dir)
                     sed(destfile, destfile, '@SUSI_SERVER_USER@', 'pi')
+                    destfile = os.path.join(systemd_system_dir, 'ss-etherpad-lite.service')
+                    sed(os.path.join(susiai_dir,'susi_installer/system-integration/systemd/ss-etherpad-lite.service.in'),
+                        destfile, '@SUSIDIR@', susiai_dir)
+                    sed(destfile, destfile, '@SUSI_ETHERPAD_USER@', 'pi')
                 else:
                     raise ValueError
             else:

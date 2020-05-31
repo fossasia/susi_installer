@@ -178,6 +178,7 @@ the respective packages in Debian/Buster and Fedora 31:
 | pip3    | python3-pip          | python3-pip | python3-pip |
 | - (3)   | python3-setuptools   | python3-setuptools | python3-setuptools |
 | - (4)   | libatlas3-base       | blas        | libopenblas_pthreads0 |
+| node/nodejs (5) | nodejs           | ?           | ? |
 
 
 (1) `sox` is not available in CentOS 8, this will probably make some of the
@@ -194,6 +195,10 @@ installed, otherwise installations of other packages using `pip3` will
 not work.
 
 (4) Some package providing `libcblas` is necessary.
+
+(5) If either `node` or `nodejs` binary is available, EtherPad for communication
+with the SUSI Server is installed.
+
 
 The above packages (plus two packages, see below under (\*)) can be optionally
 installed by `install-requirements.sh` by adding the command line option
