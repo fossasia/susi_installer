@@ -8,12 +8,20 @@ class HwMixer():
 
     def __init__(self):
         self.mixerid = ''
-        for i in alsaaudio.mixers():
-            if i == 'Master' or i == 'PCM' or i == 'Speaker' or i == 'Playback':
-                self.mixerid = i
-        if self.mixerid == '':
-            raise Exception('Cannot find mixer')
-        self.mixer = alsaaudio.Mixer(control=self.mixerid)
+        for ci in alsaaudio.card_indexes():
+            if "seeed" in alsaaudio.cards[ci]:
+                self.cardindex = ci
+        if self.cardindex is None:
+            # We don't run a seeed card, use the default mixer
+            self.cardindex = 0
+            self.mixerid = alsaaudio.mixers(self.cardindex)[0]
+        else:
+            for i in alsaaudio.mixers(self.cardindex):
+                if i == 'Master' or i == 'PCM' or i == 'Speaker' or i == 'Playback':
+                    self.mixerid = i
+            if self.mixerid == '':
+                raise Exception('Cannot find mixer')
+        self.mixer = alsaaudio.Mixer(cardindex=self.cardindex, control=self.mixerid)
 
     def svol(self):
         vols = self.mixer.getvolume()
