@@ -7,8 +7,8 @@ Environment=NODE_PORT=9001
 Environment=NODE_ENV=production
 Type=simple
 User=@SUSI_ETHERPAD_USER@
-WorkingDirectory=@SUSIDIR@/etherpad-lite
-ExecStart=/usr/bin/node @SUSIDIR@/etherpad-lite/node_modules/ep_etherpad-lite/node/server.js
+WorkingDirectory=@SUSIDIR@/susi_server/data/etherpad-lite
+ExecStart=/usr/bin/node @SUSIDIR@/susi_server/data/etherpad-lite/node_modules/ep_etherpad-lite/node/server.js
 Restart=on-failure
 
 [Install]

@@ -1,7 +1,7 @@
 #!/bin/bash
 # SUSI.AI Smart Assistant Installer
 #
-# Copyright 2018-2019 Norbert Preining
+# Copyright 2018-2020 Norbert Preining
 #
 set -euo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -620,9 +620,13 @@ else
 fi
 if [ -n "$NODEJS" ] ; then
     echo "Downloading: Etherpad-lite"
-    cd "$DESTDIR"
+    cd "$DESTDIR/susi_server/data"
     if [ ! -d etherpad-lite ] ; then
-        git clone --branch master https://github.com/ether/etherpad-lite.git
+        mkdir etherpad-lite
+        # get latest release of etherpad
+        epurl=$(curl --silent https://api.github.com/repos/ether/etherpad-lite/releases/latest | grep -Po '"tarball_url": "\K.*?(?=")')
+        curl -sL "$epurl" | tar -xf - --strip-components=1 -C etherpad-lite
+        # git clone --branch master https://github.com/ether/etherpad-lite.git
     else
         echo "WARNING: etherpad-lite directory already present, not cloning it!" >&2
     fi
@@ -633,6 +637,7 @@ if [ -n "$NODEJS" ] ; then
     # systemd file is automatically installed using Deploy/auto... further below
 fi
 
+cd "$DESTDIR"
 if [ ! -f "susi_linux/extras/cmu_us_slt.flitevox" ]
 then
     echo "Downloading Speech Data for flite TTS"
@@ -738,13 +743,10 @@ if [ $targetSystem = raspi ] ; then
     echo "Disable dhcpcd"
     sudo systemctl disable dhcpcd
 
-    # link etherpad database file to $WORKDIR
-    touch $WORKDIR/etherpad.db
-    ln -s $WORKDIR/etherpad.db $DESTDIR/etherpad-lite/var/dirty.db
-
     # save susi_linux server data outside of server dir
-    rm -rf $DESTDIR/susi_server/data
-    mkdir $WORKDIR/susi_server_data
+    mv $DESTDIR/susi_server/data $WORKDIR/susi_server_data
+    #rm -rf $DESTDIR/susi_server/data
+    #mkdir $WORKDIR/susi_server_data
     ln -s $WORKDIR/susi_server_data $DESTDIR/susi_server/data
 
     # create empty custom_skill file and make susi server read it
@@ -755,7 +757,7 @@ if [ $targetSystem = raspi ] ; then
 
     cd "$DESTDIR"
     echo "Creating a backup folder for future factory_reset"
-    tar -I 'pixz -p 2' -cf ../reset_folder.tar.xz --checkpoint=.1000 --exclude susi_server_data --exclude etherpad.db .
+    tar -I 'pixz -p 2' -cf ../reset_folder.tar.xz --checkpoint=.1000 --exclude susi_server_data .
     echo ""  # To add newline after tar's last checkpoint
     mv ../reset_folder.tar.xz susi_installer/raspi/factory_reset/reset_folder.tar.xz
 
