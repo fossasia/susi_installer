@@ -44,7 +44,7 @@ class SusiConfig():
             'susi.mode':                    { 'default': 'anonymous',
                                               'options': [ 'anonymous', 'authenticated' ] },
             'hotword.engine':               { 'default': 'Snowboy',
-                                              'options': [ 'Snowboy', 'PocketSphinx' ] },
+                                              'options': [ 'Snowboy', 'PocketSphinx', 'None' ] },
             'hotword.model':                { 'default': '' },
             'path.base':                    { 'default': '.' },
             'path.flite_speech':            { 'default': 'susi_linux/extras/cmu_us_slt.flitevox' },
@@ -60,31 +60,37 @@ class SusiConfig():
         self.susiai_path = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../.."))
 
 
-    def request_hotword_choice(self, use_snowboy = True):
+    def request_hotword_choice(self, mode = 'Snowboy'):
         """ Method to request user for default Hotword Engine and configure it in settings.
         """
-        try:
-            print("Checking for Snowboy Availability...")
-            snowboy_available = util.find_spec('snowboy')
-            found = snowboy_available is not None
+        if mode == 'Snowboy' or mode == 'PocketSphinx':
+            pass
+        elif mode == 'None':
+            print("Disabling hotword detection, interaction is only possible with wakebutton!")
+        else:
+            print(f"Unknown mode for hotword: {mode}")
+            mode = 'Snowboy'
+
+        if mode == 'Snowboy':
+            try:
+                print("Checking for Snowboy Availability...")
+                snowboy_available = util.find_spec('snowboy')
+                found = snowboy_available is not None
     
-        except ImportError:
-            print("Some Error Occurred.Snowboy not configured properly.\nUsing PocketSphinx as default engine for Hotword. Run this script again to change")
-            found = False
-            self.config['hotword.engine'] = 'PocketSphinx'
+            except ImportError:
+                print("Some Error Occurred.Snowboy not configured properly.\nUsing PocketSphinx as default engine for Hotword. Run this script again to change")
+                found = False
+                self.config['hotword.engine'] = 'PocketSphinx'
     
-        if found is True:
-            print("Snowboy is available on this platform")
-            if use_snowboy:
+            if found is True:
+                print("Snowboy is available on this platform")
                 self.config['hotword.engine'] = 'Snowboy'
-                print('\n Snowboy set as default Hotword Detection Engine \n')
             else:
+                print('\n Snowboy not configured Properly\n')
                 self.config['hotword.engine'] = 'PocketSphinx'
                 print('\n PocketSphinx set as default Hotword Detection Engine \n')
         else:
-            print('\n Snowboy not configured Properly\n')
-            self.config['hotword.engine'] = 'PocketSphinx'
-            print('\n PocketSphinx set as default Hotword Detection Engine \n')
+            self.config['hotword.engine'] = mode
     
     
     def get(self, k):
@@ -123,10 +129,15 @@ class SusiConfig():
 
         elif k == 'hotword.engine':
             if not (v is None):
-                if v == 'y' or v == 'n' or v == 'Snowboy' or v == 'PocketSphinx':
-                    self.request_hotword_choice( v == 'y' or v == 'Snowboy' )
+                if v == 'y':
+                    mode = 'Snowboy'
+                elif v == 'n':
+                    mode = 'PocketSphinx'
+                elif v == 'Snowboy' or v == 'PocketSphinx' or v == 'None':
+                    mode = v
                 else:
                     raise ValueError(f"unsupported value for {k}", v)
+                self.request_hotword_choice(mode)
             return self.config[k]
 
         elif k == 'path.base':
