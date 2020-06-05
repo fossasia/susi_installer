@@ -6,9 +6,12 @@ export LANG=C
 export LC_ALL=C
 
 # TODO
-# support new rasp os and maybe 64bit version!
+# support maybe 64bit version!
 # https://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2020-05-28/2020-05-27-raspios-buster-arm64.zip
 # https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-05-28/2020-05-27-raspios-buster-lite-armhf.zip
+# file names:
+# raspbian: 2020-02-13-raspbian-buster-lite.img
+# raspios:  2020-05-27-raspios-buster-lite-armhf.img
 
 firstarg=
 if [ "${1-}" = "--stretch" ] ; then
@@ -16,10 +19,14 @@ if [ "${1-}" = "--stretch" ] ; then
     URL=https://downloads.raspberrypi.org/raspbian/images/raspbian-2019-04-09/2019-04-08-raspbian-stretch.zip
     ZIPNAME=raspbian-latest-lite-stretch.zip
     shift
-else
+elif [ "${1-}" = "--raspbian" ] ; then
     DOSTRETCH=0
     URL=https://downloads.raspberrypi.org/raspbian_lite_latest
     ZIPNAME=raspbian-latest-lite.zip
+else # default to raspios
+    DOSTRETCH=0
+    URL=https://downloads.raspberrypi.org/raspios_lite_armhf_latest
+    ZIPNAME=raspios-latest-lite.zip
 fi
 
 TRAVIS_BRANCH=${TRAVIS_BRANCH:-""}
@@ -58,7 +65,22 @@ else
     echo "Reusing ./$ZIPNAME"
     unzip $ZIPNAME
 fi
-mv ????-??-??-raspbian-*-lite.img raspbian.img
+# raspbian: 2020-02-13-raspbian-buster-lite.img
+# raspios:  2020-05-27-raspios-buster-lite-armhf.img
+if ! compgen -G "????-??-??-rasp*buster-lite*.img" > /dev/null; then
+	echo "Cannot find any image via ????-??-??-rasp*buster-lite*.img, giving up" >&2
+	exit 1
+fi
+set -- ????-??-??-rasp*buster-lite*.img
+if [ $# -gt 1 ] ; then
+	echo "Multiple files maching ????-??-??-rasp*buster-lite*.img, giving up" >&2
+	exit 1
+fi
+if [ -r raspbian.img ] ; then
+	echo "Image raspbian.img already present, not overwriting it." >&2
+	exit 1
+fi
+mv "$1" raspbian.img
 ls
 
 qemu-img resize raspbian.img 4.7G
