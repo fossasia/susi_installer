@@ -22,9 +22,9 @@ An assembly video can be found at https://youtu.be/jAEmRvQLmc0
 ### Installation
 * check the source of this document and compare if the installation instructions has been enhanced: 
 https://github.com/fossasia/susi_installer/blob/development/docs/development_device_handout.md
-* If your SD card has no SUSI.AI operation system on it (or is too old), download the image from http://download.susi.ai/susibian and flash it yourself
-The device needs an internet connection to work. To configure the device to use a wifi connection, it starts a Wifi hotspot with SSID "SUSI.AI" itself.
-* Power on the device
+* If your SD card has no SUSI.AI operation system on it (or is too old), download the image from http://download.susi.ai/susibian and flash it yourself. To flash the image to your SD card, you can use [Etcher](https://www.balena.io/etcher)
+* Insert SD card, then power on the device
+* The device needs an internet connection to work. To configure the device to use a wifi connection, it starts a Wifi hotspot with SSID "SUSI.AI" itself.
 * Connect your computer or mobile phone to the SUSI.AI hotspot using the password "password".
 * Open http://10.0.0.1:7070/setup which will show you the set-up page as visible below:
 ![SUSI.AI Wifi Setup](images/SUSI.AI-Wifi-Setup.png "SUSI.AI Wifi Setup")
