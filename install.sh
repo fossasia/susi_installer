@@ -788,9 +788,15 @@ if [ ! $targetSystem = raspi ] ; then
         echo "To start it once, type"
         echo "  systemctl --user start ss-susi-server"
         echo "  systemctl --user start ss-susi-linux"
+        if [ -d "$DESTDIR/susi_server/data/etherpad-lite" ] ; then
+        echo "  systemctl --user start ss-etherpad-lite"
+        fi
         echo "To enable it permanently, use"
         echo "  systemctl --user enable ss-susi-server"
         echo "  systemctl --user enable ss-susi-linux"
+        if [ -d "$DESTDIR/susi_server/data/etherpad-lite" ] ; then
+        echo "  systemctl --user enable ss-etherpad-lite"
+        fi
     else
         echo "To start it once, type"
         echo "  sudo systemctl start ss-susi-server"
