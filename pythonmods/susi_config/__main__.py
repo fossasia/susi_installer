@@ -207,7 +207,7 @@ def main(args):
                             if not line.startswith('User='):
                                 dest.write(line)
                     # do the same for etherpad
-                    if os.path.isdir(os.path.join(susiai_dir,'etherpad')):
+                    if os.path.isdir(os.path.join(susiai_dir,'susi_server/data/etherpad-lite')):
                         destfile = os.path.join(systemd_home_user, 'ss-etherpad-lite.service')
                         sed(os.path.join(susiai_dir,'susi_installer/system-integration/systemd/ss-etherpad-lite.service.in'),
                             destfile, '@SUSIDIR@', susiai_dir)
@@ -218,6 +218,9 @@ def main(args):
                             for line in lines:
                                 if not line.startswith('User='):
                                     dest.write(line)
+                    else:
+                        print(f"susi-config: etherpad-lite not found in {susiai_dir}/susi_server/data/, skipping systemd file installation")
+
                 elif args[3] == 'system':
                     os.makedirs(systemd_system_dir, exist_ok=True)
                     sed(os.path.join(susiai_dir,'susi_linux/system-integration/systemd/ss-susi-linux@.service.in'),
