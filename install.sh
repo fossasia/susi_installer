@@ -111,7 +111,7 @@ SUDOCMD=sudo
 INSTALLBRANCH=master
 SERVERINSTALLBRANCH=stable-dist
 if [ -d "$INSTALLERDIR/.git" ] ; then
-    pushd "$INSTALLERDIR"
+    pushd "$INSTALLERDIR" >/dev/null
     CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
     if [ "$CURRENTBRANCH" = "master" ] ; then
         INSTALLBRANCH=master
@@ -120,7 +120,7 @@ if [ -d "$INSTALLERDIR/.git" ] ; then
         INSTALLBRANCH=development
         SERVERINSTALLBRANCH=dev-dist
     fi
-    popd
+    popd >/dev/null
 fi
 
 # we save arguments in case we need to re-exec the installer after git clone
