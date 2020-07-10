@@ -47,13 +47,14 @@ Possible options:
   --sudo-cmd CMD   Use CMD instead of the default sudo
   --system-install Try installing necessary programs, only supported for some distributions
   --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
+  --with-deepspeech Install DeepSpeech and en-US model data
   --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
   --quiet          Silence pip on installation
 ```
 
 We recommend running this script as someone with sudo permissions as follows
 ```
-bash install-requirements.sh --system-install
+bash install-requirements.sh --system-install --with-deepspeech
 ```
 See below for a detailed list of requirements. 
 
@@ -66,24 +67,47 @@ be installed into your home directory (`~/.local/lib`). On the other hand,
 no `sudo` permissions are needed, and everything can be done as local user.
 
 
+### Step 4: Run the actual install script
+
+Installation of the SUSI.AI Smart Assistant is done by the included script
+```
+install.sh
+```
+Please see the help output below:
+```
+  --system         install system-wide
+  --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
+  --destdir <ARG>  (only without --system) install into <ARG>
+                   defaults to $HOME/SUSI.AI
+  --sudo-cmd <ARG> command to run programs that need root privileges
+  --susi-server-user <ARG> (only with --system)
+                   user under which the susi server is run, default: _susiserver
+  --dev            use development branch
+  --with-coral     install support libraries for the Coral device (Raspberry)
+```
+We recommend running this script without any extra options:
+```
+bash install.sh
+```
+
 
 After this, you are ready to start SUSI.AI Smart Assistant by
 
 - first starting the SUSI.AI Server
 ```
-.../SUSI.AI/bin/susi-server start
+$HOME/SUSI.AI/bin/susi-server start
 ```
 - then starting the SUSI.AI Assistant
 ```
-.../SUSI.AI/bin/susi-linux start
+$HOME/SUSI.AI/bin/susi-linux start
 ```
 
-(where `.../SUSI.AI` is the path you have choosen)
+(where `$HOME/SUSI.AI` is the path you have choosen)
 
 You can stop the two service in the similar way:
 ```
-.../SUSI.AI/bin/susi-linux stop
-.../SUSI.AI/bin/susi-server stop
+$HOME/SUSI.AI/bin/susi-linux stop
+$HOME/SUSI.AI/bin/susi-server stop
 ```
 
 
