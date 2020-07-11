@@ -65,10 +65,10 @@ def return_mac():
 
 @app.before_request
 def before_request_callback():
-    if (request.endpoint == 'setup' or request.endpoint == 'auth'\
-     or request.endpoint == 'wifi_credentials' \
-     or request.endpoint == 'reboot') and not access_mode():
-        return redirect(url_for('control'))
+    #if (request.endpoint == 'setup' or request.endpoint == 'auth'\
+    # or request.endpoint == 'wifi_credentials' \
+    # or request.endpoint == 'reboot') and not access_mode():
+    #    return redirect(url_for('control'))
     if request.endpoint != 'login' and request.endpoint != 'static' and not\
        check_pass() and not session.get('logged_in') and request.remote_addr != '127.0.0.1':
         return render_template('login.html')
@@ -408,4 +408,4 @@ def reboot():
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
-    app.run(debug=False, port=7070, host='0.0.0.0')
+    app.run(debug=False, port=80, host='0.0.0.0')
