@@ -18,13 +18,14 @@ INSTALLERDIR=$(dirname $(realpath "$0"))
 #
 # Installation directory defaults
 # User installation
-#   DESTDIR = ~/SUSI.AI                 --destdir can override this
+#   DESTDIR = ~/.susi.ai                --destdir can override this
+#                                       on RPi: ~/SUSI.AI
 #   BINDIR  = $DESTDIR/bin
 #   WORKDIR = $DESTDIR
 # System installation
 #   DESTDIR = $prefix/lib/SUSI.AI       --prefix can be given
 #   BINDIR  = $prefix/bin
-#   WORKDIR = ~/.SUSI.AI
+#   WORKDIR = ~/.susi.ai
 #
 #   In system mode the susi-server starts as user $SUSI_SERVER_USER
 #   which defaults to _susiserver and can be configured via --susi-server-user
@@ -181,7 +182,7 @@ Possible options:
   --system         install system-wide
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
-                   defaults to $HOME/SUSI.AI
+                   defaults to $HOME/.susi.ai
   --sudo-cmd <ARG> command to run programs that need root privileges
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
@@ -296,7 +297,7 @@ if [ $INSTALLMODE = system ] ; then
     PYTHONMODDIR="$DESTDIR/pythonmods"
     # note that we do NOT expand $HOME here, since it must be replaced as is
     # in the common-script-start.in of susi_linux!
-    WORKDIR='$HOME/.SUSI.AI'
+    WORKDIR='$HOME/.susi.ai'
 else
     if [ $targetSystem = raspi ] ; then
         DESTDIR=/home/pi/SUSI.AI
@@ -304,7 +305,7 @@ else
         CLEAN=1
     else
         if [ -z "$OPTDESTDIR" ] ; then
-            DESTDIR="$HOME/SUSI.AI"
+            DESTDIR="$HOME/.susi.ai"
         else
             DESTDIR="$OPTDESTDIR"
         fi
