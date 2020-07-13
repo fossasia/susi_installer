@@ -121,6 +121,12 @@ def install_uninstall(args):
                     os.remove(cfg.conffile)
                 except OSError as e:
                     print("Error: %s : %s" % (cfg.conffile, e.strerror))
+                # try also to remove the directory if it is empty, ignore errors
+                confdir = os.path.dirname(cfg.conffile)
+                try:
+                    os.rmdir(confdir)
+                except OSError:
+                    pass
                 print("Finished.")
             else: # not a Y answer
                 print("Ok, not removing SUSI.AI")
