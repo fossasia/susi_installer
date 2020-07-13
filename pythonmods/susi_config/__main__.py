@@ -111,8 +111,8 @@ def install_uninstall(args):
             while answer not in ["y", "n"]:
                 answer = input(f"Do you want to remove the complete SUSI.AI from\n  {susiai_dir}\nAnswer [Y/N]? ").lower()
             if answer == "y":
-                install_uninstall("foo", "uninstall", "systemd", uninstall_mode)
-                install_uninstall("foo", "uninstall", "desktop", uninstall_mode)
+                install_uninstall(["foo", "uninstall", "systemd", uninstall_mode])
+                install_uninstall(["foo", "uninstall", "desktop", uninstall_mode])
                 try:
                     shutil.rmtree(susiai_dir)
                 except OSError as e:
@@ -132,9 +132,6 @@ def install_uninstall(args):
                 print("Ok, not removing SUSI.AI")
 
             sys.exit(0)
-
-        else: # uninstall_mode is neither user nor system
-            raise ValueError("Incorrect invocation of uninstall action", args[2:])
 
 
     if args[2] == 'links':
