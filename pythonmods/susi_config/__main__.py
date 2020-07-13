@@ -153,8 +153,10 @@ def install_uninstall(args):
     elif args[2] == 'desktop':
         if args[3] == 'user' or args[3] == 'raspi':
             destdir = str(Path.home()) + '/.local/share/applications'
+            icondir = str(Path.home()) + '/.local/share/icons/hicolor/scalable/apps'
         elif args[3] == 'system':
             destdir = '/usr/local/share/applications'
+            icondir = '/usr/local/share/icons/hicolor/scalable/apps'
         else:
             raise ValueError("unknown mode for install desktop", args[3])
         susiai_dir = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../.."))
@@ -168,6 +170,13 @@ def install_uninstall(args):
             raise ValueError("cannot find SUSI.AI susi_server directory", susi_server_dir)
         if args[1] == 'install':
             os.makedirs(destdir, exist_ok=True)
+            os.makedirs(icondir, exist_ok=True)
+        if args[1] == 'install':
+            shutil.copyfile(os.path.join(susiai_dir, 'susi_installer/icons/susi-ai.svg'),
+                            os.path.join(icondir, 'susi-ai.svg'))
+        else:
+            if os.path.isfile(os.path.join(icondir, 'susi-ai.svg')):
+                os.remove(os.path.join(icondir, 'susi-ai.svg'))
         desktop_files = []
         server_desktop_dir = os.path.join(susi_server_dir, "system-integration/desktop")
         linux_desktop_dir = os.path.join(susi_linux_dir, "system-integration/desktop")
