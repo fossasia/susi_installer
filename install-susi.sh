@@ -591,12 +591,6 @@ fi
 
 # install Etherpad, including the depending modules
 # on RPi install nodejs, on Desktop systems only install Etherpad if node/nodejs is installed
-if [ $targetSystem = raspi ]
-then
-    echo "Installing NodeJS"
-    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-    sudo apt-get install --no-install-recommends -y nodejs
-fi
 NODEJS=""
 if prog_available node ; then
     NODEJS=node
