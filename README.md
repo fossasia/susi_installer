@@ -178,7 +178,7 @@ systemd --user stop ss-susi-server
 
 ## Prerequisites
 
-See details in (PREREQUISITES.md)[PREREQUISITES.md].
+See details in [PREREQUISITES.md](PREREQUISITES.md).
 
 ### Installation of requirements
 
