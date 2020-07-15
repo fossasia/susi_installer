@@ -19,6 +19,7 @@ SUDOCMD=sudo
 DISTPKGS=0
 DEEPSPEECH=0
 QUIET=""
+NO_INSTALL_NODE=0
 SYSTEMINSTALL=0
 SYSINSTALLER=""
 while [[ $# -gt 0 ]]
@@ -43,6 +44,8 @@ do
             BRANCH="$2" ; shift ; shift ;;
         --with-deepspeech)
             DEEPSPEECH=1; shift ;;
+        --no-install-node)
+            NO_INSTALL_NODE=1; shift ;;
         --quiet)
             QUIET="-q" ; shift ;;
         --help)
@@ -58,6 +61,9 @@ Possible options:
   --system-install Try installing necessary programs, only supported for some distributions
   --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
   --with-deepspeech Install DeepSpeech and en-US model data
+  --no-install-node Don't install node and npm from NodeSource
+                   If Node and NPM are available in sufficiently new versions,
+                   no update/install will be done anyway
   --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
   --quiet          Silence pip on installation
 
@@ -74,6 +80,9 @@ EOF
   --system-install Try installing necessary programs, only supported for some distributions
   --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
   --with-deepspeech Install DeepSpeech and en-US model data
+  --no-install-node Don't install node and npm from NodeSource
+                   If Node and NPM are available in sufficiently new versions,
+                   no update/install will be done anyway
   --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
   --quiet          Silence pip on installation
 EOF
@@ -252,6 +261,125 @@ fi
         exit 1
     fi
 }
+
+#
+# Node/NPM installation via nodesource, see
+# https://github.com/nodesource/distributions/blob/master/README.md
+
+# require_minimal_version is adjusted from etherpad-lite/bin/installDeps.sh
+require_minimal_version() {
+  PROGRAM_LABEL="$1"
+  VERSION_STRING="$2"
+  REQUIRED_MAJOR="$3"
+  REQUIRED_MINOR="$4"
+
+  # Flag -s (--only-delimited on GNU cut) ensures no string is returned
+  # when there is no match
+  DETECTED_MAJOR=$(echo $VERSION_STRING | cut -s -d "." -f 1)
+  DETECTED_MINOR=$(echo $VERSION_STRING | cut -s -d "." -f 2)
+
+  if [ -z "$DETECTED_MAJOR" ]; then
+    printf 'Cannot extract %s major version from version string "%s"\n' "$PROGRAM_LABEL" "$VERSION_STRING" >&2
+    return 1
+  fi
+
+  if [ -z "$DETECTED_MINOR" ]; then
+    printf 'Cannot extract %s minor version from version string "%s"\n' "$PROGRAM_LABEL" "$VERSION_STRING" >&2
+    return 1
+  fi
+
+  case "$DETECTED_MAJOR" in
+      ''|*[!0-9]*)
+        printf '%s major version from "%s" is not a number. Detected: "%s"\n' "$PROGRAM_LABEL" "$VERSION_STRING" "$DETECTED_MAJOR" >&2
+        return 1
+        ;;
+  esac
+
+  case "$DETECTED_MINOR" in
+      ''|*[!0-9]*)
+        printf '%s minor version from "%s" is not a number. Detected: "%s"\n' "$PROGRAM_LABEL" "$VERSION_STRING" "$DETECTED_MINOR" >&2
+        return 1
+  esac
+
+  if [ "$DETECTED_MAJOR" -lt "$REQUIRED_MAJOR" ] || ([ "$DETECTED_MAJOR" -eq "$REQUIRED_MAJOR" ] && [ "$DETECTED_MINOR" -lt "$REQUIRED_MINOR" ]); then
+    printf 'Your %s version "%s" is too old. %s %d.%d.x or higher is required.\n' "$PROGRAM_LABEL" "$VERSION_STRING" "$PROGRAM_LABEL" "$REQUIRED_MAJOR" "$REQUIRED_MINOR" >&2
+    return 1
+  fi
+}
+
+
+if [ $NO_INSTALL_NODE = 0 ] ; then
+    do_node_install=0
+    NODEJS=""
+    if prog_available node ; then
+        NODEJS=node
+    elif prog_available nodejs ; then
+        NODEJS=nodejs
+    else
+        # try first to install system packages
+        if [ "$sysInstaller" = apt ] ; then
+            $SUDOCMD $APTINSTALL node npm
+        elif [ "$sysInstaller" = dnf ] ; then
+            $SUDOCMD $DNFINSTALL nodejs
+        elif [ "$sysInstaller" = zypper ] ; then
+            $SUDOCMD $ZYPPERINSTALL nodejs6
+        else
+            echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
+            exit 1
+        fi
+    fi
+    # redo the check, maybe installation didn't succeed
+    if prog_available node ; then
+        NODEJS=node
+    elif prog_available nodejs ; then
+        NODEJS=nodejs
+    else
+        do_node_install=1
+    fi
+    if [ -n "$NODEJS" ] ; then
+        # requirements for node and npm from etherpad-lite/bin/installDeps.sh
+        minNodeMajor=10
+        minNodeMinor=13
+        minNpmMajor=5
+        minNpmMinor=5
+        # check for version number of node
+        nodeVers=$($NODEJS --version)
+        nodeVers=${nodeVers#v} # remove initial v if there
+        if ! require_minimal_version "nodejs" "$nodeVers" $minNodeMajor $minNodeMinor ; then
+            do_node_install=1
+        fi
+        if [ $do_node_install = 0 ] ; then
+            # we need to check extra for npm, which might *not* be installed
+            # Debian eg splits npm from node
+            NPM=""
+            if prog_available npm ; then
+                NPM="npm"
+            else
+                do_node_install=1
+            fi
+            if [ -n "$NPM" ] ; then
+                npmVers=$($NPM --version)
+                if ! require_minimal_version npm "$npmVers" $minNpmMajor $minNpmMinor ; then
+                    do_node_install=1
+                fi
+            fi
+        fi
+    fi
+    if [ $do_node_install = 1 ] ; then
+        if [ "$sysInstaller" = apt ] ; then
+            curl -sL https://deb.nodesource.com/setup_lts.x | $SUDOCMD -E bash -
+            $SUDOCMD $APTINSTALL nodejs
+        elif [ "$sysInstaller" = dnf ] ; then
+            curl -sL https://rpm.nodesource.com/setup_lts.x | $SUDOCMD -E bash -
+        elif [ "$sysInstaller" = zypper ] ; then
+            # TODO not sure whether this is supported
+            $SUDOCMD $ZYPPERINSTALL nodejs6
+        else
+            echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
+            exit 1
+        fi
+    fi
+fi
 
 #
 # check that pip3 is at least at version 18
