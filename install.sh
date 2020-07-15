@@ -368,29 +368,6 @@ function install_coral()
 
 
 # only called for raspi, so debian style
-function install_snowboy()
-{
-    cd "$DESTDIR"
-    SNOWBOYBUILDDEPS="perl libterm-readline-gnu-perl i2c-tools python3-dev swig libpulse-dev
-        libasound2-dev libatlas-base-dev"
-    $SUDOCMD apt-get install --no-install-recommends -y $SNOWBOYBUILDDEPS
-    if [ ! -r v1.3.0.tar.gz ] ; then
-        wget https://github.com/Kitt-AI/snowboy/archive/v1.3.0.tar.gz
-    else
-        echo "Reusing v1.3.0.tar.gz in $DESTDIR"
-    fi
-    tar -xf v1.3.0.tar.gz
-    cd snowboy-1.3.0
-    sed -i -e "s/version='1\.2\.0b1'/version='1.3.0'/" setup.py
-    python3 setup.py build
-    $SUDOCMD python3 setup.py install
-    cd ..
-    if [ $CLEAN = 1 ] ; then
-        rm -f v1.3.0.tar.gz
-    fi
-}
-
-# only called for raspi, so debian style
 function install_seeed_voicecard_driver()
 {
     if arecord -l | grep -q voicecard
