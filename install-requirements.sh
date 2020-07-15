@@ -102,16 +102,16 @@ fi
 
 
 APTINSTALL="apt-get install --no-install-recommends -y"
-APTPKGS="git wget sox default-jre-headless vlc-bin flac python3 python3-pip python3-setuptools libatlas3-base flite"
+APTPKGS="git wget sox default-jre-headless vlc-bin flac python3 python3-pip python3-setuptools libatlas3-base flite curl"
 APTPKGSbin="python3-levenshtein python3-pyaudio"
 
 DNFINSTALL="dnf install -y"
-DNFPKGScentos="git wget java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools blas flite"
+DNFPKGScentos="git wget java-1.8.0-openjdk-headless vlc flac python3 python3-pip python3-setuptools blas flite curl"
 DNFPKGS="$DNFPKGScentos sox"
 DNFPKGSbin="python3-Levenshtein python3-pyaudio"
 
 ZYPPERINSTALL="zypper install --no-recommends -y"
-ZYPPERPKGS="git wget sox java-1_8_0-openjdk-headless vlc flac python3 python3-pip python3-setuptools libopenblas_pthreads0 flite"
+ZYPPERPKGS="git wget sox java-1_8_0-openjdk-headless vlc flac python3 python3-pip python3-setuptools libopenblas_pthreads0 flite curl"
 ZYPPERPKGSbin="python3-Levenshtein python3-PyAudio"
 
 
