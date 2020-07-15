@@ -10,6 +10,6 @@ docker run -v ${TRAVIS_BUILD_DIR}:/tmp/installer -w /tmp/installer -it --rm $TAR
       export TRIGGER_BRANCH=$TRIGGER_BRANCH ; \
       export HOME=/home/pi ; \
       sudo -EHu pi ./install-requirements.sh --system-install ; \
-      sudo -EHu pi ./install.sh --clean"
+      sudo -EHu pi ./install-susi.sh --clean"
 
 # was: sudo -E -u pi ./install.sh --use-sudo
