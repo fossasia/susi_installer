@@ -183,6 +183,19 @@ Possible options:
 
 EOF
                 exit 0
+                ;;
+            --help-only-options)
+                cat <<'EOF'
+  --system         install system-wide (requires root permissions)
+  --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
+  --destdir <ARG>  (only without --system) install into <ARG>
+                   defaults to $HOME/.susi.ai
+  --susi-server-user <ARG> (only with --system)
+                   user under which the susi server is run, default: _susiserver
+  --dev            use development branch
+  --with-coral     install support libraries for the Coral device (Raspberry)
+EOF
+                exit 0
                 shift
                 ;;
             *)
