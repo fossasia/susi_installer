@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# susi-etherpad
+
+# user mode
+#   .../SUSI.AI/bin/
+#   .../SUSI.AI/susi_server/
+# system mode
+#   prefix/bin/
+#   prefix/lib/SUSI.AI/susi_server/
+
+DIR="$(dirname "$(readlink -f "$0")")"
+SUSIDIR_USER="$(readlink -m "$DIR/..")"
+SUSIDIR_SYSTEM="$(readlink -m "$DIR/../lib/SUSI.AI")"
+if [ -d "$SUSIDIR_USER" ] && [ -d "$SUSIDIR_USER/susi_server/data/etherpad-lite" ] ; then
+    EP="$SUSIDIR_USER/susi_server/data/etherpad-lite"
+elif [ -d "$SUSIDIR_SYSTEM" ] && [ -r "$SUSIDIR_SYSTEM/susi_server/data/etherpad-lite" ] ; then
+    EP="$SUSIDIR_SYSTEM/susi_server/data/etherpad-lite"
+else
+    echo "Cannot find SUSI.AI folder" >&2
+    exit 1
+fi
+cd $EP
+exec node node_modules/ep_etherpad-lite/node/server.js
+
