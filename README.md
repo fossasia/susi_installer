@@ -7,15 +7,39 @@ based on Raspberry Pi.
 ## Quickstart
 
 If you want to get SUSI.AI Personal Assistant installed quickly without reading
-all the small print, here is a quickstart.
+all the small print, here are two avenues you can select: Either use our
+pre-built images, or install using our scripts.
 
-### Step 1: Download the SUSI.AI Smart Assistant package
+### Installation via install scripts
 
-Get the installer package SUSIAI-release-YYYYMMDD.S.tar.gz from
+Get the installer source by downloading the *Source Code*
+from the Github [SUSI Installer release page](https://github.com/fossasia/susi_installer/releases/latest).
+
+Optionally you can also clone the git repository.
+
+After that, a fully automated installation of SUSI.AI and all necessary requirements can be
+achieved by running
+```
+install.sh
+```
+Note that this will use `sudo` and you will get asked for the password.
+
+This script calls first `install-requirements.sh` and then `install-susi.sh`
+with adequate arguments.
+
+This will be default install SUSI.AI into `$HOME/.susi.ai`, adds desktop entries
+as well as systemd unit files for starting and stopping the various services.
+
+
+### Installation via pre-built images
+
+#### Step 1: Download the SUSI.AI Smart Assistant package
+
+Get the installer package SUSIAI-release-YYYYMMDD.S.tar.gz (or SUSIAI-build-YYYYMMDD.S.tar.gz) from
 the Github [SUSI Installer release page](https://github.com/fossasia/susi_installer/releases/latest).
 
 
-### Step 2: Unpack the package to your preferred location
+#### Step 2: Unpack the package to your preferred location
 
 The package unpacks into a directory
 ```
@@ -28,35 +52,14 @@ $HOME/SUSI.AI
 ```
 but feel free to move it somewhere else.
 
-### Step 3: Install necessary dependencies
+#### Step 3: Install necessary dependencies
 
 The SUSI.AI Smart Assistant depends on a lot of additional
 software that can be installed using the included script
 ```
-install-requirements.sh
-```
-which can install dependencies either system wide or locally,
-with or without sudo. Please see the help output below:
-
-Possible options:
-```
-  --trust-pip      Don't do version checks on pip3, trust it to be new enough
-  --branch BRANCH  If no local checkouts are available, use the git remotes
-                   with branch BRANCH to get requirement files (default: development)
-  --raspi          Do additional installation tasks for the SUSI.AI Smart Speaker
-  --sudo-cmd CMD   Use CMD instead of the default sudo
-  --system-install Try installing necessary programs, only supported for some distributions
-  --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
-  --with-deepspeech Install DeepSpeech and en-US model data
-  --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
-  --quiet          Silence pip on installation
-```
-
-We recommend running this script as someone with sudo permissions as follows
-```
 bash install-requirements.sh --system-install --with-deepspeech
 ```
-See below for a detailed list of requirements. 
+For other options, please see below for details.
 
 If `sudo` is not an option, the following method can be used
 ```
@@ -65,29 +68,6 @@ bash install-requirements.sh --sudo-cmd ""
 This method is much less tested, because the required Python modules will
 be installed into your home directory (`~/.local/lib`). On the other hand,
 no `sudo` permissions are needed, and everything can be done as local user.
-
-
-### Step 4: Run the actual install script
-
-Installation of the SUSI.AI Smart Assistant is done by the included script
-```
-install.sh
-```
-Please see the help output below:
-```
-  --system         install system-wide
-  --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
-  --destdir <ARG>  (only without --system) install into <ARG>
-                   defaults to $HOME/SUSI.AI
-  --susi-server-user <ARG> (only with --system)
-                   user under which the susi server is run, default: _susiserver
-  --dev            use development branch
-  --with-coral     install support libraries for the Coral device (Raspberry)
-```
-We recommend running this script without any extra options:
-```
-bash install.sh
-```
 
 
 After this, you are ready to start SUSI.AI Smart Assistant by
@@ -110,7 +90,7 @@ $HOME/SUSI.AI/bin/susi-server stop
 ```
 
 
-### Optional step 1: Linking start/stop scripts
+#### Optional step 1: Linking start/stop scripts
 
 There are several script to start, stop, and configure SUSI.AI
 available in `.../SUSI.AI/bin`, but this directory is usually not
@@ -135,7 +115,7 @@ So for example
 would make the SUSI.AI scripts available in `~/bin`
 
 
-### Optional step 2: Adding entries to the DE menus
+#### Optional step 2: Adding entries to the DE menus
 
 You can add menu entries to your desktop environment by calling
 ```
@@ -154,7 +134,7 @@ available in your desktop environment menu:
 More programs and services will be added over time.
 
 
-### Optional step 3: Adding Systemd integration
+#### Optional step 3: Adding Systemd integration
 
 Systemd integration can be achieved by installing several
 .service files into the respective locations using
@@ -175,7 +155,7 @@ systemctl --user enable ss-susi-linux
 ```
 
 
-### Additional options
+### Available options for the installation scripts
 
 For more controlled installation with lots of options to be configured,
 see below for the detailed explanation of the installation scripts.
@@ -321,10 +301,28 @@ to install the missing requirements.
 The script uses `sudo` to obtain `root` rights to install the necessary Python
 libraries.
 
+Possible options:
+```
+  --trust-pip      Don't do version checks on pip3, trust it to be new enough
+  --branch BRANCH  If no local checkouts are available, use the git remotes
+                   with branch BRANCH to get requirement files (default: development)
+  --raspi          Do additional installation tasks for the SUSI.AI Smart Speaker
+  --sudo-cmd CMD   Use CMD instead of the default sudo
+  --system-install Try installing necessary programs, only supported for some distributions
+  --sys-installer ARG   Select a system installer if not automatically detected, one of "apt" or "dnf"
+  --with-deepspeech Install DeepSpeech and en-US model data
+  --no-install-node Don't install node and npm from NodeSource
+                   If Node and NPM are available in sufficiently new versions,
+                   no update/install will be done anyway
+  --no-clean       Don't remove temp directory and don't use --no-cache-dir with pip3
+  --quiet          Silence pip on installation
+```
+
+
 
 ## Installation of SUSI.AI
 
-The installaction script `install.sh` carries out the actual installation
+The installaction script `install-susi.sh` carries out the actual installation
 on the target system. It checks that the above set of programs is availabe,
 clones the necessary git repositories from github, and installs Systemd
 unit files to allow starting/enabling the respective programs. On the
@@ -351,21 +349,20 @@ mode:
   `_susiserver`.
 
 
-### Command line options for `install.sh`
+### Command line options for `install-susi.sh`
 
 The behaviour of the installation script can be changed with the following
 command line options:
-
-- `--system`: enable `system mode` installation, the default is
-  `user mode` installation
-- `--destdir DIR`: (only in `user mode`) determines the installation
-  location in `user mode`. This is the *full* path, not relative to the
-  home directory of the user.
-- `--prefix DIR`: (only in `system mode`) determines the directory into
-  which the `SUSI.AI` directory will be put.
-- `--susi-server-user STRING`: (only in `system mode`) specifies the name
-  of the dedicated user for the SUSI.AI server user. Will be created if
-  not existing already.
+```
+  --system         install system-wide
+  --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
+  --destdir <ARG>  (only without --system) install into <ARG>
+                   defaults to $HOME/SUSI.AI
+  --susi-server-user <ARG> (only with --system)
+                   user under which the susi server is run, default: _susiserver
+  --dev            use development branch
+  --with-coral     install support libraries for the Coral device (Raspberry)
+```
 
 ### Configuration file ###
 
