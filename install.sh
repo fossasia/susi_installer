@@ -13,8 +13,7 @@ INSTALLERDIR=$(dirname $(realpath "$0"))
 #
 # Two modes of installation: "user" and "system"
 # On the RPi we *always* run in user mode and use sudo
-# On the Desktop in user mode, no root rights (sudo) are necessary
-#   but required pip3 install calls are optionally started with sudo
+# On the Desktop in user mode, no root rights are necessary
 #
 # Installation directory defaults
 # User installation
@@ -102,7 +101,6 @@ PREFIX=""
 CLEAN=0
 SUSI_SERVER_USER=
 CORAL=0
-SUDOCMD=sudo
 # default installation branch
 # we use the same branch across repositories
 # so if we build from susi_installer:master, we use the master branch of
@@ -153,11 +151,6 @@ then
                 saved_args="$saved_args --clean"
                 shift
                 ;;
-            --sudo-cmd)
-                SUDOCMD="$2"
-                saved_args="$saved_args --sudo-cmd \"$2\""
-                shift ; shift
-                ;;
             --susi-server-user)
                 SUSI_SERVER_USER="$2"
                 saved_args="$saved_args --susi-server-user \"$2\""
@@ -179,11 +172,10 @@ then
 SUSI.AI Installer
 
 Possible options:
-  --system         install system-wide
+  --system         install system-wide (requires root permissions)
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
                    defaults to $HOME/.susi.ai
-  --sudo-cmd <ARG> command to run programs that need root privileges
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
   --dev            use development branch
@@ -356,7 +348,7 @@ function install_coral()
 {
     cd "$DESTDIR"
     CORALDEPS="libc++1 libc++abi1 libunwind8 libwebpdemux2 python3-numpy python3-pil"
-    $SUDOCMD apt-get install --no-install-recommends -y $CORALDEPS
+    sudo apt-get install --no-install-recommends -y $CORALDEPS
     wget https://dl.google.com/coral/edgetpu_api/edgetpu_api_latest.tar.gz -O edgetpu_api.tar.gz --trust-server-names
     tar -xzf edgetpu_api.tar.gz
     cd edgetpu_api/
@@ -558,7 +550,11 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
     wget https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua
     echo "Updating VLC drivers"
     if [ -d /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/ ] ; then
-        $SUDOCMD mv youtube.lua /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac
+        if [ -w /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac ] ; then
+            mv youtube.lua /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac
+        else
+            echo "Cannot update /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac."
+        fi
     else
         echo "Cannot find directory /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/ - not updating youtube.lua" >&2
     fi
@@ -660,17 +656,19 @@ elif [ $INSTALLMODE = user ] ; then
     $BINDIR/susi-config install systemd $INSTALLMODE
     systemctl --user daemon-reload || true
 else
+    # system mode
+    # we expect to be able to run as root
     # susi-server does not support multi-user functionality by now
     # since data/log dirs are shared
-    # $SUDOCMD cp ss-susi-server.service $systemduser
+    # cp ss-susi-server.service $systemduser
     #
     # add a new user for susi-server
-    $SUDOCMD useradd -r -d /nonexistent $SUSI_SERVER_USER
-    $SUDOCMD mkdir -p /var/lib/susi-server/data
-    $SUDOCMD chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
-    $SUDOCMD ln -s /var/lib/susi-server/data susi_server/data
-    $SUDOCMD $BINDIR/susi-config install systemd $INSTALLMODE
-    $SUDOCMD systemctl daemon-reload || true
+    useradd -r -d /nonexistent $SUSI_SERVER_USER
+    mkdir -p /var/lib/susi-server/data
+    chown $SUSI_SERVER_USER:$SUSI_SERVER_USER /var/lib/susi-server/data
+    ln -s /var/lib/susi-server/data susi_server/data
+    $BINDIR/susi-config install systemd $INSTALLMODE
+    systemctl daemon-reload || true
 fi
 
 sed -i -e 's/^local\.openBrowser\.enable\s*=.*/local.openBrowser.enable = false/' $DESTDIR/susi_server/conf/config.properties
@@ -681,8 +679,8 @@ if [ $targetSystem = raspi ] ; then
     sudo $BINDIR/susi-config install desktop raspi
 elif [ $INSTALLMODE = user ] ; then
     $BINDIR/susi-config install desktop $INSTALLMODE
-else
-    $SUDOCMD $BINDIR/susi-config install desktop $INSTALLMODE
+else #system mode
+    $BINDIR/susi-config install desktop $INSTALLMODE
 fi
 
 

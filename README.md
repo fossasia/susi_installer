@@ -79,7 +79,6 @@ Please see the help output below:
   --prefix <ARG>   (only with --system) install into <ARG>/lib/SUSI.AI
   --destdir <ARG>  (only without --system) install into <ARG>
                    defaults to $HOME/SUSI.AI
-  --sudo-cmd <ARG> command to run programs that need root privileges
   --susi-server-user <ARG> (only with --system)
                    user under which the susi server is run, default: _susiserver
   --dev            use development branch
