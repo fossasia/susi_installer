@@ -70,26 +70,6 @@ be installed into your home directory (`~/.local/lib`). On the other hand,
 no `sudo` permissions are needed, and everything can be done as local user.
 
 
-After this, you are ready to start SUSI.AI Smart Assistant by
-
-- first starting the SUSI.AI Server
-```
-$HOME/SUSI.AI/bin/susi-server start
-```
-- then starting the SUSI.AI Assistant
-```
-$HOME/SUSI.AI/bin/susi-linux start
-```
-
-(where `$HOME/SUSI.AI` is the path you have choosen)
-
-You can stop the two service in the similar way:
-```
-$HOME/SUSI.AI/bin/susi-linux stop
-$HOME/SUSI.AI/bin/susi-server stop
-```
-
-
 #### Optional step 1: Linking start/stop scripts
 
 There are several script to start, stop, and configure SUSI.AI
@@ -159,6 +139,41 @@ systemctl --user enable ss-susi-linux
 
 For more controlled installation with lots of options to be configured,
 see below for the detailed explanation of the installation scripts.
+
+
+## Starting and stopping SUSI.AI
+
+To start the SUSI.AI Smart Assistant, first you need to start the
+SUSI.AI Server, by either calling
+```
+$HOME/.susi.ai/bin/susi-server start
+```
+or, if systemd integration was installed, by calling
+```
+systemd --user start ss-susi-server
+```
+
+After this, you are ready to start SUSI.AI Smart Assistant by either calling
+```
+$HOME/.susi.ai/bin/susi-linux start
+```
+or, if systemd integration was installed, by calling
+```
+systemd --user start ss-susi-linux
+```
+
+You can stop the two service in the similar way:
+```
+$HOME/.susi.ai/bin/susi-linux stop
+$HOME/.susi.ai/bin/susi-server stop
+```
+or, if systemd integration was installed, by calling
+```
+systemd --user stop ss-susi-linux
+systemd --user stop ss-susi-server
+```
+
+
 
 
 ## Prerequisites
