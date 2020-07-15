@@ -317,12 +317,13 @@ if [ $NO_INSTALL_NODE = 0 ] ; then
         NODEJS=nodejs
     else
         # try first to install system packages
+        # protect against failure in case the package cannot be found
         if [ "$sysInstaller" = apt ] ; then
-            $SUDOCMD $APTINSTALL node npm
+            $SUDOCMD $APTINSTALL nodejs npm || true
         elif [ "$sysInstaller" = dnf ] ; then
-            $SUDOCMD $DNFINSTALL nodejs
+            $SUDOCMD $DNFINSTALL nodejs || true
         elif [ "$sysInstaller" = zypper ] ; then
-            $SUDOCMD $ZYPPERINSTALL nodejs6
+            $SUDOCMD $ZYPPERINSTALL nodejs6 || true
         else
             echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
             exit 1
