@@ -26,27 +26,27 @@ script:
 
 jobs:
   include:
-    - os: linux
-      env:
-        - RELEASEBUILDER=1
-        - TARGET=raspi
-        - VERSION=buster
-      before_install: sudo apt-get update ; sudo apt-get install -y --no-install-recommends qemu qemu-user-static binfmt-support parted wget dosfstools zip pixz
-      script:
-        - sudo -E bash ./.travis/create-image
-        - ls -lh raspbian.img
-      before_deploy:
-        - mv raspbian.img susibian-$TRAVIS_TAG.img
-        - travis_wait 30 pixz susibian-$TRAVIS_TAG.img susibian-$TRAVIS_TAG.img.xz
-        - rm -f susibian-$TRAVIS_TAG.img
-      deploy:
-        - provider: releases
-          api_key: $GH_TOKEN
-          file_glob: true
-          file: susibian-*.img.xz
-          skip_cleanup: true
-          on:
-            tags: true
+          #    - os: linux
+          #      env:
+          #        - RELEASEBUILDER=1
+          #        - TARGET=raspi
+          #        - VERSION=buster
+          #      before_install: sudo apt-get update ; sudo apt-get install -y --no-install-recommends qemu qemu-user-static binfmt-support parted wget dosfstools zip pixz
+          #      script:
+          #        - sudo -E bash ./.travis/create-image
+          #        - ls -lh raspbian.img
+          #      before_deploy:
+          #        - mv raspbian.img susibian-$TRAVIS_TAG.img
+          #        - travis_wait 30 pixz susibian-$TRAVIS_TAG.img susibian-$TRAVIS_TAG.img.xz
+          #        - rm -f susibian-$TRAVIS_TAG.img
+          #      deploy:
+          #        - provider: releases
+          #          api_key: $GH_TOKEN
+          #          file_glob: true
+          #          file: susibian-*.img.xz
+          #          skip_cleanup: true
+          #          on:
+          #            tags: true
     - os: linux
       dist: bionic
       env:
