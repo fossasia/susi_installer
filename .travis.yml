@@ -58,7 +58,8 @@ jobs:
         - sudo pip3 install json_config
         - export TRIGGER_SOURCE=$TRIGGER_SOURCE
         - export TRIGGER_BRANCH=$TRIGGER_BRANCH
-        - ./install.sh --clean
+        - ./install-requirements.sh --system-install --with-deepspeech
+        - ./install-susi.sh --clean --destdir $HOME/SUSI.AI
         - cp install-requirements.sh $HOME/SUSI.AI/install-requirements.sh
         - cp README.md $HOME/SUSI.AI/README
         - cd $HOME
