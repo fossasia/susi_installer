@@ -478,8 +478,9 @@ echo "Downloading: Susi.AI webclient"
 if [ ! -d "susi.ai" ]
 then
     git clone --depth 1 -b local-pages https://github.com/fossasia/susi.ai.git
-    ln -s $PWD/susi.ai/static/* $PWD/susi_installer/raspi/controlserver/static/
-    ln -s $PWD/susi.ai/index.html $PWD/susi_installer/raspi/controlserver/templates/
+    #ln -s $PWD/susi.ai/static/* $PWD/susi_installer/raspi/controlserver/static/
+    #ln -s $PWD/susi.ai/index.html $PWD/susi_installer/raspi/controlserver/templates/
+    echo "WARNING: SUSI.AI Web client is installed but currently not served!"
 else
     echo "WARNING: susi.ai directory already present, not cloning it!" >&2
 fi
