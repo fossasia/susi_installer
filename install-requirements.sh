@@ -102,7 +102,7 @@ fi
 
 
 APTINSTALL="apt-get install --no-install-recommends -y"
-APTPKGS="git wget sox default-jre-headless vlc-bin vlc-plugins-base flac python3 python3-pip python3-setuptools libatlas3-base flite curl"
+APTPKGS="git wget sox default-jre-headless vlc-bin vlc-plugin-base flac python3 python3-pip python3-setuptools libatlas3-base flite curl"
 APTPKGSbin="python3-levenshtein python3-pyaudio"
 
 DNFINSTALL="dnf install -y"
