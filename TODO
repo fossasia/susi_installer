@@ -1,9 +1,24 @@
-- npm/node installation!!!!
--
+- page setup
+  We have three different pages to server
+  1) setup - wifi/hotword/wakebutton setup, does reboot the server
+  2) control - controls the device (loudness, ...)
+  3) susi web - provides skill access
+  We want 1) and 2) running as user root, so it cannot be on port 80
+  We want 3) to be able to communicate with pi's susi_server - not sure
+    whether this requires running as the same user?
+  We want something running on port 80
+
+  Option 1: run susi web as root on port 80 - but how do people find wifi setup?
+  Option 2: run a minimal page with links to the three pages above on 80,
+    redirect to port 7070/page
+    Maybe we could run susi web also as user pi - in this case we should use
+    Flask::Blueprint facility to server separate "parts".
+
 - install youtube_dl on buster and above?
 
 - make susi-server systemd socket activated so that
   starting susi_linux starts susi-server automatically
+
 - ApplicationIcon for susi-linux
   example code maybe https://github.com/bluppfisk/coinprice-indicator/blob/master/coin/indicator.py
 
