@@ -570,7 +570,8 @@ if [[ ( $targetSystem = debian && $targetVersion = 9 ) \
     echo "Updating VLC drivers"
     if [ -d /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/ ] ; then
         if [ -w /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac ] ; then
-            mv youtube.lua /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac
+            cp youtube.lua /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac
+            rm youtube.lua
         else
             echo "Cannot update /usr/lib/$HOSTARCHTRIPLE/vlc/lua/playlist/youtube.luac."
         fi
