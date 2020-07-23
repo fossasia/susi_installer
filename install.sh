@@ -53,4 +53,22 @@ fi
 # --quiet          Silence pip on installation
 
 
+read -p "Do you want to download languages for offline recognition?[y/n] " lang
+echo 
+if [[ $lang = y ]] ; then
+    SR_LIB=$(python3 -c "import speech_recognition as sr, os.path as p; print(p.dirname(sr.__file__))")
+    sudo mkdir "$SR_LIB/it-IT"
+    sudo mkdir "$SR_LIB/temp"
+    echo "Downloading Italian Language"
+    sudo wget -O "$SR_LIB/temp/it-IT.tar.gz" 'https://sourceforge.net/projects/cmusphinx/files/Acoustic%20and%20Language%20Models/Italian/cmusphinx-it-5.2.tar.gz/download'
+    sudo tar -zxf "$SR_LIB/temp/it-IT.tar.gz" --directory "$SR_LIB/temp"
+    sudo mv "$SR_LIB/temp/cmusphinx-it-5.2/etc/voxforge_it_sphinx.lm" "$SR_LIB/temp/cmusphinx-it-5.2/etc/italian.lm"
+    sudo sphinx_lm_convert -i "$SR_LIB/temp/cmusphinx-it-5.2/etc/italian.lm" -o "$SR_LIB/temp/cmusphinx-it-5.2/etc/italian.lm.bin"
+    sudo mv "$SR_LIB/temp/cmusphinx-it-5.2/etc/italian.lm" "$SR_LIB/it-IT/italian.lm"
+    sudo mv "$SR_LIB/temp/cmusphinx-it-5.2/etc/italian.lm.bin" "$SR_LIB/it-IT/italian.lm.bin"
+    sudo mv "$SR_LIB/temp/cmusphinx-it-5.2/etc/voxforge_it_sphinx.dic" "$SR_LIB/it-IT/pronounciation-dictionary.dic"
+    sudo mv -v "$SR_LIB/temp/cmusphinx-it-5.2/model_parameters/voxforge_it_sphinx.cd_cont_2000/" "$SR_LIB/it-IT/acoustic-model/"
+    sudo rm -rf "$SR_LIB/temp"
+    
+fi
 
