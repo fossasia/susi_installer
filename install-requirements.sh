@@ -167,9 +167,9 @@ if [ $SYSTEMINSTALL = 1 ] ; then
         echo "Unknown installer system, please define one with --sys-installer apt|dnf" >&2
         exit 1
     elif [ $sysInstaller = apt ] ; then
-        $SUDOCMD apt-get update
-        $SUDOCMD $APTINSTALL $APTPKGS
-        $SUDOCMD $APTINSTALL $APTPKGSbin
+        $SUDOCMD apt-get update || true
+        $SUDOCMD $APTINSTALL $APTPKGS || true
+        $SUDOCMD $APTINSTALL $APTPKGSbin || true
     elif [ $sysInstaller = dnf ] ; then
         if [ $targetSystem = fedora ] ; then
             $SUDOCMD $DNFINSTALL https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
@@ -369,7 +369,7 @@ if [ $NO_INSTALL_NODE = 0 ] ; then
     if [ $do_node_install = 1 ] ; then
         if [ "$sysInstaller" = apt ] ; then
             curl -sL https://deb.nodesource.com/setup_lts.x | $SUDOCMD -E bash -
-            $SUDOCMD $APTINSTALL nodejs
+            $SUDOCMD $APTINSTALL nodejs || true
         elif [ "$sysInstaller" = dnf ] ; then
             curl -sL https://rpm.nodesource.com/setup_lts.x | $SUDOCMD -E bash -
         elif [ "$sysInstaller" = zypper ] ; then
