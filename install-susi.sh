@@ -497,20 +497,12 @@ ln -s ../susi_linux/susi_linux "$PYTHONMODDIR/susi_linux"
 
 echo "Initializing SUSI config"
 mkdir -p $BINDIR
-cp susi_installer/scripts/susi-config $BINDIR/susi-config
-chmod +x $BINDIR/susi-config
-if [ -r susi_installer/scripts/test-deepspeech ] ; then
-    cp susi_installer/scripts/test-deepspeech $BINDIR/test-deepspeech
-    chmod +x $BINDIR/test-deepspeech
-fi
-if [ -r susi_installer/scripts/susi-etherpad ] ; then
-    cp susi_installer/scripts/susi-etherpad $BINDIR/susi-etherpad
-    chmod +x $BINDIR/susi-etherpad
-fi
-if [ -r susi_installer/scripts/susi-assistant ] ; then
-    cp susi_installer/scripts/susi-assistant $BINDIR/susi-assistant
-    chmod +x $BINDIR/susi-assistant
-fi
+for i in susi_installer/system-integration/scripts/* ; do
+    cp $i $BINDIR/
+    # shouldn't be necessary, but for safety
+    chmod ugo+x "$BINDIR/$(basename $i)"
+done
+
 DEVICENAME="Desktop Computer"
 if [ $targetSystem = raspi ] ; then
     DEVICENAME="RaspberryPi"
