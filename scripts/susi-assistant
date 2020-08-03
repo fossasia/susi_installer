@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# susi-assistant
+
+DIR="$(dirname "$(readlink -f "$0")")"
+export PATH=$DIR:$PATH
+
+do_start() {
+    susi-server start
+    sleep 3
+    susi-etherpad start
+    susi-linux start
+}
+
+do_stop() {
+    susi-linux stop
+    susi-etherpad stop
+    susi-server stop
+}
+
+case "$1" in
+    start)
+        do_start ;;
+    stop)  
+        do_stop  ;;
+    restart)
+        do_stop ; sleep 1 ; do_start ;;
+    *) 
+        echo "Usage: susi-assistant {start|stop|restart}" >&2
+        exit 1
+        ;;
+esac
+
+

@@ -204,10 +204,13 @@ def install_uninstall(args):
             raise ValueError("cannot find SUSI.AI directory", susiai_dir)
         susi_linux_dir = os.path.join(susiai_dir, 'susi_linux')
         susi_server_dir = os.path.join(susiai_dir, 'susi_server')
+        susi_installer_dir = os.path.join(susiai_dir, 'susi_installer')
         if not os.path.isdir(susi_linux_dir):
             raise ValueError("cannot find SUSI.AI susi_linux directory", susi_linux_dir)
         if not os.path.isdir(susi_server_dir):
             raise ValueError("cannot find SUSI.AI susi_server directory", susi_server_dir)
+        if not os.path.isdir(susi_installer_dir):
+            raise ValueError("cannot find SUSI.AI susi_installer directory", susi_installer_dir)
         if args[1] == 'install':
             os.makedirs(destdir, exist_ok=True)
             os.makedirs(icondir, exist_ok=True)
@@ -220,10 +223,14 @@ def install_uninstall(args):
         desktop_files = []
         server_desktop_dir = os.path.join(susi_server_dir, "system-integration/desktop")
         linux_desktop_dir = os.path.join(susi_linux_dir, "system-integration/desktop")
+        installer_desktop_dir = os.path.join(susi_installer_dir, "system-integration/desktop")
         for f in os.listdir(server_desktop_dir):
             if f.endswith("desktop.in"):
                 desktop_files.append((f[:-3], os.path.join(server_desktop_dir, f)))
         for f in os.listdir(linux_desktop_dir):
+            if f.endswith("desktop.in"):
+                desktop_files.append((f[:-3], os.path.join(linux_desktop_dir, f)))
+        for f in os.listdir(installer_desktop_dir):
             if f.endswith("desktop.in"):
                 desktop_files.append((f[:-3], os.path.join(linux_desktop_dir, f)))
         for f,p in desktop_files:

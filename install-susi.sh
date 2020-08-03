@@ -507,6 +507,10 @@ if [ -r susi_installer/scripts/susi-etherpad ] ; then
     cp susi_installer/scripts/susi-etherpad $BINDIR/susi-etherpad
     chmod +x $BINDIR/susi-etherpad
 fi
+if [ -r susi_installer/scripts/susi-assistant ] ; then
+    cp susi_installer/scripts/susi-assistant $BINDIR/susi-assistant
+    chmod +x $BINDIR/susi-assistant
+fi
 DEVICENAME="Desktop Computer"
 if [ $targetSystem = raspi ] ; then
     DEVICENAME="RaspberryPi"
