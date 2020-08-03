@@ -232,7 +232,7 @@ def install_uninstall(args):
                 desktop_files.append((f[:-3], os.path.join(linux_desktop_dir, f)))
         for f in os.listdir(installer_desktop_dir):
             if f.endswith("desktop.in"):
-                desktop_files.append((f[:-3], os.path.join(linux_desktop_dir, f)))
+                desktop_files.append((f[:-3], os.path.join(installer_desktop_dir, f)))
         for f,p in desktop_files:
             target = os.path.join(destdir, f)
             if args[1] == 'install':
