@@ -14,12 +14,38 @@ SUSIDIR_USER="$(readlink -m "$DIR/..")"
 SUSIDIR_SYSTEM="$(readlink -m "$DIR/../lib/SUSI.AI")"
 if [ -d "$SUSIDIR_USER" ] && [ -d "$SUSIDIR_USER/susi_server/data/etherpad-lite" ] ; then
     EP="$SUSIDIR_USER/susi_server/data/etherpad-lite"
+    LOGDIR="$SUSIDIR_USER/logs"
 elif [ -d "$SUSIDIR_SYSTEM" ] && [ -r "$SUSIDIR_SYSTEM/susi_server/data/etherpad-lite" ] ; then
     EP="$SUSIDIR_SYSTEM/susi_server/data/etherpad-lite"
+    LOGDIR="$HOME/.susi.ai/logs"
 else
     echo "Cannot find SUSI.AI folder" >&2
     exit 1
 fi
-cd $EP
-exec node node_modules/ep_etherpad-lite/node/server.js
+
+STARTCMD="node node_modules/ep_etherpad-lite/node/server.js"
+do_start() {
+    cd "$EP"
+    $STARTCMD > "$LOGDIR/etherpad.log" 2>&1 &
+    sleep 3
+    echo "You can access your Etherpad instance at http://0.0.0.0:9001/"
+}
+
+do_stop() {
+    pkill -f "$STARTCMD"
+}
+
+case "$1" in
+    start)
+        do_start ;;
+    stop)  
+        do_stop  ;;
+    restart)
+        do_stop ; sleep 1 ; do_start ;;
+    *) 
+        echo "Usage: susi-etherpad {start|stop|restart}" >&2
+        exit 1
+        ;;
+esac
+
 
