@@ -697,6 +697,10 @@ else #system mode
     $BINDIR/susi-config install desktop $INSTALLMODE
 fi
 
+if [ $INSTALLMODE = user ] ; then
+    echo "Adding SUSI bin directory to shell"
+    $BINDIR/susi-config install shell
+fi
 
 
 # enable the client service ONLY on Desktop, NOT on RPi

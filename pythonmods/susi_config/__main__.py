@@ -35,6 +35,8 @@ Usage:
          Tries to log into the SUSI.AI Server
   susi-config (un)install links DIR
          Install or uninstall links to user programs into DIR
+  susi-config (un)install shell
+         Add/Remove PATH adjustment code to the shell
   susi-config (un)install desktop user|system|raspi
          Install or uninstall desktop files into user or system directories
          (or for the SUSI Smart Speaker when `raspi' is given)
@@ -75,13 +77,35 @@ def __run_pkgconfig(default, *args):
     return ret
 
 
+def install_uninstall_shell_fragment(mode, fn, linea):
+    if mode == 'install':
+        with open(fn, 'a+') as f:
+            f.write(linea)
+    else: # uninstall
+        if os.path.exists(fn):
+            with open(fn, "r") as source:
+                lines = source.readlines()
+            with open(fn, "w") as dest:
+                for line in lines:
+                    if line == linea:
+                        pass
+                    else:
+                        dest.write(line)
+
+
+# susi-config (un)install shell
 # susi-config (un)install links DIR
 # susi-config (un)install desktop user|system|raspi
 # susi-config (un)install systemd user|system|raspi
 # susi-config uninstall [user|system]
 def install_uninstall(args):
-    if args[1] == 'install' and len(args) != 4:
-        raise ValueError("incorrect invocation of install action", args[2:])
+    if args[1] == 'install':
+        if len(args) == 2:
+            raise ValueError("incorrect invocation of install action", args[2:])
+        if args[2] == "shell" and len(args) > 3:
+            raise ValueError("incorrect invocation of install action", args[2:])
+        if (args[2] == "links" or args[2] == "desktop" or args[2] == "systemd") and len(args) != 4:
+            raise ValueError("incorrect invocation of install action", args[2:])
     if args[1] == 'uninstall' and len(args) > 4:
         raise ValueError("incorrect invocation of uninstall action", args[2:])
 
@@ -92,6 +116,8 @@ def install_uninstall(args):
         elif len(args) == 3:
             if args[2] == "user" or args[2] == "system":
                 uninstall_mode = args[2]
+            elif args[2] == "shell":
+                pass
             else:
                 raise ValueError("Incorrect invocation of uninstall action", args[2:])
         if uninstall_mode == "user" or uninstall_mode == "system":
@@ -111,6 +137,7 @@ def install_uninstall(args):
             while answer not in ["y", "n"]:
                 answer = input(f"Do you want to remove the complete SUSI.AI from\n  {susiai_dir}\nAnswer [Y/N]? ").lower()
             if answer == "y":
+                install_uninstall(["foo", "uninstall", "shell"])
                 install_uninstall(["foo", "uninstall", "systemd", uninstall_mode])
                 install_uninstall(["foo", "uninstall", "desktop", uninstall_mode])
                 try:
@@ -133,8 +160,18 @@ def install_uninstall(args):
 
             sys.exit(0)
 
+    if args[2] == 'shell':
+        susiai_bin = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../bin"))
+        if not os.path.isdir(susiai_bin):
+            raise ValueError("cannot find SUSI.AI/bin directory", susiai_bin)
+        linea = f"export PATH={susiai_bin}:$PATH\n"
+        bash_profile = str(Path.home()) + '/.bash_profile'
+        bashrc = str(Path.home()) + '/.bashrc'
+        install_uninstall_shell_fragment(args[1], bash_profile, linea)
+        install_uninstall_shell_fragment(args[1], bashrc, linea)
 
-    if args[2] == 'links':
+
+    elif args[2] == 'links':
         if not os.path.exists(args[3]):
             raise ValueError("target directory not existing", args[3])
         susiai_bin = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../bin"))
@@ -142,7 +179,7 @@ def install_uninstall(args):
             raise ValueError("cannot find SUSI.AI/bin directory", susiai_bin)
         for f in os.listdir(susiai_bin):
             susipath = os.path.join(susiai_bin, f)
-            ospath = os.path.join(args[3], f)
+            ospath = os.path.join(args[2], f)
             if args[1] == 'install':
                 os.symlink(susipath, ospath)
             else: # unistall
