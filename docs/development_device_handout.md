@@ -6,7 +6,7 @@ You should have the following parts:
 * A ReSpeaker 2-Mics Pi HAT
 * A speaker (like Audiocore AC870) with attached JST PH 2.0 2-Pin cable
 * A 3D-printed SUSI.AI Faceplate - or DIY print from https://www.thingiverse.com/thing:3124755
-* A 16GB Micro SD card with pre-flashed OS - or DIY flash from https://github.com/fossasia/susi_installer/releases
+* A 16GB Micro SD card with pre-flashed OS - or DIY flash from http://download.susi.ai/susibian/
 * 4x 3cm spacers, 4x 2.5mm nuts, 4x 2.5mm screws, 4x 3mm screws, 4x washer, 4x 3mm nuts
 
 An assembly video can be found at https://youtu.be/jAEmRvQLmc0
