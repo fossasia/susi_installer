@@ -26,6 +26,7 @@ fi
 STARTCMD="node node_modules/ep_etherpad-lite/node/server.js"
 do_start() {
     cd "$EP"
+    mkdir -p "$LOGDIR"
     $STARTCMD > "$LOGDIR/etherpad.log" 2>&1 &
     sleep 3
     echo "You can access your Etherpad instance at http://0.0.0.0:9001/"
