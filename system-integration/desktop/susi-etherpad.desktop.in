@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=SUSI.AI Etherpad
+GenericName=SUSI Personal Assistant Etherpad
+Comment=Privacy aware personal assistant - etherpad
+Exec=@SUSIDIR@/bin/susi-etherpad start
+Icon=susi-ai
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=SUSI.AI;Personal Assistant;Office;
