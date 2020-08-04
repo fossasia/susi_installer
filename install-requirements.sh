@@ -463,6 +463,7 @@ if [ $DEEPSPEECH = 1 ] ; then
         exit 1
     fi
     $SUDOCMD mkdir -p "$sr_dir/speech_recognition/deepspeech-data/en-US"
+    echo "Downloading DeepSpeech model data - this might take some time!"
     for i in pbmm tflite scorer ; do
         if [ ! -r "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-${DSVersion}-models.$i" ] ; then
             $SUDOCMD wget -nv -O "$sr_dir/speech_recognition/deepspeech-data/en-US/deepspeech-${DSVersion}-models.$i" \
