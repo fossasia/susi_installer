@@ -453,7 +453,7 @@ for i in $reqs ; do
 done
 
 if [ $DEEPSPEECH = 1 ] ; then
-    $SUDOCMD $PIP install deepspeech==0.7.*
+    $SUDOCMD $PIP install deepspeech==0.8.*
     # check which version is actually installed
     DSVersion=$(pip show deepspeech | grep ^Version | awk '{print$2}')
     # we need to find out where SpeechRecognition is installed
