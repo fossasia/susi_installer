@@ -10,28 +10,27 @@ If you want to get SUSI.AI Personal Assistant installed quickly without reading
 all the small print, here are two avenues you can select: Either use our
 pre-built images, or install using our scripts.
 
-### Installation via install scripts
+### Installation via install script
 
-Get the installer source by downloading the *Source Code*
-from the Github [SUSI Installer release page](https://github.com/fossasia/susi_installer/releases/latest).
-
-Optionally you can also clone the git repository.
-
-After that, a fully automated installation of SUSI.AI and all necessary requirements can be
-achieved by running
+Run the following command (assuming you have `curl` installed):
 ```
-install.sh
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/fossasia/susi_installer/development/install.sh | bash
 ```
+If you haven't `curl` installed but `wget`, you can use the following line instead:
+```
+wget -O - https://raw.githubusercontent.com/fossasia/susi_installer/development/install.sh | bash
+```
+
 Note that this will use `sudo` and you will get asked for the password.
-
-This script calls first `install-requirements.sh` and then `install-susi.sh`
-with adequate arguments.
 
 This will be default install SUSI.AI into `$HOME/.susi.ai`, adds desktop entries
 as well as systemd unit files for starting and stopping the various services.
 
 
 ### Installation via pre-built images
+
+*WARNING* we strongly suggest using the method above. If you really want to use some
+different method, please see the various install scripts.
 
 #### Step 1: Download the SUSI.AI Smart Assistant package
 

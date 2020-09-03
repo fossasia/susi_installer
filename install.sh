@@ -8,6 +8,12 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 # we use the development branch for now!
 GITHUB=https://raw.githubusercontent.com/fossasia/susi_installer/development/
 
+tmpdir=`mktemp -d`
+if [ ! -d "$tmpdir" ] ; then
+    mkdir -p $HOME/.susi.ai/tmp
+    tmpdir=$HOME/.susi.ai/tmp
+fi
+
 if [ $# -gt 0 ] ; then
     if [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "-help" ] ; then
 	echo "SUSI.AI installer"
@@ -55,7 +61,7 @@ check_download() {
         if [ -z "$downloader" ] ; then
             error_download $1
         fi
-        $downloader ./$1 $GITHUB/$1
+        $downloader $tmpdir/$1 $GITHUB/$1
     fi
 }
 
@@ -63,9 +69,9 @@ echo "Downloading installer scripts ..."
 check_download install-requirements.sh
 check_download install-susi.sh
 echo "Running install-requirements.sh ..."
-bash ./install-requirements.sh --system-install --with-deepspeech
+bash $tmpdir/install-requirements.sh --system-install --with-deepspeech
 echo "Running install-susi.sh ..."
-bash ./install-susi.sh --dev
+bash $tmpdir/install-susi.sh --dev
 
 
 # install-susi.sh options
