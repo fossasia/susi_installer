@@ -57,7 +57,7 @@ error_download() {
 }
 
 check_download() {
-    if [ ! -r $1 ] ; then
+    if [ ! -r $tmpdir/$1 ] ; then
         if [ -z "$downloader" ] ; then
             error_download $1
         fi
