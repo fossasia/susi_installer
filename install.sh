@@ -65,7 +65,7 @@ check_download install-susi.sh
 echo "Running install-requirements.sh ..."
 bash ./install-requirements.sh --system-install --with-deepspeech
 echo "Running install-susi.sh ..."
-bash ./install-susi.sh
+bash ./install-susi.sh --dev
 
 
 # install-susi.sh options
