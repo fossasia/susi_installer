@@ -5,6 +5,9 @@
 set -euo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
+# we use the development branch for now!
+GITHUB=https://raw.githubusercontent.com/fossasia/susi_installer/development/
+
 if [ $# -gt 0 ] ; then
     if [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "-help" ] ; then
 	echo "SUSI.AI installer"
@@ -27,8 +30,42 @@ if [ $# -gt 0 ] ; then
     fi
 fi
 
-./install-requirements.sh --system-install --with-deepspeech
-./install-susi.sh
+prog_available() {
+    if ! [ -x "$(command -v $1)" ]; then
+        return 1
+    fi
+}
+
+if prog_available wget ; then
+    downloader="wget --tries=3 -q -O"
+elif prog_available curl ; then
+    downloader="wget --retry 3 --fail --location --silent --output"
+else
+    downloader=""
+fi
+
+error_download() {
+    echo "Cannot find script $1, nor cannot download it." >&2
+    echo "Neither wget nor curl is available." >&2
+    exit 1
+}
+
+check_download() {
+    if [ ! -r $1 ] ; then
+        if [ -z "$downloader" ] ; then
+            error_download $1
+        fi
+        $downloader ./$1 $GITHUB/$1
+    fi
+}
+
+echo "Downloading installer scripts ..."
+check_download install-requirements.sh
+check_download install-susi.sh
+echo "Running install-requirements.sh ..."
+bash ./install-requirements.sh --system-install --with-deepspeech
+echo "Running install-susi.sh ..."
+bash ./install-susi.sh
 
 
 # install-susi.sh options
