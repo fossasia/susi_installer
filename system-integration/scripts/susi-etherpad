@@ -29,7 +29,8 @@ do_start() {
     mkdir -p "$LOGDIR"
     $STARTCMD > "$LOGDIR/etherpad.log" 2>&1 &
     sleep 3
-    echo "You can access your Etherpad instance at http://0.0.0.0:9001/"
+    echo "Trying to open Etherpad instance at http://0.0.0.0:9001/"
+    xdg-open http://0.0.0.0:9001/
 }
 
 do_stop() {
