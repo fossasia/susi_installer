@@ -15,7 +15,7 @@ if [ $# -gt 0 ] ; then
 	echo "This script runs installs the necessary requirements for SUSI.AI"
 	echo "as well as the actual system, by calling the following two commands:"
 	echo "   ./install-requirements.sh --system-install --with-deepspeech"
-	echo "   ./install-susi.sh"
+	echo "   ./install-susi.sh --dev"
 	echo
 	echo "If you need different options, please call the scripts separately!"
 	echo "See below for possible options."
