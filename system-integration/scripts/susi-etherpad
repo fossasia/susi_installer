@@ -15,26 +15,52 @@ SUSIDIR_SYSTEM="$(readlink -m "$DIR/../lib/SUSI.AI")"
 if [ -d "$SUSIDIR_USER" ] && [ -d "$SUSIDIR_USER/susi_server/data/etherpad-lite" ] ; then
     EP="$SUSIDIR_USER/susi_server/data/etherpad-lite"
     LOGDIR="$SUSIDIR_USER/logs"
+    PIDFILE="$SUSIDIR_USER/etherpad.pid"
 elif [ -d "$SUSIDIR_SYSTEM" ] && [ -r "$SUSIDIR_SYSTEM/susi_server/data/etherpad-lite" ] ; then
     EP="$SUSIDIR_SYSTEM/susi_server/data/etherpad-lite"
     LOGDIR="$HOME/.susi.ai/logs"
+    PIDFILE="$HOME/.susi.ai/etherpad.pid"
 else
     echo "Cannot find SUSI.AI folder" >&2
     exit 1
 fi
 
+find_skillpad() {
+    found_pid=""
+    if [ -r $PIDFILE ] ; then
+        maybepid=`cat $PIDFILE`
+        if [ -n "$maybepid" ] ; then
+            if ps -p $maybepid >/dev/null ; then
+                found_pid=$maybepid
+            fi
+        fi
+    fi
+    echo $found_pid
+}
+
 STARTCMD="node node_modules/ep_etherpad-lite/node/server.js"
 do_start() {
-    cd "$EP"
-    mkdir -p "$LOGDIR"
-    $STARTCMD > "$LOGDIR/etherpad.log" 2>&1 &
-    sleep 3
+    etherpad_is_running=0
+    if [ -z `find_skillpad` ] ; then
+        cd "$EP"
+        mkdir -p "$LOGDIR"
+        $STARTCMD > "$LOGDIR/etherpad.log" 2>&1 &
+        echo $! > $PIDFILE
+        sleep 3
+    fi
     echo "Trying to open Etherpad instance at http://0.0.0.0:9001/"
     xdg-open http://0.0.0.0:9001/p/susi
 }
 
 do_stop() {
-    pkill -f "$STARTCMD"
+    skillpad_pid=`find_skillpad`
+    if [ -n "$skillpad_pid" ] ; then
+        kill $skillpad_pid
+    else
+        # try old method
+        pkill -f "$STARTCMD"
+    fi
+    rm -f $PIDFILE
 }
 
 case "$1" in
