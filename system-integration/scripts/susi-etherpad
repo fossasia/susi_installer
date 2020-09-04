@@ -30,7 +30,7 @@ do_start() {
     $STARTCMD > "$LOGDIR/etherpad.log" 2>&1 &
     sleep 3
     echo "Trying to open Etherpad instance at http://0.0.0.0:9001/"
-    xdg-open http://0.0.0.0:9001/
+    xdg-open http://0.0.0.0:9001/p/susi
 }
 
 do_stop() {
