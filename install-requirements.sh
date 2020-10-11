@@ -114,6 +114,9 @@ ZYPPERINSTALL="zypper install --no-recommends -y"
 ZYPPERPKGS="git wget sox java-1_8_0-openjdk-headless vlc flac python3 python3-pip python3-setuptools libopenblas_pthreads0 flite curl"
 ZYPPERPKGSbin="python3-Levenshtein python3-PyAudio"
 
+PACMANINSTALL="pacman -Syu --noconfirm"
+PACMANPKGS="git wget curl sox jre-openjdk-headless vlc flac python-pip python-setuptools blas flite curl"
+PACMANPKGSbin="python-levenshtein python-pyaudio"
 
 targetSystem="unknown"
 sysInstaller="unknown"
@@ -127,6 +130,7 @@ if [ -x "$(command -v lsb_release)" ]; then
         CentOS)    targetSystem=centos  ;;
         Fedora)    targetSystem=fedora  ;;
         openSUSE)  targetSystem=opensuse-leap ;;
+        Arch)      targetSystem=arch  ;; 
         *)         targetSystem=unknown ;;
     esac
 else
@@ -148,6 +152,7 @@ case $targetSystem in
     debian|ubuntu|raspi|linuxmint) sysInstaller=apt ;;
     fedora|centos)                 sysInstaller=dnf ;;
     opensuse-leap)                 sysInstaller=zypper ;;
+    arch)                          sysInstaller=pacman ;;
 esac
 
 
@@ -190,8 +195,12 @@ if [ $SYSTEMINSTALL = 1 ] ; then
     elif [ $sysInstaller = zypper ] ; then
         $SUDOCMD $ZYPPERINSTALL $ZYPPERPKGS
         $SUDOCMD $ZYPPERINSTALL $ZYPPERPKGSbin
+    elif [ $sysInstaller = pacman ] ; then
+        $SUDOCMD pacman -Syy
+        $SUDOCMD $PACMANINSTALL $PACMANPKGS
+        $SUDOCMD $PACMANINSTALL $PACMANPKGSbin
     else
-        echo "Unknown system installer $sysInstaller, currently only apt or dnf supported" >&2
+        echo "Unknown system installer $sysInstaller, currently only apt , dnf or pacman supported" >&2
         exit 1
     fi
 fi
