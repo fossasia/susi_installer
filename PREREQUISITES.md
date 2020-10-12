@@ -6,19 +6,20 @@ on the system, in particular the following programs need to be available
 programs afterwards). The following table lists the required programs and
 the respective packages in Debian/Buster and Fedora 31:
 
-| Program | Debian/Ubuntu/Mint   | Fedora 31   | openSUSE Leap 15.1 |
-| ------- | -------------------- | ----------- | ------------------ |
-| git     | git                  | git         | git |
-| wget    | wget                 | wget        | wget |
-| sox     | sox                  | sox (1)     | sox |
-| java    | default-jre-headless | java-1.8.0-openjdk-headless | java-1_8_0-openjdk-headless |
-| vlc     | vlc-bin              | vlc (2)     | vlc |
-| flac    | flac                 | flac        | flac |
-| python3 | python3              | python3     | python3 |
-| pip3    | python3-pip          | python3-pip | python3-pip |
-| - (3)   | python3-setuptools   | python3-setuptools | python3-setuptools |
-| - (4)   | libatlas3-base       | blas        | libopenblas_pthreads0 |
-| node/nodejs (5) | nodejs           | ?           | ? |
+| Program | Debian/Ubuntu/Mint   | Fedora 31   | openSUSE Leap 15.1 | Arch Linux |
+| ------- | -------------------- | ----------- | ------------------ |------------|
+| git     | git                  | git         | git | git |
+| wget    | wget                 | wget        | wget | wget |
+| curl    | curl                 | curl        | curl | curl |
+| sox     | sox                  | sox (1)     | sox | sox |
+| java    | default-jre-headless | java-1.8.0-openjdk-headless | java-1_8_0-openjdk-headless | jre-openjdk-headless |
+| vlc     | vlc-bin              | vlc (2)     | vlc | vlc |
+| flac    | flac                 | flac        | flac | flac |
+| python3 | python3              | python3     | python3 | python3 |
+| pip3    | python3-pip          | python3-pip | python3-pip | python3-pip |
+| - (3)   | python3-setuptools   | python3-setuptools | python3-setuptools | python3-setuptools |
+| - (4)   | libatlas3-base       | blas        | libopenblas_pthreads0 | libopenblas_pthreads0 |
+| node/nodejs (5) | nodejs           | ?           | ? | ? |
 
 
 (1) `sox` is not available in CentOS 8, this will probably make some of the
