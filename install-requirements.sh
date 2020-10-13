@@ -127,10 +127,12 @@ if [ -x "$(command -v lsb_release)" ]; then
         Raspbian)  targetSystem=raspi   ;;
         Ubuntu)    targetSystem=ubuntu  ;;
         LinuxMint) targetSystem=linuxmint ;;
+        Pop)       targetSystem=pop  ;;
         CentOS)    targetSystem=centos  ;;
         Fedora)    targetSystem=fedora  ;;
         openSUSE)  targetSystem=opensuse-leap ;;
         Arch)      targetSystem=arch  ;; 
+        Manjaro)   targetSystem=manjaro  ;;
         *)         targetSystem=unknown ;;
     esac
 else
@@ -149,10 +151,10 @@ fi
 
 sysInstaller=unknown
 case $targetSystem in
-    debian|ubuntu|raspi|linuxmint) sysInstaller=apt ;;
+    debian|ubuntu|raspi|linuxmint|pop) sysInstaller=apt ;;
     fedora|centos)                 sysInstaller=dnf ;;
     opensuse-leap)                 sysInstaller=zypper ;;
-    arch)                          sysInstaller=pacman ;;
+    manjaro|arch)                  sysInstaller=pacman ;;
 esac
 
 
