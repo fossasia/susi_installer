@@ -69,6 +69,7 @@ if [ -x "$(command -v lsb_release)" ]; then
         LinuxMint) targetSystem=linuxmint ;;
         CentOS)    targetSystem=centos  ;;
         Fedora)    targetSystem=fedora  ;;
+        Pop)       targetSystem=pop  ;;
         Manjaro)   targetSystem=manjaro  ;;
         Arch)      targetSystem=arch  ;;
         *)         targetSystem=unknown ;;
