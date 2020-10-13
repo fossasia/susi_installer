@@ -127,12 +127,12 @@ if [ -x "$(command -v lsb_release)" ]; then
         Raspbian)  targetSystem=raspi   ;;
         Ubuntu)    targetSystem=ubuntu  ;;
         LinuxMint) targetSystem=linuxmint ;;
-        Pop)       targetSystem=pop  ;;
         CentOS)    targetSystem=centos  ;;
         Fedora)    targetSystem=fedora  ;;
         openSUSE)  targetSystem=opensuse-leap ;;
         Arch)      targetSystem=arch  ;; 
         Manjaro)   targetSystem=manjaro  ;;
+        Pop)       targetSystem=pop  ;;
         *)         targetSystem=unknown ;;
     esac
 else
