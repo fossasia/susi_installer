@@ -468,7 +468,7 @@ if [ $DEEPSPEECH = 1 ] ; then
     # check which version is actually installed
     DSVersion=$(pip3 show deepspeech | grep ^Version | awk '{print$2}')
     # we need to find out where SpeechRecognition is installed
-    sr_dir=$(pip3 show SpeechRecognition | grep ^Location | awk '{print$2}' 2>/dev/null)
+    sr_dir=$(pip3 show speech-recognition-fork | grep ^Location | awk '{print$2}' 2>/dev/null)
     if [ ! -d "$sr_dir/speech_recognition" ] ; then
         echo "Cannot find directory of SpeechRecognition!" >&2
         exit 1
