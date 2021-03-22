@@ -30,7 +30,7 @@ class SusiConfig():
                                               'options' : [ 'enabled', 'disabled', 'not available' ] },
             'stt':                          { 'default': 'google', 
                                               'options': [ 'google', 'watson', 'bing',
-                                                           'pocketsphinx', 'deepspeech-local' ] },
+                                                           'pocketsphinx', 'deepspeech-local', 'vosk' ] },
             'tts':                          { 'default': 'google', 
                                               'options': [ 'google', 'watson', 'flite' ] },
             'watson.stt.user':              { 'default': '' },
